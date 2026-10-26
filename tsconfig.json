@@ -1,0 +1,7 @@
+{
+  "extends": "./tooling/tsconfig/base.json",
+  "include": ["scripts/**/*.ts", "vite.config.ts"],
+  "compilerOptions": {
+    "types": ["node"]
+  }
+}

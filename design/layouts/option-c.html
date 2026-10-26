@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Layout C — Studio sidebar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="base.css" />
+    <style>
+      .layout {
+        display: grid;
+        grid-template-columns: 290px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+        padding: 32px 28px;
+        background: var(--ink-2);
+        border-right: 1px solid var(--line);
+      }
+
+      .capture .sidebar {
+        position: static;
+        height: auto;
+      }
+
+      .sidebar .badge {
+        width: 150px;
+      }
+
+      .sidebar .tagline {
+        font-family: var(--serif);
+        font-size: 19px;
+        line-height: 1.25;
+      }
+
+      .sidebar .tagline em {
+        color: var(--red);
+      }
+
+      .sidebar nav a {
+        display: flex;
+        justify-content: space-between;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .sidebar nav a.on {
+        color: var(--bone);
+      }
+
+      .sidebar nav a.on::after {
+        content: "●";
+        color: var(--red);
+        font-size: 9px;
+      }
+
+      .sidebar .status {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .sidebar .status b {
+        color: var(--bone);
+        font-weight: 500;
+      }
+
+      .sidebar .contact {
+        margin-top: auto;
+        font-size: 12px;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+
+      .sidebar .contact b {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--bone);
+      }
+
+      main {
+        min-width: 0;
+      }
+
+      .mobile-bar,
+      .mobile-tabs {
+        display: none;
+      }
+
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 40px;
+        background: rgba(11, 10, 9, 0.95);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .capture .toolbar {
+        position: static;
+      }
+
+      .toolbar .count {
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .content {
+        padding: 36px 40px 64px;
+      }
+
+      .intro {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 32px;
+        margin-bottom: 24px;
+      }
+
+      .intro h1 {
+        font-size: 46px;
+      }
+
+      .intro p {
+        max-width: 420px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: 300px;
+        gap: 10px;
+      }
+
+      .gallery .photo:first-child {
+        grid-row: span 2;
+      }
+
+      .gallery .more {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        border: 1px dashed var(--line);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .gallery .more b {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 500;
+        color: var(--bone);
+      }
+
+      section.block {
+        margin-top: 64px;
+      }
+
+      .block-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 24px;
+        margin-bottom: 20px;
+      }
+
+      .block-head h2 {
+        font-size: 38px;
+        margin-top: 10px;
+      }
+
+      .spots {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .spot-card {
+        padding: 20px;
+        background: var(--ink-2);
+        border: 1px solid var(--line);
+      }
+
+      .spot-card .date {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .spot-card h3 {
+        font-size: 26px;
+        margin: 8px 0 4px;
+      }
+
+      .spot-card p {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 14px;
+      }
+
+      .planner {
+        display: grid;
+        grid-template-columns: 5fr 7fr;
+        border: 1px solid var(--line);
+      }
+
+      .planner .form {
+        display: grid;
+        gap: 14px;
+        align-content: start;
+        padding: 24px;
+        background: var(--ink-2);
+        border-right: 1px solid var(--line);
+      }
+
+      .planner .dates {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .planner .result {
+        padding: 24px;
+      }
+
+      .line {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 14px;
+      }
+
+      .line small {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .line b {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 500;
+      }
+
+      .line.total b {
+        font-size: 30px;
+        color: var(--bone);
+      }
+
+      .line.total {
+        border-bottom: 0;
+      }
+
+      .shop {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+
+      @media (max-width: 600px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar,
+        .toolbar {
+          display: none;
+        }
+
+        .mobile-bar {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 60px;
+          padding: 0 20px;
+          background: rgba(19, 17, 16, 0.97);
+          border-bottom: 1px solid var(--line);
+        }
+
+        .mobile-bar img {
+          width: 110px;
+        }
+
+        .mobile-tabs {
+          position: sticky;
+          top: 60px;
+          z-index: 9;
+          display: flex;
+          gap: 22px;
+          padding: 0 20px;
+          overflow: hidden;
+          background: rgba(11, 10, 9, 0.97);
+          border-bottom: 1px solid var(--line);
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          white-space: nowrap;
+          color: var(--muted);
+        }
+
+        .mobile-tabs a {
+          padding: 13px 0;
+        }
+
+        .mobile-tabs .on {
+          color: var(--bone);
+          box-shadow: inset 0 -2px var(--red);
+        }
+
+        .capture .mobile-bar,
+        .capture .mobile-tabs {
+          position: static;
+        }
+
+        .content {
+          padding: 18px 20px 48px;
+        }
+
+        .intro {
+          display: block;
+        }
+
+        .intro h1 {
+          font-size: 32px;
+        }
+
+        .intro p {
+          margin-top: 8px;
+        }
+
+        .filters {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 14px;
+          overflow: hidden;
+        }
+
+        .gallery {
+          grid-template-columns: 1fr 1fr;
+          grid-auto-rows: 210px;
+        }
+
+        .spots,
+        .planner,
+        .planner .dates {
+          grid-template-columns: 1fr;
+        }
+
+        .planner .form {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .shop {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .block-head h2 {
+          font-size: 30px;
+        }
+      }
+
+      @media (min-width: 601px) {
+        .filters {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <img
+          class="badge"
+          src="../mockup/assets/logo-2-white.png"
+          alt="Daniel Castro, Tattoo Artist"
+        />
+        <p class="tagline">A fan first. <em>An artist through and through.</em></p>
+        <nav>
+          <a class="on" href="#">Work</a>
+          <a href="#">Guest spots</a>
+          <a href="#">Travel</a>
+          <a href="#">How to book</a>
+          <a href="#">Shop</a>
+          <a href="#">About</a>
+        </nav>
+        <p class="status">
+          <span class="dot"></span><b>Books open</b> in Braga<br />
+          Next guest spot: <b>Düsseldorf</b>, 19 – 23 Nov
+        </p>
+        <a class="btn btn-red" href="#">Book a session</a>
+        <div class="contact">
+          <b>Studio</b>
+          Rua da Ramoa, loja 80<br />Merelim S. Pedro, Braga<br />danielcastrotattooshop@gmail.com
+          <br /><br />Instagram · YouTube · Necrotic Wear
+        </div>
+      </aside>
+
+      <main>
+        <div class="mobile-bar">
+          <img src="../mockup/assets/logo-1-white.png" alt="Daniel Castro" />
+          <a class="btn btn-red btn-small" href="#">Book</a>
+        </div>
+        <nav class="mobile-tabs">
+          <a class="on" href="#">Work</a>
+          <a href="#">Guest spots</a>
+          <a href="#">Travel</a>
+          <a href="#">How to book</a>
+          <a href="#">Shop</a>
+        </nav>
+
+        <div class="toolbar">
+          <span class="chip on">All work</span><span class="chip">Anime</span
+          ><span class="chip">Video games</span><span class="chip">Films</span
+          ><span class="chip">Dark fantasy</span><span class="chip">Mythologies</span
+          ><span class="chip">Gothic</span>
+          <span class="count">4 pieces</span>
+        </div>
+
+        <div class="content">
+          <div class="intro">
+            <h1>Characters you love, <em>drawn for skin.</em></h1>
+            <p>
+              Custom manga, anime, fantasy and gaming tattoos in black linework with strong contrast
+              and a touch of red, in Braga and on the road.
+            </p>
+          </div>
+
+          <div class="filters">
+            <span class="chip on">All</span><span class="chip">Anime</span
+            ><span class="chip">Video games</span><span class="chip">Films</span>
+          </div>
+
+          <div class="gallery">
+            <figure class="photo">
+              <img src="../mockup/assets/portfolio/god-of-war.webp" alt="" />
+              <figcaption><b>God of War</b>Kratos &amp; Atreus · backpiece</figcaption>
+            </figure>
+            <figure class="photo">
+              <img src="../mockup/assets/portfolio/skull-knight.webp" alt="" />
+              <figcaption><b>Skull Knight</b>Berserk</figcaption>
+            </figure>
+            <figure class="photo">
+              <img src="../mockup/assets/portfolio/asta.webp" alt="" />
+              <figcaption><b>Asta</b>Black Clover</figcaption>
+            </figure>
+            <figure class="photo">
+              <img src="../mockup/assets/portfolio/madara.webp" alt="" />
+              <figcaption><b>Madara Uchiha</b>Naruto</figcaption>
+            </figure>
+            <a class="more" href="#"><b>See every piece</b>Full gallery →</a>
+          </div>
+
+          <section class="block">
+            <div class="block-head">
+              <div>
+                <p class="eyebrow"><b>Guest spots</b>On the road</p>
+                <h2>Book Daniel <em>near you.</em></h2>
+              </div>
+            </div>
+            <div class="spots">
+              <div class="spot-card">
+                <p class="date">Home studio</p>
+                <h3>Braga, Portugal</h3>
+                <p>Daniel Castro Tattoo Studio</p>
+                <span class="pill">Books open</span>
+              </div>
+              <div class="spot-card">
+                <p class="date">19 – 23 Nov 2026</p>
+                <h3>Düsseldorf, Germany</h3>
+                <p>Monochrome Ink Collective</p>
+                <span class="pill">Fully booked</span>
+              </div>
+              <div class="spot-card">
+                <p class="date">How it works</p>
+                <h3>Choose the city</h3>
+                <p>Pick Braga or a guest spot city in your enquiry.</p>
+                <a class="btn btn-small" href="#">Start an enquiry</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="block">
+            <div class="block-head">
+              <div>
+                <p class="eyebrow"><b>Travel</b>Coming from abroad</p>
+                <h2>Plan the trip <em>to your tattoo.</em></h2>
+              </div>
+            </div>
+            <div class="planner">
+              <div class="form">
+                <div>
+                  <p class="label">Where do you travel from?</p>
+                  <div class="input">Amsterdam</div>
+                </div>
+                <div class="dates">
+                  <div>
+                    <p class="label">Arrive</p>
+                    <div class="input">03/11/2026</div>
+                  </div>
+                  <div>
+                    <p class="label">Leave</p>
+                    <div class="input">06/11/2026</div>
+                  </div>
+                </div>
+                <a class="btn btn-red" href="#">Estimate</a>
+              </div>
+              <div class="result">
+                <div class="line">
+                  <span
+                    >Flight to Porto, both ways<small
+                      >Transavia · direct · 2 hours 45 minutes</small
+                    ></span
+                  ><b>€196</b>
+                </div>
+                <div class="line">
+                  <span>Airport bus, both ways<small>Or a rental car, or Uber</small></span
+                  ><b>€18</b>
+                </div>
+                <div class="line">
+                  <span>3 nights in Braga<small>Average of the 3 cheapest good hotels</small></span
+                  ><b>€123</b>
+                </div>
+                <div class="line total">
+                  <span
+                    >Estimated total for one person<small
+                      >Live prices; check them before you book</small
+                    ></span
+                  ><b>€337</b>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="block">
+            <div class="block-head">
+              <div>
+                <p class="eyebrow"><b>Shop</b>Necrotic Wear</p>
+                <h2>Prints and <em>merch.</em></h2>
+              </div>
+              <a class="btn btn-ghost" href="#">Visit the shop</a>
+            </div>
+            <div class="shop">
+              <div class="product">
+                <img src="../mockup/assets/shop/maliketh.jpg" alt="" />
+                <h3>Maliketh, The Black Blade</h3>
+                <p>Print · €50.00</p>
+              </div>
+              <div class="product">
+                <img src="../mockup/assets/shop/nazgul.jpg" alt="" />
+                <h3>Nazgûl</h3>
+                <p>Limited print · €50.00</p>
+              </div>
+              <div class="product">
+                <img src="../mockup/assets/shop/itachi.jpg" alt="" />
+                <h3>Uchiha Itachi Susanoo</h3>
+                <p>Print · €30.00</p>
+              </div>
+              <div class="product">
+                <img src="../mockup/assets/shop/luffy-tshirt.png" alt="" />
+                <h3>Luffy Gear 5</h3>
+                <p>T-shirt · €29.99</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

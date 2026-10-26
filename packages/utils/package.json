@@ -1,0 +1,21 @@
+{
+  "name": "@daniel/utils",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vp test run --passWithNoTests",
+    "lint:effect": "effect-tsgo diagnostics --project tsconfig.json --strict",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@date-fns/tz": "catalog:",
+    "date-fns": "catalog:"
+  },
+  "devDependencies": {
+    "@daniel/tsconfig": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

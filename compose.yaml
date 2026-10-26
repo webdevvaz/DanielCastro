@@ -1,0 +1,36 @@
+# Local development services. Start them with `podman compose up -d` (Podman runs the compose file
+# through an installed provider such as podman-compose).
+#
+# - postgres:  the database in `.env.example` (postgresql://postgres:postgres@localhost:5432/daniel)
+# - telemetry: OpenTelemetry Collector + Grafana, Loki, Tempo, and Prometheus (docs/observability.md)
+#              Set OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 and open http://localhost:3001.
+
+services:
+  postgres:
+    image: docker.io/library/postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: daniel
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d daniel"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  telemetry:
+    image: docker.io/grafana/otel-lgtm:latest
+    ports:
+      - "3001:3000"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - telemetry-data:/data
+
+volumes:
+  postgres-data:
+  telemetry-data:

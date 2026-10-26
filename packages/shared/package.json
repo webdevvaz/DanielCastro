@@ -1,0 +1,31 @@
+{
+  "name": "@daniel/shared",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts",
+    "./components/*": "./src/components/*.tsx"
+  },
+  "scripts": {
+    "test": "vp test run --passWithNoTests",
+    "lint:effect": "effect-tsgo diagnostics --project tsconfig.json --strict",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@daniel/utils": "workspace:*",
+    "@date-fns/tz": "catalog:",
+    "date-fns": "catalog:",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@daniel/tsconfig": "workspace:*",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@tanstack/react-router": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "@daniel/tsconfig/base.json",
+  "include": ["**/*.ts"],
+  "compilerOptions": {
+    "types": ["node"]
+  }
+}

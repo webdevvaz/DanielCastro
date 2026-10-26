@@ -1,0 +1,85 @@
+packages:
+  - apps/*
+  - packages/*
+  - tooling/*
+
+# https://pnpm.io/settings#minimumreleaseage
+# https://pnpm.io/supply-chain-security#delay-dependency-updates
+minimumReleaseAge: 1440
+
+onlyBuiltDependencies:
+  - esbuild
+
+allowBuilds:
+  esbuild: true
+  msgpackr-extract: true
+
+# Every dependency version lives here. Package manifests reference it with `catalog:`.
+catalog:
+  "@better-auth/drizzle-adapter": 1.7.6
+  "@date-fns/tz": 1.5.0
+  "@effect/platform-node": 4.0.0-rc.115
+  "@effect/platform-node-shared": 4.0.0-rc.115
+  "@effect/sql-pg": 4.0.0-rc.115
+  "@effect/tsgo": 0.47.0
+  "@effect/vitest": 4.0.0-rc.115
+  "@stylistic/eslint-plugin": 5.10.0
+  "@tanstack/eslint-plugin-query": 5.104.0
+  "@tanstack/eslint-plugin-router": 1.162.0
+  "@tanstack/react-form": 1.33.5
+  "@tanstack/react-query": 5.104.0
+  "@tanstack/react-router": 1.170.40
+  "@tanstack/react-router-ssr-query": 1.167.3
+  "@tanstack/react-start": 1.168.59
+  "@tanstack/react-table": 9.2.4
+  "@tanstack/start-client-core": 1.170.33
+  "@tanstack/start-storage-context": 1.167.35
+  "@types/node": 26.6.3
+  "@types/pg": 8.23.1
+  "@types/react": 19.3.0
+  "@types/react-dom": 19.3.0
+  "@vitejs/plugin-react": 6.1.1
+  better-auth: 1.7.6
+  date-fns: 4.4.0
+  dotenv: 18.0.4
+  drizzle-kit: 1.0.0-rc.5-5935859
+  drizzle-orm: 1.0.0-rc.5-5935859
+  effect: 4.0.0-rc.115
+  nitro: npm:nitro-nightly@3.0.1-20260928-103646-f72e2ba6
+  oxc-parser: 0.152.0
+  oxc-transform-react: 0.152.0
+  oxlint: 1.86.0
+  pg: 8.23.0
+  react: 19.3.0
+  react-dom: 19.3.0
+  sharp: 0.35.5
+  sonner: 2.0.8
+  tsx: 4.23.15
+  typescript: 7.0.2
+  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
+  vite-plus: 1.0.0
+  vitest: 5.0.2
+
+catalogMode: prefer
+
+overrides:
+  "@types/node": "catalog:"
+  "@tanstack/react-router": "catalog:"
+  "@tanstack/react-start": "catalog:"
+  "@tanstack/start-client-core": "catalog:"
+  "@tanstack/start-storage-context": "catalog:"
+  effect: "catalog:"
+  vite: "catalog:"
+  vitest: "catalog:"
+  "@effect/platform-node-shared": "catalog:"
+
+packageExtensions:
+  vite-plus@*:
+    dependencies:
+      vite: "catalog:"
+
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: "*"

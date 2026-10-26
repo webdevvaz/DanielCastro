@@ -1,0 +1,23 @@
+node_modules
+.DS_Store
+*.log
+*.tsbuildinfo
+.env
+.env.local
+.idea/
+.vscode
+.cache
+.tanstack
+.vitest-*
+__screenshots__/
+test-results
+dist
+apps/*/dist
+packages/*/dist
+apps/web/.output/
+
+# Local PostgreSQL cluster and stored photos (scripts/postgres.ts, PHOTO_STORAGE_DIR).
+.data/
+
+# Rendered mockups and layout proposals; the scripts in design/ render them again.
+design/*/out/

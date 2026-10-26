@@ -1,0 +1,1213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Daniel Castro — Tattoo Artist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #0b0a09;
+        --ink-2: #131110;
+        --ink-3: #1b1816;
+        --line: #2b2724;
+        --bone: #ece6dc;
+        --muted: #9b938a;
+        --red: #c1121f;
+        --red-soft: rgba(193, 18, 31, 0.14);
+        --serif: "Cormorant Garamond", Georgia, serif;
+        --sans: "Inter", system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        background: #050404;
+      }
+
+      body {
+        background: var(--ink);
+        color: var(--bone);
+        font-family: var(--sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 48px;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        color: var(--muted);
+      }
+
+      .eyebrow b {
+        color: var(--red);
+        font-weight: 600;
+      }
+
+      .eyebrow::after {
+        content: "";
+        width: 56px;
+        height: 1px;
+        background: var(--line);
+      }
+
+      h2 {
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 56px;
+        line-height: 1.02;
+        letter-spacing: -0.01em;
+        margin-top: 18px;
+      }
+
+      h2 em {
+        color: var(--red);
+      }
+
+      .lead {
+        color: var(--muted);
+        max-width: 440px;
+        margin-top: 18px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        height: 48px;
+        padding: 0 26px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        border: 1px solid var(--bone);
+      }
+
+      .btn-red {
+        background: var(--red);
+        border-color: var(--red);
+        color: #fff;
+      }
+
+      .btn-ghost {
+        border-color: var(--line);
+        color: var(--bone);
+      }
+
+      /* Navigation */
+
+      .nav {
+        position: relative;
+        z-index: 2;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav .wrap {
+        display: flex;
+        align-items: center;
+        height: 84px;
+        gap: 40px;
+      }
+
+      .nav-logo {
+        width: 150px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 34px;
+        margin-left: auto;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .nav-links a:first-child {
+        color: var(--bone);
+      }
+
+      .nav-lang {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+      }
+
+      .nav-lang b {
+        color: var(--bone);
+        font-weight: 600;
+      }
+
+      .nav .btn {
+        height: 40px;
+        padding: 0 18px;
+        font-size: 11px;
+      }
+
+      /* Hero */
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-badge {
+        position: absolute;
+        left: -140px;
+        top: 40px;
+        width: 760px;
+        opacity: 0.05;
+        pointer-events: none;
+      }
+
+      .hero .wrap {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 64px;
+        align-items: center;
+        padding-top: 72px;
+        padding-bottom: 88px;
+      }
+
+      .hero h1 {
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 92px;
+        line-height: 0.95;
+        letter-spacing: -0.02em;
+        margin-top: 26px;
+      }
+
+      .hero h1 em {
+        display: block;
+        font-weight: 400;
+        color: var(--red);
+      }
+
+      .hero p {
+        color: var(--muted);
+        font-size: 17px;
+        max-width: 470px;
+        margin-top: 28px;
+      }
+
+      .hero-actions {
+        display: flex;
+        gap: 14px;
+        margin-top: 40px;
+      }
+
+      .hero-meta {
+        display: flex;
+        gap: 40px;
+        margin-top: 56px;
+        padding-top: 28px;
+        border-top: 1px solid var(--line);
+      }
+
+      .hero-meta div {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .hero-meta strong {
+        display: block;
+        font-family: var(--serif);
+        font-size: 30px;
+        font-weight: 500;
+        line-height: 1.1;
+        color: var(--bone);
+      }
+
+      .hero-art {
+        position: relative;
+      }
+
+      .hero-art img {
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        object-fit: cover;
+        filter: grayscale(0.15) contrast(1.05);
+      }
+
+      .hero-art::before {
+        content: "";
+        position: absolute;
+        inset: -14px 14px 14px -14px;
+        border: 1px solid var(--line);
+        z-index: -1;
+      }
+
+      .hero-caption {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 80px 22px 18px;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.88) 70%);
+      }
+
+      .hero-caption span:last-child {
+        color: var(--red);
+      }
+
+      /* Marquee */
+
+      .band {
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        background: var(--ink-2);
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .band p {
+        padding: 18px 0;
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 26px;
+        color: var(--muted);
+      }
+
+      .band i {
+        font-style: normal;
+        color: var(--red);
+        margin: 0 26px;
+      }
+
+      section {
+        padding: 120px 0;
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 40px;
+        margin-bottom: 56px;
+      }
+
+      /* Portfolio */
+
+      .grid-work {
+        display: grid;
+        grid-template-columns: 1.25fr 1fr 1fr;
+        grid-template-rows: 300px 300px;
+        gap: 16px;
+      }
+
+      .work {
+        position: relative;
+        overflow: hidden;
+        background: var(--ink-3);
+      }
+
+      .work:first-child {
+        grid-row: span 2;
+      }
+
+      .work:nth-child(4) {
+        grid-column: span 2;
+      }
+
+      .work img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .work::after {
+        content: "";
+        position: absolute;
+        inset: 45% 0 0 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+      }
+
+      .work figcaption {
+        position: absolute;
+        z-index: 1;
+        left: 18px;
+        bottom: 16px;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        text-shadow: 0 1px 12px rgba(0, 0, 0, 0.9);
+      }
+
+      .work figcaption b {
+        display: block;
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+
+      /* Travel estimator */
+
+      .travel {
+        background: var(--ink-2);
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .travel .wrap {
+        display: grid;
+        grid-template-columns: 0.85fr 1.15fr;
+        gap: 72px;
+        align-items: start;
+      }
+
+      .route {
+        margin-top: 40px;
+        display: grid;
+        gap: 14px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .route div {
+        display: flex;
+        gap: 14px;
+        align-items: baseline;
+      }
+
+      .route b {
+        min-width: 26px;
+        color: var(--red);
+        font-weight: 600;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+      }
+
+      .estimator {
+        background: var(--ink);
+        border: 1px solid var(--line);
+      }
+
+      .est-form {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr 0.7fr;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .field {
+        padding: 18px 22px;
+        border-right: 1px solid var(--line);
+      }
+
+      .field:last-child {
+        border-right: 0;
+      }
+
+      .field label {
+        display: block;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .field div {
+        margin-top: 6px;
+        font-size: 15px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        padding: 18px 22px 0;
+      }
+
+      .tab {
+        padding: 8px 16px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        border: 1px solid var(--line);
+        color: var(--muted);
+      }
+
+      .tab.on {
+        border-color: var(--bone);
+        color: var(--bone);
+      }
+
+      .lines {
+        padding: 10px 22px 0;
+      }
+
+      .line {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px dashed var(--line);
+      }
+
+      .line span {
+        font-size: 14px;
+      }
+
+      .line small {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .line strong {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .total {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 22px;
+      }
+
+      .total small {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .total strong {
+        display: block;
+        font-family: var(--serif);
+        font-size: 48px;
+        font-weight: 500;
+        line-height: 1;
+        margin-top: 6px;
+      }
+
+      .total strong em {
+        color: var(--red);
+        font-style: normal;
+      }
+
+      .total .btn {
+        height: 44px;
+        padding: 0 18px;
+        font-size: 11px;
+      }
+
+      .group {
+        padding: 6px 22px 4px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .group-head {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 14px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .group-head a {
+        color: var(--red);
+      }
+
+      .group .line:last-child {
+        border-bottom: 0;
+      }
+
+      .line strong i {
+        font-family: var(--sans);
+        font-size: 12px;
+        font-style: normal;
+        color: var(--muted);
+      }
+
+      .est-note {
+        padding: 14px 22px;
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--red-soft);
+        border-top: 1px solid var(--line);
+      }
+
+      /* Shop */
+
+      .products {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+
+      .product img {
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        background: var(--ink-3);
+      }
+
+      .product-tag {
+        display: inline-block;
+        margin-top: 16px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--red);
+      }
+
+      .product h3 {
+        font-family: var(--serif);
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 1.15;
+        margin-top: 6px;
+      }
+
+      .product-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+        font-size: 14px;
+      }
+
+      .product-row span:last-child {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .shop-foot {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* Process */
+
+      .process {
+        border-top: 1px solid var(--line);
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-top: 1px solid var(--line);
+      }
+
+      .step {
+        padding: 36px 36px 0 0;
+      }
+
+      .step + .step {
+        padding-left: 36px;
+        border-left: 1px solid var(--line);
+      }
+
+      .step b {
+        font-family: var(--serif);
+        font-size: 64px;
+        font-weight: 500;
+        line-height: 1;
+        color: var(--red);
+      }
+
+      .step h3 {
+        font-family: var(--serif);
+        font-size: 28px;
+        font-weight: 500;
+        margin-top: 18px;
+      }
+
+      .step p {
+        color: var(--muted);
+        margin-top: 10px;
+      }
+
+      /* Call to action and footer */
+
+      .cta {
+        text-align: center;
+        background: var(--ink-2);
+        border-top: 1px solid var(--line);
+      }
+
+      .cta img {
+        width: 260px;
+        margin: 0 auto;
+        opacity: 0.9;
+      }
+
+      .cta h2 {
+        font-size: 72px;
+        margin-top: 36px;
+      }
+
+      .cta .lead {
+        margin: 18px auto 0;
+      }
+
+      .cta .hero-actions {
+        justify-content: center;
+      }
+
+      footer {
+        background: #070606;
+        border-top: 1px solid var(--line);
+        padding: 56px 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      footer .wrap {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1fr 1fr;
+        gap: 40px;
+      }
+
+      footer img {
+        width: 190px;
+      }
+
+      footer h4 {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--bone);
+        margin-bottom: 12px;
+      }
+
+      /* Phone */
+
+      @media (max-width: 720px) {
+        .wrap {
+          padding: 0 22px;
+        }
+
+        .nav .wrap {
+          height: 68px;
+        }
+
+        .eyebrow {
+          white-space: normal;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .eyebrow::after {
+          display: none;
+        }
+
+        .nav-logo {
+          width: 120px;
+        }
+
+        .nav-links,
+        .nav-lang,
+        .nav .btn {
+          display: none;
+        }
+
+        .nav .wrap::after {
+          content: "";
+          margin-left: auto;
+          width: 26px;
+          height: 12px;
+          border-top: 2px solid var(--bone);
+          border-bottom: 2px solid var(--bone);
+        }
+
+        .hero .wrap {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 40px;
+          padding-top: 40px;
+          padding-bottom: 56px;
+        }
+
+        .hero-badge {
+          width: 520px;
+          left: -160px;
+        }
+
+        .hero h1 {
+          font-size: 58px;
+        }
+
+        .hero p {
+          font-size: 15px;
+        }
+
+        .hero-actions {
+          flex-direction: column;
+        }
+
+        .hero-actions .btn {
+          justify-content: center;
+        }
+
+        .hero-meta {
+          flex-wrap: wrap;
+          gap: 18px 28px;
+          margin-top: 40px;
+        }
+
+        .hero-meta strong {
+          font-size: 24px;
+        }
+
+        .band p {
+          font-size: 20px;
+        }
+
+        section {
+          padding: 72px 0;
+        }
+
+        h2 {
+          font-size: 40px;
+        }
+
+        .section-head {
+          display: block;
+          margin-bottom: 32px;
+        }
+
+        .section-head .btn {
+          margin-top: 24px;
+        }
+
+        .grid-work {
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: 240px 160px 160px;
+          gap: 10px;
+        }
+
+        .work:first-child {
+          grid-row: auto;
+          grid-column: span 2;
+        }
+
+        .work:nth-child(4) {
+          grid-column: span 2;
+        }
+
+        .travel .wrap,
+        .est-form,
+        .steps,
+        footer .wrap {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .hero-meta div {
+          min-width: 0;
+        }
+
+        .hero-meta strong {
+          white-space: nowrap;
+        }
+
+        .shop-foot {
+          display: block;
+        }
+
+        .shop-foot span {
+          display: block;
+          margin-top: 6px;
+        }
+
+        .product-row span:last-child {
+          display: none;
+        }
+
+        .travel .wrap {
+          gap: 40px;
+        }
+
+        .field {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .total {
+          display: block;
+        }
+
+        .total .btn {
+          margin-top: 18px;
+        }
+
+        .products {
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
+        }
+
+        .product h3 {
+          font-size: 19px;
+        }
+
+        .step,
+        .step + .step {
+          padding: 28px 0;
+          border-left: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .cta h2 {
+          font-size: 46px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="wrap">
+        <img class="nav-logo" src="assets/logo-1-white.png" alt="Daniel Castro, Tattoo Artist" />
+        <nav class="nav-links">
+          <a href="#work">Work</a>
+          <a href="#artist">Artist</a>
+          <a href="#travel">Travel</a>
+          <a href="#shop">Shop</a>
+          <a href="#process">Process</a>
+        </nav>
+        <span class="nav-lang"><b>EN</b> / PT</span>
+        <a class="btn btn-red" href="#enquire">Start your project</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="hero">
+        <img class="hero-badge" src="assets/logo-2-white.png" alt="" />
+        <div class="wrap">
+          <div>
+            <p class="eyebrow"><b>Braga</b> Portugal · Custom tattoos</p>
+            <h1>A fan first. <em>An artist through and through.</em></h1>
+            <p>
+              Custom manga, anime, fantasy and gaming pieces in black linework with strong contrast
+              and a touch of red. Every design drawn by hand, for the person who wears it.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-red" href="#enquire">Start your project</a>
+              <a class="btn btn-ghost" href="#travel">Plan your trip</a>
+            </div>
+            <div class="hero-meta">
+              <div><strong>Award-winning</strong>tattoo artist</div>
+              <div><strong>EN · PT</strong>enquiries</div>
+              <div><strong>Guest spots</strong>across Europe</div>
+            </div>
+          </div>
+          <figure class="hero-art">
+            <img src="assets/portfolio/skull-knight.webp" alt="Skull Knight forearm tattoo" />
+            <figcaption class="hero-caption">
+              <span>Skull Knight · Berserk</span><span>Forearm</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="band">
+        <p>
+          Manga<i>✦</i>Anime<i>✦</i>Fantasy<i>✦</i>Gaming<i>✦</i>Blackwork<i>✦</i>Red
+          accents<i>✦</i>Manga<i>✦</i>Anime<i>✦</i>Fantasy<i>✦</i>Gaming<i>✦</i>Blackwork
+        </p>
+      </div>
+
+      <section id="work">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow"><b>01</b> The work</p>
+              <h2>Characters you love, <em>drawn for skin.</em></h2>
+            </div>
+            <a class="btn btn-ghost" href="#work">Full portfolio</a>
+          </div>
+          <div class="grid-work">
+            <figure class="work">
+              <img src="assets/portfolio/god-of-war.webp" alt="God of War backpiece" />
+              <figcaption><b>God of War</b>Backpiece · multi-session</figcaption>
+            </figure>
+            <figure class="work">
+              <img
+                src="assets/portfolio/asta.webp"
+                alt="Asta tattoo"
+                style="object-position: center 30%"
+              />
+              <figcaption><b>Asta</b>Black Clover</figcaption>
+            </figure>
+            <figure class="work">
+              <img
+                src="assets/portfolio/madara.webp"
+                alt="Madara Uchiha tattoo"
+                style="object-position: center 25%"
+              />
+              <figcaption><b>Madara Uchiha</b>Naruto</figcaption>
+            </figure>
+            <figure class="work">
+              <img
+                src="assets/portfolio/skull-knight.webp"
+                alt="Skull Knight tattoo"
+                style="object-position: center 30%"
+              />
+              <figcaption><b>Skull Knight</b>Berserk</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="travel" class="travel">
+        <div class="wrap">
+          <div>
+            <p class="eyebrow"><b>02</b> Travel for your tattoo</p>
+            <h2>What will the trip <em>really cost?</em></h2>
+            <p class="lead">
+              Tell us where you live. We estimate the journey to the Braga studio, the stay, and
+              everything in between, so you can plan your tattoo like a trip.
+            </p>
+            <div class="route">
+              <div><b>01</b>Fly into Porto Airport (OPO)</div>
+              <div><b>02</b>Direct coach from the airport to Braga</div>
+              <div><b>03</b>Stay in central Braga, a short ride from the studio</div>
+            </div>
+          </div>
+
+          <div class="estimator" id="estimate">
+            <div class="est-form">
+              <div class="field">
+                <label>Travelling from</label>
+                <div>London, United Kingdom</div>
+              </div>
+              <div class="field">
+                <label>Dates</label>
+                <div>19 – 23 Nov</div>
+              </div>
+              <div class="field">
+                <label>Nights</label>
+                <div>4</div>
+              </div>
+            </div>
+
+            <div class="group">
+              <div class="group-head">
+                <span>Flights London → Porto (OPO)</span>
+                <a href="#travel">Google Flights →</a>
+              </div>
+              <div class="line">
+                <span>Ryanair<small>Direct · 2 h 25 min</small></span>
+                <strong><i>from</i> €54</strong>
+              </div>
+              <div class="line">
+                <span>easyJet<small>Direct · 2 h 30 min</small></span>
+                <strong><i>from</i> €96</strong>
+              </div>
+              <div class="line">
+                <span>TAP Air Portugal<small>1 stop</small></span>
+                <strong><i>from</i> €171</strong>
+              </div>
+            </div>
+
+            <div class="group">
+              <div class="group-head">
+                <span>Porto airport → Braga</span>
+              </div>
+              <div class="line">
+                <span>Direct coach<small>About 50 min</small></span>
+                <strong><i>from</i> €8</strong>
+              </div>
+            </div>
+
+            <div class="group">
+              <div class="group-head">
+                <span>Stay in Braga</span>
+                <a href="#travel">Booking.com →</a>
+              </div>
+              <div class="line">
+                <span>Hotels &amp; guesthouses<small>Most stays €80 – 120 a night</small></span>
+                <strong><i>from</i> €47<i> / night</i></strong>
+              </div>
+            </div>
+
+            <div class="total">
+              <div>
+                <small>Trip estimate · 1 traveller, 4 nights</small>
+                <strong>€260 <em>–</em> 670</strong>
+              </div>
+              <a class="btn btn-ghost" href="#travel">Search flights →</a>
+            </div>
+            <p class="est-note">
+              Illustrative values. Confirm your dates and deposit with the studio before you book
+              travel.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="shop">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow"><b>03</b> Necrotic Wear</p>
+              <h2>Prints &amp; apparel, <em>signed in ink.</em></h2>
+            </div>
+            <a class="btn btn-ghost" href="#shop">Visit the shop</a>
+          </div>
+          <div class="products">
+            <article class="product">
+              <img src="assets/shop/maliketh.jpg" alt="Maliketh print" />
+              <span class="product-tag">Limited edition</span>
+              <h3>Maliketh, The Black Blade</h3>
+              <div class="product-row"><span>€50.00</span><span>Add to cart</span></div>
+            </article>
+            <article class="product">
+              <img src="assets/shop/nazgul.jpg" alt="Nazgûl print" />
+              <span class="product-tag">Limited edition</span>
+              <h3>Nazgûl</h3>
+              <div class="product-row"><span>€50.00</span><span>Add to cart</span></div>
+            </article>
+            <article class="product">
+              <img src="assets/shop/itachi.jpg" alt="Uchiha Itachi print" />
+              <span class="product-tag">Print</span>
+              <h3>Uchiha Itachi Susanoo</h3>
+              <div class="product-row"><span>€30.00</span><span>Add to cart</span></div>
+            </article>
+            <article class="product">
+              <img src="assets/shop/luffy-tshirt.png" alt="Luffy Gear 5 t-shirt" />
+              <span class="product-tag">T-shirt</span>
+              <h3>Luffy Gear 5</h3>
+              <div class="product-row"><span>€29.99</span><span>Add to cart</span></div>
+            </article>
+          </div>
+          <div class="shop-foot">
+            <span>Secure checkout by Shopify</span>
+            <span>28 products · Prints · T-shirts · Zodiac collection</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="process" class="process">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow"><b>04</b> The process</p>
+              <h2>From idea <em>to ink.</em></h2>
+            </div>
+          </div>
+          <div class="steps">
+            <div class="step">
+              <b>I</b>
+              <h3>Send your idea</h3>
+              <p>Characters, placement, size and references. Braga or a guest spot.</p>
+            </div>
+            <div class="step">
+              <b>II</b>
+              <h3>Quote &amp; plan</h3>
+              <p>
+                A private quote, the session plan and available dates. A deposit secures your date.
+              </p>
+            </div>
+            <div class="step">
+              <b>III</b>
+              <h3>Design &amp; session</h3>
+              <p>
+                Daniel draws your piece close to the appointment. You review it before we start.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="enquire" class="cta">
+        <div class="wrap">
+          <img src="assets/logo-2-white.png" alt="" />
+          <h2>Let’s make it <em>yours.</em></h2>
+          <p class="lead">Tell us about your project. Enquiries in English or Portuguese.</p>
+          <div class="hero-actions">
+            <a class="btn btn-red" href="#enquire">Start your project</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <div><img src="assets/logo-1-white.png" alt="Daniel Castro, Tattoo Artist" /></div>
+        <div>
+          <h4>Studio</h4>
+          Rua da Ramoa, loja 80<br />4700-855 Merelim S. Pedro<br />Braga, Portugal
+        </div>
+        <div>
+          <h4>Contact</h4>
+          danielcastrotattooshop@gmail.com<br />By appointment only
+        </div>
+        <div>
+          <h4>Follow</h4>
+          Instagram<br />YouTube<br />Necrotic Wear shop
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Mockup only: `?section=<id>` opens the page at that section. A `#hash` would also scroll
+      // the teaser page that embeds this one in an iframe.
+      const section = new URLSearchParams(location.search).get("section");
+
+      if (section) {
+        addEventListener("load", () =>
+          scrollTo(0, document.getElementById(section).offsetTop - 24),
+        );
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "name": "@daniel/db",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./adapter": "./src/adapter.ts",
+    "./schema": "./src/schema/index.ts",
+    "./testing": "./tests/support/testing.ts"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:test-application": "vp test run --project integration",
+    "test": "vp test run --project unit --passWithNoTests",
+    "lint:effect": "effect-tsgo diagnostics --project tsconfig.json --strict",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@daniel/shared": "workspace:*",
+    "@daniel/utils": "workspace:*",
+    "@effect/sql-pg": "catalog:",
+    "date-fns": "catalog:",
+    "dotenv": "catalog:",
+    "drizzle-orm": "catalog:",
+    "effect": "catalog:",
+    "pg": "catalog:"
+  },
+  "devDependencies": {
+    "@daniel/tsconfig": "workspace:*",
+    "@effect/vitest": "catalog:",
+    "@types/pg": "catalog:",
+    "drizzle-kit": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

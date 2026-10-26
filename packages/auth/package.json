@@ -1,0 +1,31 @@
+{
+  "name": "@daniel/auth",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/auth-client.ts"
+  },
+  "scripts": {
+    "seed:admins": "node --import tsx src/scripts/seed-admins.ts",
+    "test": "vp test run",
+    "lint:effect": "effect-tsgo diagnostics --project tsconfig.json --strict",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "catalog:",
+    "@daniel/db": "workspace:*",
+    "@daniel/shared": "workspace:*",
+    "@daniel/utils": "workspace:*",
+    "@effect/platform-node": "catalog:",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@daniel/tsconfig": "workspace:*",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

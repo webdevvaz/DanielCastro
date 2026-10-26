@@ -1,0 +1,12 @@
+{
+  "extends": "@daniel/tsconfig/base.json",
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", ".output", "dist"],
+  "compilerOptions": {
+    "types": ["vite-plus/client", "node"],
+    "paths": {
+      "#/*": ["./src/*"],
+      "@/*": ["./src/*"]
+    }
+  }
+}

@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Layout B — Booking hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="base.css" />
+    <style>
+      .wrap {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 48px;
+      }
+
+      header {
+        border-bottom: 1px solid var(--line);
+      }
+
+      header .wrap {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        height: 76px;
+      }
+
+      header .logo img {
+        width: 140px;
+      }
+
+      header nav {
+        display: flex;
+        gap: 30px;
+        margin-left: auto;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .hero .wrap {
+        display: grid;
+        grid-template-columns: 7fr 5fr;
+        gap: 56px;
+        align-items: end;
+        padding-top: 56px;
+        padding-bottom: 40px;
+      }
+
+      .hero h1 {
+        font-size: 64px;
+        margin: 18px 0 18px;
+      }
+
+      .hero .lead {
+        max-width: 520px;
+        color: var(--muted);
+      }
+
+      .status-card {
+        padding: 24px;
+        background: var(--ink-2);
+        border: 1px solid var(--line);
+      }
+
+      .status-card .row {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 12px;
+        padding: 12px 0;
+        border-top: 1px solid var(--line);
+        font-size: 14px;
+      }
+
+      .status-card .row:first-of-type {
+        border-top: 0;
+        padding-top: 4px;
+      }
+
+      .status-card .row span:first-child {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding-top: 3px;
+      }
+
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        padding-bottom: 72px;
+      }
+
+      .tile {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        min-height: 300px;
+        padding: 22px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: var(--ink-2);
+      }
+
+      .tile > img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.6;
+      }
+
+      /* Darkens the lower part of a photo tile, so its text stays readable. */
+      .tile:has(> img)::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.88));
+      }
+
+      .tile > :not(img) {
+        position: relative;
+        z-index: 1;
+      }
+
+      .tile h2 {
+        font-size: 32px;
+      }
+
+      .tile p {
+        margin-top: 6px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .tile .go {
+        margin-top: 16px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .tile.red {
+        background: var(--red);
+        border-color: var(--red);
+        justify-content: space-between;
+      }
+
+      .tile.red p,
+      .tile.red ol {
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .tile.red ol {
+        font-size: 13px;
+        line-height: 2;
+        counter-reset: step;
+      }
+
+      .tile.red ol li::before {
+        counter-increment: step;
+        content: counter(step) "  ";
+        font-family: var(--serif);
+        font-size: 18px;
+      }
+
+      .tile.red .btn {
+        background: #fff;
+        border-color: #fff;
+        color: var(--ink);
+        margin-top: 18px;
+        align-self: flex-start;
+      }
+
+      .tile .mini-form {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      section.block {
+        padding: 72px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .block-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 28px;
+      }
+
+      .block-head h2 {
+        font-size: 44px;
+        margin-top: 12px;
+      }
+
+      .guide {
+        display: grid;
+        grid-template-columns: 5fr 7fr;
+        gap: 56px;
+      }
+
+      .checklist li {
+        padding: 12px 0;
+        border-top: 1px solid var(--line);
+        font-size: 15px;
+      }
+
+      .checklist li::before {
+        content: "✓";
+        color: var(--red);
+        margin-right: 12px;
+      }
+
+      .timeline li {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        gap: 16px;
+        padding: 18px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .timeline .n {
+        font-family: var(--serif);
+        font-size: 30px;
+        color: var(--red);
+        line-height: 1;
+      }
+
+      .timeline h3 {
+        font-size: 24px;
+      }
+
+      .timeline p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .strip {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      .strip .photo {
+        aspect-ratio: 1;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+      }
+
+      .split h3 {
+        font-size: 32px;
+        margin: 10px 0 18px;
+      }
+
+      .spot {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 4px 16px;
+        padding: 16px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .spot .city {
+        font-family: var(--serif);
+        font-size: 22px;
+      }
+
+      .spot small {
+        grid-column: 1;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .faq details {
+        border-top: 1px solid var(--line);
+        padding: 16px 0;
+      }
+
+      .faq summary {
+        font-family: var(--serif);
+        font-size: 22px;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .faq summary::after {
+        content: "+";
+        color: var(--red);
+      }
+
+      .faq details[open] summary::after {
+        content: "−";
+      }
+
+      .faq details p {
+        margin-top: 8px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      footer {
+        padding: 48px 0;
+        border-top: 1px solid var(--line);
+        background: #070606;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      footer .wrap {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 32px;
+      }
+
+      footer img {
+        width: 150px;
+      }
+
+      footer b {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--bone);
+      }
+
+      .tab-bar {
+        display: none;
+      }
+
+      @media (max-width: 600px) {
+        .wrap {
+          padding: 0 20px;
+        }
+
+        header .wrap {
+          height: 60px;
+        }
+
+        header .logo img {
+          width: 110px;
+        }
+
+        header nav {
+          display: none;
+        }
+
+        header .btn {
+          margin-left: auto;
+        }
+
+        .hero .wrap {
+          grid-template-columns: 1fr;
+          gap: 20px;
+          padding-top: 24px;
+          padding-bottom: 20px;
+        }
+
+        .hero h1 {
+          font-size: 40px;
+        }
+
+        .hero .lead {
+          display: none;
+        }
+
+        .status-card {
+          padding: 14px 18px;
+        }
+
+        .status-card .row {
+          grid-template-columns: 96px 1fr;
+          padding: 8px 0;
+          font-size: 13px;
+        }
+
+        .status-card .row:nth-of-type(2),
+        .status-card .row:nth-of-type(4) {
+          display: none;
+        }
+
+        .tiles {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          padding-bottom: 44px;
+        }
+
+        .tile {
+          min-height: 190px;
+          padding: 16px;
+        }
+
+        .tile h2 {
+          font-size: 24px;
+        }
+
+        .tile p,
+        .tile ol,
+        .tile .mini-form {
+          display: none;
+        }
+
+        .tile.red .btn {
+          display: none;
+        }
+
+        section.block {
+          padding: 44px 0;
+        }
+
+        .block-head h2 {
+          font-size: 32px;
+        }
+
+        .guide,
+        .split,
+        footer .wrap {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+
+        .strip {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .tab-bar {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          position: fixed;
+          inset: auto 0 0;
+          z-index: 20;
+          background: rgba(11, 10, 9, 0.97);
+          border-top: 1px solid var(--line);
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          text-align: center;
+          color: var(--muted);
+        }
+
+        .tab-bar a {
+          padding: 14px 0 22px;
+        }
+
+        .tab-bar i {
+          display: block;
+          font-style: normal;
+          font-size: 18px;
+          line-height: 1.4;
+        }
+
+        .tab-bar .on {
+          color: var(--bone);
+        }
+
+        .tab-bar .book {
+          background: var(--red);
+          color: #fff;
+        }
+
+        .capture .tab-bar {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <a class="logo" href="#"
+          ><img src="../mockup/assets/logo-1-white.png" alt="Daniel Castro"
+        /></a>
+        <nav>
+          <a href="#">Work</a>
+          <a href="#">Guest spots</a>
+          <a href="#">Travel</a>
+          <a href="#">Shop</a>
+          <a href="#">FAQ</a>
+        </nav>
+        <a class="btn btn-red btn-small" href="#">Book a session</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="wrap">
+        <div>
+          <p class="eyebrow"><b>Braga</b>Portugal · Custom tattoos</p>
+          <h1>A fan first. <em>An artist through and through.</em></h1>
+          <p class="lead">
+            Custom manga, anime, fantasy and gaming tattoos in black linework with strong contrast
+            and a touch of red. Every design drawn by hand, for the person who wears it.
+          </p>
+        </div>
+        <div class="status-card">
+          <div class="row">
+            <span>Bookings</span><span><span class="dot"></span>Open</span>
+          </div>
+          <div class="row"><span>Studio</span><span>Braga, Portugal · by appointment</span></div>
+          <div class="row">
+            <span>Next spot</span><span>Düsseldorf, 19 – 23 Nov · fully booked</span>
+          </div>
+          <div class="row"><span>Enquiries</span><span>Answered by email</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap tiles">
+      <a class="tile" href="#">
+        <img src="../mockup/assets/portfolio/madara.webp" alt="" />
+        <h2>See the work</h2>
+        <p>Anime, games, films, and dark fantasy.</p>
+        <span class="go">Gallery →</span>
+      </a>
+      <div class="tile red">
+        <h2>Book a session</h2>
+        <ol>
+          <li>Send your idea</li>
+          <li>Quote &amp; date</li>
+          <li>Deposit</li>
+          <li>Session</li>
+        </ol>
+        <a class="btn btn-small" href="#">Start</a>
+      </div>
+      <div class="tile">
+        <h2>Plan your trip</h2>
+        <p>Flights, the airport, and hotels, with live prices.</p>
+        <div class="mini-form">
+          <div class="input">Where do you travel from?</div>
+          <a class="btn btn-small" href="#">Estimate</a>
+        </div>
+      </div>
+      <a class="tile" href="#">
+        <img src="../mockup/assets/shop/nazgul.jpg" alt="" />
+        <h2>Shop</h2>
+        <p>Prints and t-shirts from Necrotic Wear.</p>
+        <span class="go">Visit the shop →</span>
+      </a>
+    </div>
+
+    <section class="block">
+      <div class="wrap guide">
+        <div>
+          <p class="eyebrow"><b>01</b>Book a session</p>
+          <h2 style="font-size: 44px; margin: 12px 0 20px">What to <em>send us.</em></h2>
+          <ul class="checklist">
+            <li>The theme or the character</li>
+            <li>A short description of your idea</li>
+            <li>Reference images</li>
+            <li>A photo of the placement</li>
+            <li>Braga, or a guest spot city</li>
+          </ul>
+          <a class="btn btn-red" style="margin-top: 24px" href="#">Start your enquiry</a>
+        </div>
+        <ol class="timeline">
+          <li>
+            <span class="n">I</span>
+            <div>
+              <h3>Send your idea</h3>
+              <p>Tell us your theme, references, and placement in the enquiry form.</p>
+            </div>
+          </li>
+          <li>
+            <span class="n">II</span>
+            <div>
+              <h3>Quote &amp; date</h3>
+              <p>Joana answers every enquiry by email with a private quote and the dates.</p>
+            </div>
+          </li>
+          <li>
+            <span class="n">III</span>
+            <div>
+              <h3>Deposit</h3>
+              <p>A non-refundable deposit secures your date and is deducted on the day.</p>
+            </div>
+          </li>
+          <li>
+            <span class="n">IV</span>
+            <div>
+              <h3>Design &amp; session</h3>
+              <p>You get the final drawing the night before; small changes happen on the day.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap">
+        <div class="block-head">
+          <div>
+            <p class="eyebrow"><b>02</b>Latest work</p>
+            <h2>Characters you love, <em>drawn for skin.</em></h2>
+          </div>
+          <a class="btn btn-ghost" href="#">Full gallery</a>
+        </div>
+        <div class="strip">
+          <figure class="photo">
+            <img src="../mockup/assets/portfolio/god-of-war.webp" alt="" />
+          </figure>
+          <figure class="photo"><img src="../mockup/assets/portfolio/asta.webp" alt="" /></figure>
+          <figure class="photo">
+            <img src="../mockup/assets/portfolio/skull-knight.webp" alt="" />
+          </figure>
+          <figure class="photo"><img src="../mockup/assets/portfolio/madara.webp" alt="" /></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow"><b>03</b>Guest spots</p>
+          <h3>Daniel <em>on the road.</em></h3>
+          <div class="spot">
+            <span class="city">Düsseldorf, Germany</span><span class="pill">Fully booked</span>
+            <small>19 – 23 Nov 2026 · Monochrome Ink Collective</small>
+          </div>
+          <div class="spot">
+            <span class="city">Braga, Portugal</span><span class="pill">Books open</span>
+            <small>Home studio · by appointment</small>
+          </div>
+        </div>
+        <div class="faq">
+          <p class="eyebrow"><b>04</b>Questions</p>
+          <h3>Before you <em>book.</em></h3>
+          <details open>
+            <summary>How much does a tattoo cost?</summary>
+            <p>Every piece is quoted privately, by email, after you send your idea.</p>
+          </details>
+          <details>
+            <summary>Is there a deposit?</summary>
+            <p>Yes. It secures your date, is not refundable, and is deducted on the day.</p>
+          </details>
+          <details>
+            <summary>When do I see the design?</summary>
+            <p>The night before your session.</p>
+          </details>
+          <details>
+            <summary>Can I book at a guest spot?</summary>
+            <p>Yes. Choose the city in your enquiry.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <img src="../mockup/assets/logo-1-white.png" alt="Daniel Castro" />
+        <div>
+          <b>Studio</b>Rua da Ramoa, loja 80<br />4700-855 Merelim S. Pedro<br />Braga, Portugal
+        </div>
+        <div><b>Contact</b>danielcastrotattooshop@gmail.com<br />By appointment only</div>
+        <div><b>Follow</b>Instagram<br />YouTube<br />Necrotic Wear shop</div>
+      </div>
+    </footer>
+
+    <nav class="tab-bar">
+      <a class="on" href="#"><i>◐</i>Home</a>
+      <a href="#"><i>▦</i>Work</a>
+      <a href="#"><i>✈</i>Travel</a>
+      <a class="book" href="#"><i>✎</i>Book</a>
+    </nav>
+  </body>
+</html>

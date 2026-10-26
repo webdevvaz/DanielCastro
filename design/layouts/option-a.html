@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Layout A — Work first</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="base.css" />
+    <style>
+      .wrap {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 48px;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(11, 10, 9, 0.94);
+        border-bottom: 1px solid var(--line);
+      }
+
+      header .wrap {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        height: 76px;
+      }
+
+      header .logo img {
+        width: 140px;
+      }
+
+      header nav {
+        display: flex;
+        gap: 30px;
+        margin-left: auto;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      header nav .on {
+        color: var(--bone);
+      }
+
+      .menu-button {
+        display: none;
+      }
+
+      .status {
+        background: var(--ink-2);
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .status .wrap {
+        display: flex;
+        align-items: center;
+        gap: 36px;
+        height: 44px;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .status b {
+        color: var(--bone);
+        font-weight: 500;
+      }
+
+      .hero .wrap {
+        display: grid;
+        grid-template-columns: 5fr 7fr;
+        gap: 56px;
+        align-items: center;
+        padding-top: 48px;
+        padding-bottom: 64px;
+      }
+
+      .hero h1 {
+        font-size: 62px;
+        margin: 18px 0 20px;
+      }
+
+      .hero .lead {
+        max-width: 440px;
+        color: var(--muted);
+      }
+
+      .hero .actions {
+        display: flex;
+        gap: 12px;
+        margin: 28px 0 24px;
+      }
+
+      .themes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .mosaic {
+        display: grid;
+        grid-template-columns: 1.25fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 10px;
+        height: 600px;
+      }
+
+      .mosaic .photo:first-child {
+        grid-row: 1 / 3;
+      }
+
+      section.block {
+        padding: 72px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .block-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 28px;
+      }
+
+      .block-head h2 {
+        font-size: 44px;
+        margin-top: 12px;
+      }
+
+      .filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+
+      .grid4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      .grid4 .photo {
+        aspect-ratio: 3 / 4;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+
+      .steps li {
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+      }
+
+      .steps .n {
+        font-family: var(--serif);
+        font-size: 32px;
+        color: var(--red);
+      }
+
+      .steps h3 {
+        font-size: 24px;
+        margin: 4px 0 8px;
+      }
+
+      .steps p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+
+      .panel {
+        padding: 28px;
+        background: var(--ink-2);
+        border: 1px solid var(--line);
+      }
+
+      .panel h3 {
+        font-size: 32px;
+        margin: 10px 0 20px;
+      }
+
+      .spot {
+        display: grid;
+        grid-template-columns: 130px 1fr auto;
+        gap: 16px;
+        align-items: baseline;
+        padding: 16px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .spot .date {
+        font-family: var(--serif);
+        font-size: 20px;
+      }
+
+      .spot .city {
+        font-family: var(--serif);
+        font-size: 22px;
+      }
+
+      .spot .city small {
+        display: block;
+        font-family: var(--sans);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .trip-form {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .shop {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+
+      footer {
+        padding: 48px 0;
+        border-top: 1px solid var(--line);
+        background: #070606;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      footer .wrap {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 32px;
+      }
+
+      footer img {
+        width: 150px;
+      }
+
+      footer b {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--bone);
+      }
+
+      .bottom-bar {
+        display: none;
+      }
+
+      @media (max-width: 600px) {
+        .wrap {
+          padding: 0 20px;
+        }
+
+        header .wrap {
+          height: 60px;
+          gap: 12px;
+        }
+
+        header .logo img {
+          width: 110px;
+        }
+
+        header nav,
+        header .btn {
+          display: none;
+        }
+
+        header .menu-button {
+          display: inline-flex;
+          margin-left: auto;
+        }
+
+        .status .wrap {
+          flex-wrap: wrap;
+          gap: 2px 16px;
+          height: auto;
+          padding-top: 8px;
+          padding-bottom: 8px;
+          font-size: 12px;
+          white-space: normal;
+        }
+
+        .status span:last-child {
+          display: none;
+        }
+
+        .hero .wrap {
+          grid-template-columns: 1fr;
+          gap: 24px;
+          padding-top: 20px;
+          padding-bottom: 40px;
+        }
+
+        .mosaic {
+          order: -1;
+          height: 380px;
+        }
+
+        .hero h1 {
+          font-size: 40px;
+        }
+
+        .hero .actions .btn-ghost {
+          display: none;
+        }
+
+        section.block {
+          padding: 44px 0;
+        }
+
+        .block-head h2 {
+          font-size: 32px;
+        }
+
+        .block-head .btn {
+          display: none;
+        }
+
+        .grid4,
+        .shop {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .steps,
+        .two,
+        .trip-form,
+        footer .wrap {
+          grid-template-columns: 1fr;
+        }
+
+        .spot {
+          grid-template-columns: 1fr auto;
+        }
+
+        .spot .date {
+          grid-column: 1 / -1;
+        }
+
+        .bottom-bar {
+          display: flex;
+          position: fixed;
+          inset: auto 0 0;
+          z-index: 20;
+          gap: 10px;
+          padding: 12px 20px 18px;
+          background: rgba(11, 10, 9, 0.96);
+          border-top: 1px solid var(--line);
+        }
+
+        .bottom-bar .btn-red {
+          flex: 1;
+        }
+
+        .capture .bottom-bar {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <a class="logo" href="#"
+          ><img src="../mockup/assets/logo-1-white.png" alt="Daniel Castro"
+        /></a>
+        <nav>
+          <a class="on" href="#">Work</a>
+          <a href="#">Guest spots</a>
+          <a href="#">Travel</a>
+          <a href="#">Shop</a>
+          <a href="#">About</a>
+        </nav>
+        <a class="btn btn-red btn-small" href="#">Book a session</a>
+        <a class="btn btn-small menu-button" href="#">Menu</a>
+      </div>
+    </header>
+
+    <div class="status">
+      <div class="wrap">
+        <span><span class="dot"></span><b>Books open</b> in Braga</span>
+        <span>Next guest spot <b>Düsseldorf, 19 – 23 Nov</b></span>
+        <span>Every design drawn for one person</span>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="wrap">
+        <div>
+          <p class="eyebrow"><b>Braga</b>Portugal · Custom tattoos</p>
+          <h1>A fan first. <em>An artist through and through.</em></h1>
+          <p class="lead">
+            Custom manga, anime, fantasy and gaming tattoos in black linework with strong contrast
+            and a touch of red.
+          </p>
+          <div class="actions">
+            <a class="btn btn-red" href="#">Book a session</a>
+            <a class="btn btn-ghost" href="#">See all work</a>
+          </div>
+          <div class="themes">
+            <span class="chip">Anime</span><span class="chip">Video games</span
+            ><span class="chip">Dark fantasy</span><span class="chip">Mythologies</span
+            ><span class="chip">Gothic</span>
+          </div>
+        </div>
+        <div class="mosaic">
+          <figure class="photo">
+            <img src="../mockup/assets/portfolio/god-of-war.webp" alt="" />
+            <figcaption><b>God of War</b>Backpiece</figcaption>
+          </figure>
+          <figure class="photo">
+            <img src="../mockup/assets/portfolio/skull-knight.webp" alt="" />
+            <figcaption><b>Skull Knight</b>Berserk</figcaption>
+          </figure>
+          <figure class="photo">
+            <img src="../mockup/assets/portfolio/asta.webp" alt="" />
+            <figcaption><b>Asta</b>Black Clover</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap">
+        <div class="block-head">
+          <div>
+            <p class="eyebrow"><b>01</b>The work</p>
+            <h2>Characters you love, <em>drawn for skin.</em></h2>
+          </div>
+          <a class="btn btn-ghost" href="#">Full gallery</a>
+        </div>
+        <div class="filters">
+          <span class="chip on">All</span><span class="chip">Anime</span
+          ><span class="chip">Video games</span><span class="chip">Films</span
+          ><span class="chip">Dark fantasy</span><span class="chip">Gothic</span>
+        </div>
+        <div class="grid4">
+          <figure class="photo">
+            <img src="../mockup/assets/portfolio/madara.webp" alt="" />
+            <figcaption><b>Madara Uchiha</b>Naruto</figcaption>
+          </figure>
+          <figure class="photo">
+            <img src="../mockup/assets/portfolio/asta.webp" alt="" />
+            <figcaption><b>Asta</b>Black Clover</figcaption>
+          </figure>
+          <figure class="photo">
+            <img src="../mockup/assets/portfolio/skull-knight.webp" alt="" />
+            <figcaption><b>Skull Knight</b>Berserk</figcaption>
+          </figure>
+          <figure class="photo">
+            <img src="../mockup/assets/portfolio/god-of-war.webp" alt="" />
+            <figcaption><b>God of War</b>Kratos &amp; Atreus</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap">
+        <div class="block-head">
+          <div>
+            <p class="eyebrow"><b>02</b>How to book</p>
+            <h2>From idea <em>to ink.</em></h2>
+          </div>
+          <a class="btn btn-red" href="#">Book a session</a>
+        </div>
+        <ol class="steps">
+          <li>
+            <span class="n">I</span>
+            <h3>Send your idea</h3>
+            <p>The theme, a short description, references, and a photo of the placement.</p>
+          </li>
+          <li>
+            <span class="n">II</span>
+            <h3>Quote &amp; date</h3>
+            <p>Joana answers by email with a private quote and the dates.</p>
+          </li>
+          <li>
+            <span class="n">III</span>
+            <h3>Deposit</h3>
+            <p>A non-refundable deposit secures your date and is deducted on the day.</p>
+          </li>
+          <li>
+            <span class="n">IV</span>
+            <h3>Session</h3>
+            <p>You get the final drawing the night before; small changes happen on the day.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap two">
+        <div class="panel">
+          <p class="eyebrow"><b>03</b>Guest spots</p>
+          <h3>Daniel <em>on the road.</em></h3>
+          <div class="spot">
+            <span class="date">19 – 23 Nov</span>
+            <span class="city">Düsseldorf, Germany<small>Monochrome Ink Collective</small></span>
+            <span class="pill">Fully booked</span>
+          </div>
+          <div class="spot">
+            <span class="date">Home studio</span>
+            <span class="city">Braga, Portugal<small>Daniel Castro Tattoo Studio</small></span>
+            <span class="pill">Books open</span>
+          </div>
+        </div>
+        <div class="panel">
+          <p class="eyebrow"><b>04</b>Travel</p>
+          <h3>Coming from abroad? <em>Plan the trip.</em></h3>
+          <div class="trip-form">
+            <div>
+              <p class="label">From</p>
+              <div class="input">London</div>
+            </div>
+            <div>
+              <p class="label">Arrive</p>
+              <div class="input">03/12</div>
+            </div>
+            <div>
+              <p class="label">Leave</p>
+              <div class="input">06/12</div>
+            </div>
+          </div>
+          <a class="btn btn-red" href="#">Estimate the trip</a>
+          <p class="muted" style="margin-top: 14px; font-size: 13px">
+            Live flight and hotel prices, the bus or a car from the airport, and a total.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap">
+        <div class="block-head">
+          <div>
+            <p class="eyebrow"><b>05</b>Necrotic Wear</p>
+            <h2>Prints and <em>merch.</em></h2>
+          </div>
+          <a class="btn btn-ghost" href="#">Visit the shop</a>
+        </div>
+        <div class="shop">
+          <div class="product">
+            <img src="../mockup/assets/shop/maliketh.jpg" alt="" />
+            <h3>Maliketh, The Black Blade</h3>
+            <p>Print · €50.00</p>
+          </div>
+          <div class="product">
+            <img src="../mockup/assets/shop/nazgul.jpg" alt="" />
+            <h3>Nazgûl</h3>
+            <p>Limited print · €50.00</p>
+          </div>
+          <div class="product">
+            <img src="../mockup/assets/shop/itachi.jpg" alt="" />
+            <h3>Uchiha Itachi Susanoo</h3>
+            <p>Print · €30.00</p>
+          </div>
+          <div class="product">
+            <img src="../mockup/assets/shop/luffy-tshirt.png" alt="" />
+            <h3>Luffy Gear 5</h3>
+            <p>T-shirt · €29.99</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <img src="../mockup/assets/logo-1-white.png" alt="Daniel Castro" />
+        <div>
+          <b>Studio</b>Rua da Ramoa, loja 80<br />4700-855 Merelim S. Pedro<br />Braga, Portugal
+        </div>
+        <div><b>Contact</b>danielcastrotattooshop@gmail.com<br />By appointment only</div>
+        <div><b>Follow</b>Instagram<br />YouTube<br />Necrotic Wear shop</div>
+      </div>
+    </footer>
+
+    <div class="bottom-bar">
+      <a class="btn btn-red" href="#">Book a session</a>
+      <a class="btn" href="#">Travel</a>
+    </div>
+  </body>
+</html>

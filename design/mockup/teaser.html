@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="utf-8" />
+    <title>Daniel Castro — Teaser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #0b0a09;
+        --line: #2b2724;
+        --bone: #ece6dc;
+        --muted: #9b938a;
+        --red: #c1121f;
+        --serif: "Cormorant Garamond", Georgia, serif;
+        --sans: "Inter", system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        background: var(--ink);
+        overflow: hidden;
+      }
+
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        position: relative;
+        background: radial-gradient(ellipse at 72% 45%, #1d1715 0%, var(--ink) 62%);
+        color: var(--bone);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .badge {
+        position: absolute;
+        left: -220px;
+        bottom: -260px;
+        width: 1000px;
+        opacity: 0.045;
+      }
+
+      .copy {
+        position: absolute;
+        left: 120px;
+        top: 130px;
+        width: 620px;
+      }
+
+      .copy .logo {
+        width: 330px;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 96px;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--red);
+      }
+
+      .eyebrow::after {
+        content: "";
+        width: 72px;
+        height: 1px;
+        background: var(--line);
+      }
+
+      h1 {
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 104px;
+        line-height: 0.95;
+        letter-spacing: -0.02em;
+        margin-top: 24px;
+      }
+
+      h1 em {
+        display: block;
+        font-weight: 400;
+        color: var(--red);
+      }
+
+      ul {
+        list-style: none;
+        margin-top: 52px;
+        border-top: 1px solid var(--line);
+      }
+
+      li {
+        display: flex;
+        gap: 22px;
+        align-items: baseline;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 19px;
+      }
+
+      li b {
+        min-width: 28px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        color: var(--red);
+      }
+
+      .footnote {
+        position: absolute;
+        left: 120px;
+        bottom: 64px;
+        font-size: 13px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      /* Laptop: the 1440 × 900 page, scaled to fit. */
+
+      .laptop {
+        position: absolute;
+        left: 820px;
+        top: 170px;
+      }
+
+      .laptop-screen {
+        width: 1002px;
+        height: 646px;
+        padding: 22px 22px 24px;
+        background: #050505;
+        border: 2px solid #2e2b29;
+        border-radius: 22px 22px 0 0;
+        box-shadow: 0 60px 120px rgba(0, 0, 0, 0.7);
+      }
+
+      .laptop-view {
+        width: 954px;
+        height: 596px;
+        overflow: hidden;
+        border-radius: 4px;
+      }
+
+      .laptop iframe {
+        width: 1440px;
+        height: 900px;
+        border: 0;
+        transform: scale(0.6625);
+        transform-origin: 0 0;
+      }
+
+      .laptop-base {
+        width: 1180px;
+        height: 30px;
+        margin-left: -89px;
+        background: linear-gradient(#3a3634, #1a1817);
+        border-radius: 0 0 26px 26px;
+      }
+
+      .laptop-base::before {
+        content: "";
+        display: block;
+        width: 180px;
+        height: 10px;
+        margin: 0 auto;
+        background: #121110;
+        border-radius: 0 0 10px 10px;
+      }
+
+      /* Phone: the 390 × 844 page, scaled to fit. */
+
+      .phone {
+        position: absolute;
+        left: 1530px;
+        top: 360px;
+        width: 300px;
+        height: 620px;
+        padding: 12px;
+        background: #050505;
+        border: 2px solid #34302e;
+        border-radius: 46px;
+        box-shadow:
+          0 50px 100px rgba(0, 0, 0, 0.8),
+          0 0 0 8px rgba(11, 10, 9, 0.9);
+      }
+
+      .phone-view {
+        width: 272px;
+        height: 592px;
+        overflow: hidden;
+        border-radius: 34px;
+      }
+
+      .phone iframe {
+        width: 390px;
+        height: 849px;
+        border: 0;
+        transform: scale(0.6974);
+        transform-origin: 0 0;
+      }
+    </style>
+  </head>
+  <body>
+    <img class="badge" src="assets/logo-2-white.png" alt="" />
+
+    <div class="copy">
+      <img class="logo" src="assets/logo-1-white.png" alt="Daniel Castro, Tattoo Artist" />
+      <p class="eyebrow">Novo website</p>
+      <h1>Em breve. <em>Feito à medida.</em></h1>
+      <ul>
+        <li><b>01</b>Portefólio com o trabalho do Daniel</li>
+        <li><b>02</b>Calculadora de custos de viagem até Braga</li>
+        <li><b>03</b>Loja Necrotic Wear integrada</li>
+        <li><b>04</b>Pedidos de projeto online, em PT e EN</li>
+      </ul>
+    </div>
+
+    <p class="footnote">Braga · Portugal — Pré-visualização do design</p>
+
+    <div class="laptop">
+      <div class="laptop-screen">
+        <div class="laptop-view">
+          <iframe src="index.html" title="Website desktop" scrolling="no"></iframe>
+        </div>
+      </div>
+      <div class="laptop-base"></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-view">
+        <iframe src="index.html?section=estimate" title="Website mobile" scrolling="no"></iframe>
+      </div>
+    </div>
+  </body>
+</html>

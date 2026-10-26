@@ -1,0 +1,9 @@
+{
+  "extends": "@daniel/tsconfig/base.json",
+  "include": ["**/*.ts", "**/*.tsx"],
+  "compilerOptions": {
+    "paths": {
+      "@daniel/shared/components/*": ["./src/components/*"]
+    }
+  }
+}
