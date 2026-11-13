@@ -33,7 +33,7 @@ Return paths after sign-in come from the URL: accept only a path inside this app
 - **Headers:** set `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy: strict-origin-when-cross-origin` on every response, plus `Strict-Transport-Security` in production.
 - **Rate limits:** Better Auth limits auth requests per client IP. Behind a proxy, set `AUTH_IP_ADDRESS_HEADER`, or all users share one limit.
 - **Server routes** (`apps/web/src/routes/api/`) are outside the server-function middleware and its CSRF check. Each one checks the session and role itself. An OAuth callback, such as `/api/instagram/callback`, also requires the `state` value from an HTTP-only cookie that its start route set (see `docs/instagram.md`).
-- **Outgoing requests:** when a service takes a key or token in the address (SerpApi, Instagram), turn tracing off for its requests (`HttpClient.TracerDisabledWhen`) and keep only `describeHttpFailure(error)` in errors, because traces and error messages record addresses. Fetch user-influenced addresses only from an allowed list of hosts over HTTPS.
+- **Outgoing requests:** when a service takes a key or token in the address (SerpApi, Instagram) or in a header (Travelpayouts), turn tracing off for its requests (`HttpClient.TracerDisabledWhen`) and keep only `describeHttpFailure(error)` in errors, because traces and error messages can record addresses and headers. Prefer a header when the service accepts one. Fetch user-influenced addresses only from an allowed list of hosts over HTTPS.
 
 ## Input and output
 

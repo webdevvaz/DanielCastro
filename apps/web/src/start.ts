@@ -26,7 +26,8 @@ const csrfMiddleware = createCsrfMiddleware({
 
 /**
  * Baseline security headers for every response. Add a Content-Security-Policy here once you know
- * the origins your app loads scripts, images, and styles from.
+ * the origins your app loads scripts, images, and styles from. `HIDE_FROM_SEARCH_ENGINES=true`
+ * keeps a test copy of the site out of search results.
  */
 const securityHeadersMiddleware = createMiddleware().server(({ next }) => {
   setResponseHeader("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -35,6 +36,10 @@ const securityHeadersMiddleware = createMiddleware().server(({ next }) => {
 
   if (process.env.NODE_ENV === "production") {
     setResponseHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+
+  if (process.env.HIDE_FROM_SEARCH_ENGINES === "true") {
+    setResponseHeader("X-Robots-Tag", "noindex, nofollow");
   }
 
   return next();

@@ -13,6 +13,8 @@
 *.log
 .env
 .env.*
+.data
+design
 apps/web/public/uploads
 .output
 **/.output

@@ -18,20 +18,41 @@ import { HttpClient, HttpClientRequest, HttpClientResponse } from "effect/unstab
 import { describeHttpFailure } from "../describe-http-failure";
 
 const PLACES_URL = "https://autocomplete.travelpayouts.com/places2";
+const FARES_URL = "https://api.travelpayouts.com/aviasales/v3/prices_for_dates";
+const AIRLINES_URL = "https://api.travelpayouts.com/data/en/airlines.json";
 const SERPAPI_URL = "https://serpapi.com/search.json";
 
 /** City search runs while the visitor types, so a slow answer counts as no answer. */
 const PLACES_TIMEOUT = "6 seconds";
 
+/** Fares and airline names come from Travelpayouts' cache and answer in well under a second. */
+const FARES_TIMEOUT = "10 seconds";
+
 /** A Google search through SerpApi takes 2 to 6 seconds; the page shows links meanwhile. */
 const SERPAPI_TIMEOUT = "15 seconds";
 
-/** Each new price search costs one SerpApi search, so a repeated search reuses the answer. */
-const PRICES_TIME_TO_LIVE = "6 hours";
+/** Each new hotel search costs one SerpApi search, so a repeated search reuses the answer. */
+const HOTELS_TIME_TO_LIVE = "6 hours";
+
+/**
+ * Live flight searches run only for routes with too few recent fares, and each costs one SerpApi
+ * search, so a repeated search reuses the answer for a whole day.
+ */
+const FLIGHTS_TIME_TO_LIVE = "1 day";
+
+/** Travelpayouts keeps fares for 2 to 7 days, so an average from today stays good until tomorrow. */
+const FARES_TIME_TO_LIVE = "1 day";
 const PLACES_TIME_TO_LIVE = "1 day";
+const AIRLINES_TIME_TO_LIVE = "7 days";
 
 /** A failed lookup is retried soon, but not on every page view. */
 const FAILURE_TIME_TO_LIVE = "1 minute";
+
+/** Fares that Portuguese Aviasales users found. Other markets gave the same fares in tests. */
+const FARES_MARKET = "pt";
+
+/** An airline shows only with at least this many fares: one fare is not an average. */
+const MIN_FARES = 2;
 
 /**
  * Hotels with 3 stars or more and a review score of 3.5 or more (`rating=7`). Without these
@@ -53,29 +74,46 @@ const Place = Schema.Struct({
   city_code: Schema.optional(Schema.NullOr(Schema.String)),
 });
 
+/** A fare that Aviasales users found recently: the airline's IATA code and the ticket price. */
+const Fare = Schema.Struct({
+  airline: Schema.String,
+  price: Schema.Finite,
+});
+
 const Segment = Schema.Struct({
   airline: Schema.String,
-  departure_airport: Schema.Struct({ time: Schema.String }),
 });
 
 /** A round trip as Google Flights lists it: the outbound flights and the price of the whole trip. */
 const Itinerary = Schema.Struct({
-  price: Schema.Number,
+  price: Schema.Finite,
   flights: Schema.NonEmptyArray(Segment),
   layovers: Schema.optional(Schema.Array(Schema.Unknown)),
-  total_duration: Schema.optional(Schema.Number),
+  total_duration: Schema.optional(Schema.Finite),
+});
+
+const Airline = Schema.Struct({
+  code: Schema.String,
+  name: Schema.optional(Schema.NullOr(Schema.String)),
+  name_translations: Schema.optional(Schema.Struct({ en: Schema.optional(Schema.String) })),
 });
 
 /** A hotel as Google Hotels lists it, with its lowest price per night. */
 const Hotel = Schema.Struct({
   name: Schema.String,
-  rate_per_night: Schema.Struct({ extracted_lowest: Schema.Number }),
-  overall_rating: Schema.optional(Schema.Number),
-  extracted_hotel_class: Schema.optional(Schema.Number),
+  rate_per_night: Schema.Struct({ extracted_lowest: Schema.Finite }),
+  overall_rating: Schema.optional(Schema.Finite),
+  extracted_hotel_class: Schema.optional(Schema.Finite),
 });
 
-// Items are decoded one by one, so one malformed place, itinerary, or hotel does not hide the rest.
+// Items are decoded one by one, so one malformed place, fare, airline, or hotel does not hide the
+// rest.
 const ItemList = Schema.Array(Schema.Unknown);
+
+// Travelpayouts answers `data: null` with an `error` text when it has nothing for a request.
+const FaresResponse = Schema.Struct({
+  data: Schema.optional(Schema.NullOr(ItemList)),
+});
 
 // With no results, SerpApi answers 200 with an `error` text and no lists; that counts as none.
 const FlightsResponse = Schema.Struct({
@@ -88,7 +126,9 @@ const HotelsResponse = Schema.Struct({
 });
 
 const decodePlace = Schema.decodeUnknownOption(Place);
+const decodeFare = Schema.decodeUnknownOption(Fare);
 const decodeItinerary = Schema.decodeUnknownOption(Itinerary);
+const decodeAirline = Schema.decodeUnknownOption(Airline);
 const decodeHotel = Schema.decodeUnknownOption(Hotel);
 
 /** Cities with their airports. A city without listed airports has one airport with its own code. */
@@ -117,12 +157,114 @@ const citiesOf = (places: ReadonlyArray<typeof Place.Type>): ReadonlyArray<Trave
     }));
 };
 
+/** Airline names by IATA code. An airline without a name keeps its code. */
+const airlineNamesOf = (airlines: ReadonlyArray<typeof Airline.Type>) =>
+  new Map(
+    airlines.flatMap((airline) => {
+      const name = airline.name ?? airline.name_translations?.en;
+
+      return name === undefined ? [] : [[airline.code, name] as const];
+    }),
+  );
+
+/**
+ * The prices of each airline, by name: one airline can fly under several codes (easyJet is U2,
+ * EC, and DS), and the visitor sees one easyJet.
+ */
+const pricesByAirline = (
+  fares: ReadonlyArray<typeof Fare.Type>,
+  names: ReadonlyMap<string, string>,
+) => {
+  const prices = new Map<string, Array<number>>();
+
+  for (const fare of fares) {
+    const airline = names.get(fare.airline) ?? fare.airline;
+    const list = prices.get(airline) ?? [];
+
+    list.push(fare.price);
+    prices.set(airline, list);
+  }
+
+  return prices;
+};
+
+const averageOf = (prices: ReadonlyArray<number>) =>
+  prices.reduce((sum, price) => sum + price, 0) / prices.length;
+
+/**
+ * The average price of a trip both ways, from return fares, or from the average one-way fare out
+ * plus the average one-way fare back, whichever stands for more trips: on many routes, travellers
+ * search one way at a time. One-way fares stand for as many trips as the direction with fewer
+ * fares, so one fare out and one fare back count as one trip, like one return fare. Null below
+ * `MIN_FARES` trips: one trip is not an average.
+ */
+const averageTripOf = (
+  returnPrices: ReadonlyArray<number>,
+  outPrices: ReadonlyArray<number>,
+  backPrices: ReadonlyArray<number>,
+): AverageTrip | null => {
+  const estimates: Array<AverageTrip> = [];
+
+  if (returnPrices.length > 0) {
+    estimates.push({ averageEuros: averageOf(returnPrices), fares: returnPrices.length });
+  }
+
+  if (outPrices.length > 0 && backPrices.length > 0) {
+    estimates.push({
+      averageEuros: averageOf(outPrices) + averageOf(backPrices),
+      fares: Math.min(outPrices.length, backPrices.length),
+    });
+  }
+
+  // The sort is stable, so return fares win a tie.
+  const best = estimates.toSorted((first, second) => second.fares - first.fares).at(0);
+
+  if (best === undefined || best.fares < MIN_FARES) return null;
+
+  return { averageEuros: Math.round(best.averageEuros), fares: best.fares };
+};
+
+/**
+ * The average trip of each airline with enough fares, the cheapest first, and of all airlines
+ * together: on long routes the fares spread over many airlines, one or two each.
+ */
+const averageFaresOf = (found: FoundFares, names: ReadonlyMap<string, string>): FareAverages => {
+  const roundTrips = pricesByAirline(found.roundTrips, names);
+  const outbound = pricesByAirline(found.outbound, names);
+  const inbound = pricesByAirline(found.inbound, names);
+
+  const airlines = new Set([...roundTrips.keys(), ...outbound.keys()]);
+
+  const byAirline = [...airlines]
+    .flatMap((airline): Array<AirlineAverage> => {
+      const trip = averageTripOf(
+        roundTrips.get(airline) ?? [],
+        outbound.get(airline) ?? [],
+        inbound.get(airline) ?? [],
+      );
+
+      return trip === null ? [] : [{ airline, ...trip }];
+    })
+    .toSorted((first, second) => first.averageEuros - second.averageEuros);
+
+  const allAirlines = averageTripOf(
+    found.roundTrips.map((fare) => fare.price),
+    found.outbound.map((fare) => fare.price),
+    found.inbound.map((fare) => fare.price),
+  );
+
+  return { byAirline, allAirlines };
+};
+
 /** The airlines of an itinerary, such as "Ryanair" or "TAP Air Portugal + Lufthansa". */
 const airlinesOf = (itinerary: typeof Itinerary.Type) =>
   [...new Set(itinerary.flights.map((segment) => segment.airline))].join(" + ");
 
-/** A fare search, compared by value so the cache recognizes a repeated search. */
-class FareQuery extends Data.Class<{
+/** A route, compared by value so the cache recognizes a repeated lookup. */
+class RouteQuery extends Data.Class<FareRoute> {}
+
+/** A live flight search, compared by value so the cache recognizes a repeated search. */
+class FlightQuery extends Data.Class<{
   readonly origins: string;
   readonly destination: string;
   readonly outboundDate: string;
@@ -135,7 +277,8 @@ class HotelQuery extends Data.Class<HotelSearch> {}
 const makeTravelData = Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient;
 
-  const apiKey = yield* Config.option(Config.Redacted("SERPAPI_API_KEY"));
+  const faresToken = yield* Config.option(Config.Redacted("TRAVELPAYOUTS_TOKEN"));
+  const serpApiKey = yield* Config.option(Config.Redacted("SERPAPI_API_KEY"));
 
   const getJson = <S extends Schema.Constraint>(
     operation: string,
@@ -153,13 +296,48 @@ const makeTravelData = Effect.gen(function* () {
       Effect.withSpan(`travelData.${operation}`),
     );
 
+  /**
+   * Fares that Aviasales users found for every upcoming date, from Travelpayouts. Without the
+   * token it fails: that is a setup problem, not "no fares".
+   */
+  const searchFares = (origin: string, destination: string, oneWay: boolean) =>
+    Option.match(faresToken, {
+      onNone: () =>
+        Effect.fail(
+          new TravelDataError({ operation: "findFares", cause: "TRAVELPAYOUTS_TOKEN is not set" }),
+        ),
+      onSome: (token) =>
+        getJson(
+          "findFares",
+          HttpClientRequest.get(FARES_URL, {
+            urlParams: {
+              origin,
+              destination,
+              one_way: String(oneWay),
+              currency: "eur",
+              market: FARES_MARKET,
+              sorting: "price",
+              limit: "1000",
+            },
+          }).pipe(HttpClientRequest.setHeader("X-Access-Token", Redacted.value(token))),
+          FaresResponse,
+          FARES_TIMEOUT,
+        ).pipe(
+          Effect.map((response) =>
+            Arr.getSomes((response.data ?? []).map((item) => decodeFare(item))),
+          ),
+          // The HTTP client can record request headers in traces, and the token is one.
+          Effect.provideService(HttpClient.TracerDisabledWhen, () => true),
+        ),
+    });
+
   /** A SerpApi search. Without the key it fails: that is a setup problem, not "no results". */
   const searchSerpApi = <S extends Schema.Constraint>(
     operation: string,
     params: Readonly<Record<string, string>>,
     schema: S,
   ): Effect.Effect<S["Type"], TravelDataError, S["DecodingServices"]> =>
-    Option.match(apiKey, {
+    Option.match(serpApiKey, {
       onNone: () =>
         Effect.fail(new TravelDataError({ operation, cause: "SERPAPI_API_KEY is not set" })),
       onSome: (key) =>
@@ -189,10 +367,41 @@ const makeTravelData = Effect.gen(function* () {
     { capacity: 1000, timeToLive: timeToLive(PLACES_TIME_TO_LIVE) },
   );
 
+  const airlineNames = yield* Cache.makeWith(
+    (_language: "en") =>
+      getJson("airlineNames", HttpClientRequest.get(AIRLINES_URL), ItemList, FARES_TIMEOUT).pipe(
+        Effect.map((items) =>
+          airlineNamesOf(Arr.getSomes(items.map((item) => decodeAirline(item)))),
+        ),
+      ),
+    { capacity: 1, timeToLive: timeToLive(AIRLINES_TIME_TO_LIVE) },
+  );
+
+  const averageFares = yield* Cache.makeWith(
+    (route: RouteQuery) =>
+      Effect.all(
+        {
+          roundTrips: searchFares(route.origin, route.destination, false),
+          outbound: searchFares(route.origin, route.destination, true),
+          inbound: searchFares(route.destination, route.origin, true),
+          names: Cache.get(airlineNames, "en"),
+        },
+        { concurrency: "unbounded" },
+      ).pipe(
+        Effect.map((found) =>
+          averageFaresOf(
+            { roundTrips: found.roundTrips, outbound: found.outbound, inbound: found.inbound },
+            found.names,
+          ),
+        ),
+      ),
+    { capacity: 500, timeToLive: timeToLive(FARES_TIME_TO_LIVE) },
+  );
+
   const itineraries = yield* Cache.makeWith(
-    (query: FareQuery) =>
+    (query: FlightQuery) =>
       searchSerpApi(
-        "findFares",
+        "findLiveFares",
         {
           engine: "google_flights",
           type: "1",
@@ -213,7 +422,7 @@ const makeTravelData = Effect.gen(function* () {
           ),
         ),
       ),
-    { capacity: 500, timeToLive: timeToLive(PRICES_TIME_TO_LIVE) },
+    { capacity: 500, timeToLive: timeToLive(FLIGHTS_TIME_TO_LIVE) },
   );
 
   const hotels = yield* Cache.makeWith(
@@ -238,13 +447,13 @@ const makeTravelData = Effect.gen(function* () {
           Arr.getSomes((response.properties ?? []).map((item) => decodeHotel(item))),
         ),
       ),
-    { capacity: 200, timeToLive: timeToLive(PRICES_TIME_TO_LIVE) },
+    { capacity: 200, timeToLive: timeToLive(HOTELS_TIME_TO_LIVE) },
   );
 
-  const findFares = Effect.fn("travelData.findFares")(function* (search: FareSearch) {
+  const findLiveFares = Effect.fn("travelData.findLiveFares")(function* (search: FlightSearch) {
     const found = yield* Cache.get(
       itineraries,
-      new FareQuery({
+      new FlightQuery({
         origins: search.origins.join(","),
         destination: search.destination,
         outboundDate: search.outboundDate,
@@ -253,7 +462,7 @@ const makeTravelData = Effect.gen(function* () {
     );
 
     return found
-      .map((itinerary): FlightFare => ({
+      .map((itinerary): LiveFare => ({
         airline: airlinesOf(itinerary),
         priceEuros: Math.round(itinerary.price),
         stops: itinerary.layovers?.length ?? itinerary.flights.length - 1,
@@ -277,29 +486,44 @@ const makeTravelData = Effect.gen(function* () {
 
   return TravelData.of({
     searchCities: (term) => Cache.get(cities, term.trim().toLowerCase()),
-    findFares,
+    findAverageFares: (route) => Cache.get(averageFares, new RouteQuery(route)),
+    findLiveFares,
     findHotels,
   });
 });
 
-/** A failed or unusable answer from the city search, the flight search, or the hotel search. */
+/** A failed or unusable answer from the city search, the fare data, or a SerpApi search. */
 export class TravelDataError extends Schema.TaggedError<TravelDataError>()("TravelDataError", {
   operation: Schema.String,
-  /** A short description that never includes the request address. */
+  /** A short description that never includes the request address or a token. */
   cause: Schema.String,
 }) {}
 
-/** Cities, live flight fares, and live hotel prices for the travel estimator. */
+/** Cities, average and live flight fares, and live hotel prices for the travel estimator. */
 export class TravelData extends Context.Service<TravelData, TravelDataService>()(
   "web/TravelData",
 ) {}
 
 /**
- * Cities from the Travelpayouts place search, which needs no account, and live Google Flights
- * and Google Hotels prices through SerpApi, which need `SERPAPI_API_KEY`. Without the key, every
- * price search fails with `TravelDataError` and the travel page shows links only.
+ * Cities from the Travelpayouts place search, which needs no account; average fares from the
+ * fares that Aviasales users found recently, through the free Travelpayouts data API, which needs
+ * `TRAVELPAYOUTS_TOKEN`; and live Google Flights and Google Hotels prices through SerpApi, which
+ * need `SERPAPI_API_KEY`. Without a token or key, that lookup fails with `TravelDataError` and the
+ * travel page shows links instead.
  */
 export const TravelDataLive = Layer.effect(TravelData, makeTravelData);
+
+type AverageTrip = {
+  readonly averageEuros: number;
+  /** How many trips both ways the average stands for (see `averageTripOf`). */
+  readonly fares: number;
+};
+
+type FoundFares = {
+  readonly roundTrips: ReadonlyArray<typeof Fare.Type>;
+  readonly outbound: ReadonlyArray<typeof Fare.Type>;
+  readonly inbound: ReadonlyArray<typeof Fare.Type>;
+};
 
 /** A city with its IATA code and the codes of its airports (London: LHR, LGW, STN, ...). */
 export type TravelCity = {
@@ -310,8 +534,30 @@ export type TravelCity = {
   readonly airports: ReadonlyArray<string>;
 };
 
+/** A route between two cities or airports, by IATA code. */
+export type FareRoute = {
+  readonly origin: string;
+  readonly destination: string;
+};
+
+/**
+ * An airline's average price both ways for one adult, from the fares that Aviasales users found
+ * in the last 2 to 7 days for upcoming dates. An estimate, not a price to book.
+ */
+export type AirlineAverage = AverageTrip & {
+  readonly airline: string;
+};
+
+/** The average prices on a route: per airline, and of all airlines together. */
+export type FareAverages = {
+  /** Each airline with enough fares, the cheapest first. */
+  readonly byAirline: ReadonlyArray<AirlineAverage>;
+  /** All airlines together; null when even together there are too few fares. */
+  readonly allAirlines: AverageTrip | null;
+};
+
 /** A live round-trip fare for one adult in economy, as Google Flights shows it. */
-export type FlightFare = {
+export type LiveFare = {
   readonly airline: string;
   /** The price of the whole round trip. */
   readonly priceEuros: number;
@@ -321,8 +567,8 @@ export type FlightFare = {
   readonly durationMinutes: number | null;
 };
 
-/** A round-trip fare search from any of `origins` (airport codes). */
-export type FareSearch = {
+/** A live round-trip search from any of `origins` (airport codes). */
+export type FlightSearch = {
   readonly origins: ReadonlyArray<string>;
   readonly destination: string;
   readonly outboundDate: string;
@@ -352,10 +598,16 @@ export type TravelDataService = {
   readonly searchCities: (
     term: string,
   ) => Effect.Effect<ReadonlyArray<TravelCity>, TravelDataError>;
-  /** Round trips, the cheapest first. Empty when no flights exist; fails without an API key. */
-  readonly findFares: (
-    search: FareSearch,
-  ) => Effect.Effect<ReadonlyArray<FlightFare>, TravelDataError>;
+  /** The average prices on the route, from recent fares. Fails without a token. */
+  readonly findAverageFares: (route: FareRoute) => Effect.Effect<FareAverages, TravelDataError>;
+  /**
+   * Live round trips from Google Flights, the cheapest first. Costs one SerpApi search per new
+   * search. Empty when Google Flights has none; fails without an API key or when the plan's
+   * searches are used up.
+   */
+  readonly findLiveFares: (
+    search: FlightSearch,
+  ) => Effect.Effect<ReadonlyArray<LiveFare>, TravelDataError>;
   /**
    * Hotels with 3 stars or more and good reviews, the cheapest first. Empty when none are free;
    * fails without an API key.

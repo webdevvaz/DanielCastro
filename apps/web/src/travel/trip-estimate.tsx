@@ -58,12 +58,11 @@ const shownEstimateOf = (estimate: Estimate | undefined, loading: boolean) => {
 
 /** What the flight card says when it has no prices to list. */
 const FLIGHT_MESSAGES = {
-  loading: "Looking up live prices…",
-  none: "No flights found for these dates. Google Flights shows more options.",
+  loading: "Looking up flight prices…",
+  none: "Not enough recent fares from this city for an average. Google Flights shows every flight and its price.",
   unavailable:
-    "Live prices are not available right now. Google Flights shows every flight and its price.",
-  past: "These dates have passed. Choose new dates above.",
-  unknownCity: "Live prices need a city we know. Google Flights shows every flight.",
+    "Flight prices are not available right now. Google Flights shows every flight and its price.",
+  unknownCity: "Flight prices need a city we know. Google Flights shows every flight.",
 } as const;
 
 const formatStops = (stops: number) => {
@@ -72,40 +71,63 @@ const formatStops = (stops: number) => {
   return stops === 1 ? "1 stop" : `${stops} stops`;
 };
 
+/** An average from recent fares, or a live fare with its stops and journey time. */
 function FlightOption({ flight }: { flight: Flight }) {
-  const details = [formatStops(flight.stops)];
+  const details = [flight.source === "average" ? "Average price, both ways" : "Both ways"];
+
+  if (flight.stops !== null) details.push(formatStops(flight.stops));
 
   if (flight.durationMinutes !== null) details.push(formatMinutes(flight.durationMinutes));
 
   return (
     <li className="trip-flight">
       <div>
-        <b>{flight.airline}</b>
+        <b>{flight.airline ?? "All airlines"}</b>
         <span>{details.join(" · ")}</span>
       </div>
       <p className="trip-price">
-        <b>{euros.format(flight.priceEuros)}</b> both ways
+        {flight.source === "average" ? "about " : null}
+        <b>{euros.format(flight.priceEuros)}</b>
       </p>
     </li>
   );
 }
 
-function TripDatesLine({ tripDates }: { tripDates: TripDates }) {
+/** Where the listed prices come from. */
+function FlightSourceLine({ status, tripDates }: FlightSourceLineProps) {
+  if (status !== "live") {
+    return <p className="field-hint">From fares that travellers found in the last few days.</p>;
+  }
+
+  if (tripDates === null) return null;
+
   const range = formatDateRange(tripDates.outbound, tripDates.return);
 
-  if (!tripDates.example) return <p className="field-hint">There and back, {range}</p>;
-
-  return <p className="field-hint">Example trip, {range}. Add your dates for your own prices.</p>;
+  return (
+    <p className="field-hint">
+      {tripDates.example
+        ? `Live prices from Google Flights for an example trip, ${range}.`
+        : `Live prices from Google Flights for ${range}.`}
+    </p>
+  );
 }
 
+/**
+ * The flight prices, and the Google Flights search for the visitor's dates below them. Most
+ * routes show the average price of each airline from recent fares; a less common route shows live
+ * Google Flights prices.
+ */
 function FlightsCard({ flights, tripDates, searchUrl, status }: FlightsCardProps) {
   const body =
-    status === "found" ? (
-      <ul className="trip-flights">
-        {flights.map((flight) => (
-          <FlightOption key={flight.airline} flight={flight} />
-        ))}
-      </ul>
+    status === "averages" || status === "live" ? (
+      <>
+        <FlightSourceLine status={status} tripDates={tripDates} />
+        <ul className="trip-flights">
+          {flights.map((flight) => (
+            <FlightOption key={flight.airline ?? "all"} flight={flight} />
+          ))}
+        </ul>
+      </>
     ) : (
       <p>{FLIGHT_MESSAGES[status]}</p>
     );
@@ -113,7 +135,6 @@ function FlightsCard({ flights, tripDates, searchUrl, status }: FlightsCardProps
   return (
     <article className="trip-card">
       <h3>Flights to Porto</h3>
-      {tripDates === null ? null : <TripDatesLine tripDates={tripDates} />}
       {body}
       <a className="btn btn-ghost btn-small" href={searchUrl} target="_blank" rel="noreferrer">
         Search Google Flights
@@ -202,7 +223,9 @@ function TotalLine({ estimate }: { estimate: Estimate }) {
     estimate.hotelAverage === null
       ? `${nights} in a hotel at typical prices`
       : `${nights} at the average hotel price`;
-  const parts = `The flight and the bus both ways, and ${hotel}.`;
+  const flight =
+    estimate.flightStatus === "live" ? "A flight both ways" : "An average flight both ways";
+  const parts = `${flight}, the bus both ways, and ${hotel}.`;
 
   return (
     <div className="trip-total">
@@ -282,6 +305,7 @@ export function TripEstimate({ input }: { input: TravelEstimateInput }) {
           average={shown.hotelAverage}
           nights={shown.nights}
           settings={shown.settings}
+          tripDates={shown.tripDates}
           stay={priced}
         />
         {shown.canDrive ? <DriveCard from={from} /> : null}
@@ -290,9 +314,11 @@ export function TripEstimate({ input }: { input: TravelEstimateInput }) {
       {estimate === undefined ? null : <TotalLine estimate={estimate} />}
 
       <p className="trip-note">
-        Flight and hotel prices are live from Google, for one adult. Transport prices are typical
-        prices. Prices change, so check them before you book. Book your travel only after your date
-        is confirmed and your deposit is paid.
+        Flight prices are average prices for both ways, from fares that travellers found recently on
+        Aviasales; for less common routes, they are live from Google Flights. Hotel prices are live
+        from Google. Transport prices are typical prices. All prices are for one adult and change
+        often, so check them before you book. Book your travel only after your date is confirmed and
+        your deposit is paid.
       </p>
     </section>
   );
@@ -325,9 +351,16 @@ type TripStatusProps = {
   readonly typed: string;
 };
 
+type FlightSourceLineProps = {
+  readonly status: "averages" | "live";
+  readonly tripDates: TripDates | null;
+};
+
 type FlightsCardProps = {
   readonly flights: ReadonlyArray<Flight>;
+  /** The dates of live prices; null while the estimate loads. */
   readonly tripDates: TripDates | null;
+  /** Google Flights for the visitor's dates, or for the example trip. */
   readonly searchUrl: string;
   readonly status: Estimate["flightStatus"] | "loading";
 };

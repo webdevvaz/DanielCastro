@@ -39,6 +39,8 @@ Read the matching guide before you change an area, and update it in the same cha
 - `docs/security.md`: the authorization layers and the checklist for new server functions.
 - `docs/testing.md`: how to write each kind of test.
 - `docs/observability.md`: logs, traces, metrics, and audit events.
+- `docs/instagram.md`: the Instagram connection, its Meta app, and its security.
+- `docs/deploy.md`: the container image, the release step, and the Railway test site.
 
 ## Code style
 

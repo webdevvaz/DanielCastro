@@ -7,8 +7,10 @@
 # check field and drops it with a warning. Image names are fully qualified (docker.io/...)
 # because Podman does not guess a registry for short names.
 #
-# Configuration comes from the environment at run time (see .env.example). Run the migrate image
-# with DATABASE_URL before you start a new web version.
+# Configuration comes from the environment at run time (see .env.example). Apply migrations before
+# you start a new web version: either run the migrate image with DATABASE_URL, or run
+# `node release/migrate.mjs` in the web image itself, which is what a platform's pre-deploy step
+# uses (docs/deploy.md).
 
 FROM docker.io/library/node:26-bookworm-slim AS build
 
@@ -30,6 +32,9 @@ COPY . .
 
 RUN pnpm --filter web build
 
+# The migration script with its dependencies in one file, for the web image.
+RUN pnpm --filter @daniel/db build:release
+
 # Applies pending Drizzle migrations, then exits.
 FROM build AS migrate
 
@@ -45,6 +50,10 @@ ENV PORT=3000
 WORKDIR /app
 
 COPY --from=build --chown=node:node /workspace/apps/web/.output ./
+COPY --from=build --chown=node:node /workspace/packages/db/dist/release/migrate.mjs ./release/
+COPY --from=build --chown=node:node /workspace/packages/db/drizzle ./release/drizzle
+
+ENV MIGRATIONS_DIR=/app/release/drizzle
 
 USER node
 

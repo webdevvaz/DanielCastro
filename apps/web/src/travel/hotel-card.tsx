@@ -1,5 +1,7 @@
 import type { getTripEstimate } from "@/server/travel/travel.functions";
 
+import { formatDateRange } from "@/components/format-date-range";
+
 import { bookingHotelUrl, bookingUrl } from "./travel-links";
 import { euros, formatNights } from "./trip-format";
 
@@ -31,6 +33,15 @@ function HotelOption({ hotel, stay }: HotelOptionProps) {
   );
 }
 
+/** The nights the hotel prices are for: the visitor's dates, or the example trip. */
+function StayDatesLine({ tripDates }: { tripDates: TripDates }) {
+  const range = formatDateRange(tripDates.outbound, tripDates.return);
+
+  if (!tripDates.example) return <p className="field-hint">For {range}</p>;
+
+  return <p className="field-hint">Example stay, {range}. Add your dates for your own prices.</p>;
+}
+
 /** The live hotels and their average, for the nights of the stay. */
 function LiveHotels({ hotels, average, nights, stay }: LiveHotelsProps) {
   return (
@@ -54,7 +65,15 @@ function LiveHotels({ hotels, average, nights, stay }: LiveHotelsProps) {
  * Hotels in Braga: the cheapest good hotels with live prices and their average, or the admin's
  * typical prices when live prices are not available.
  */
-export function HotelCard({ status, hotels, average, nights, settings, stay }: HotelCardProps) {
+export function HotelCard({
+  status,
+  hotels,
+  average,
+  nights,
+  settings,
+  tripDates,
+  stay,
+}: HotelCardProps) {
   // There is an average exactly when live hotels were found.
   const live = average === null ? null : { hotels, average };
   const typical = live === null && status !== "loading" ? settings : null;
@@ -62,6 +81,7 @@ export function HotelCard({ status, hotels, average, nights, settings, stay }: H
   return (
     <article className="trip-card">
       <h3>Stay in Braga</h3>
+      {tripDates === null ? null : <StayDatesLine tripDates={tripDates} />}
       {live === null ? (
         <p>{HOTEL_MESSAGES[status === "found" ? "none" : status]}</p>
       ) : (
@@ -93,6 +113,8 @@ type Estimate = Awaited<ReturnType<typeof getTripEstimate>>;
 
 type Hotel = Estimate["hotels"][number];
 
+type TripDates = Estimate["tripDates"];
+
 type Stay = {
   readonly from: string;
   readonly arrive?: string | undefined;
@@ -119,6 +141,8 @@ type HotelCardProps = {
   readonly nights: number;
   /** The admin's typical prices, shown when there are no live prices. */
   readonly settings: Estimate["settings"];
+  /** The dates the live prices are for; null while the estimate loads. */
+  readonly tripDates: TripDates | null;
   /** The dates the prices are for, so Booking.com opens on the same nights. */
   readonly stay: Stay;
 };

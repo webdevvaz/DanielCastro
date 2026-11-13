@@ -5,7 +5,7 @@ The website of Daniel Castro, Tattoo Artist®, a studio in Braga, Portugal. It w
 ## What works today
 
 - **Public site**: a side menu on every page (on phones, a top bar with page tabs) with the next guest spot, "Book a session", and the studio contact. Pages: Work (`/`, the full gallery; featured photos are large tiles), News (`/news`, Daniel's latest Instagram posts), Guest spots (`/guest-spots`), Travel (`/travel`), How to book (`/how-to-book`: steps, what to send, FAQ), and About (`/about`, placeholder bio and awards). Shop opens necroticwear.com until the Shopify page exists.
-- **Travel estimator**: the visitor enters their city (with suggestions) and, optionally, their dates. The page shows up to three live Google Flights fares to Porto (through SerpApi; without dates, for an example trip four weeks ahead), the bus, a rental car, and Uber from the airport (priced for the whole trip), the 3 cheapest good hotels in Braga with live prices and their average, driving directions from Portugal and Spain, and a total range for one person. Links open Google Flights, Booking.com, and Google Maps with the search filled in. City suggestions come from the Travelpayouts place search, which needs no account; flight and hotel prices need `SERPAPI_API_KEY`. When a source has no answer or fails, the page shows the links only.
+- **Travel estimator**: the visitor enters their city (with suggestions) and, optionally, their dates. The page shows the average price to Porto and back of up to three airlines (from fares that Aviasales users found recently, free through Travelpayouts; for routes with too few fares, live Google Flights prices through SerpApi), the bus, a rental car, and Uber from the airport (priced for the whole trip), the 3 cheapest good hotels in Braga with live prices and their average (without dates, for an example trip four weeks ahead), driving directions from Portugal and Spain, and a total range for one person. Links open Google Flights, Booking.com, and Google Maps with the search filled in. City suggestions come from the Travelpayouts place search, which needs no account; average fares need `TRAVELPAYOUTS_TOKEN`, and hotel prices and live flight prices need `SERPAPI_API_KEY`. When a source has no answer or fails, the page shows the links only.
 - **Admin area** at `/admin` (admins only, no public sign-up):
   - **Gallery**: drop photos to upload them (JPG, PNG, or WebP up to 25 MB; converted to WebP in two sizes), add a title, series, and placement, feature photos (large tiles on the Work page), hide photos, delete them, and drag or use the arrows to change the order.
   - **Guest spots**: add, edit, and delete spots. A spot shows on the Guest spots page and in the side menu until its last day has passed, as "Books open" or "Fully booked".
@@ -40,7 +40,7 @@ Stack: TypeScript, TanStack Start (React 19), TanStack Query, Router, Form, and 
 │   ├── shared/            Effect Schema contracts, AppError, reusable React components
 │   └── utils/             Helpers used by more than one package
 ├── tooling/tsconfig/      Shared tsconfig base
-├── docs/                  Architecture, client, security, testing, observability, Instagram guides
+├── docs/                  Architecture, client, security, testing, observability, Instagram, deploy guides
 ├── AGENTS.md              Rules for coding agents
 ├── PRODUCT.md             What this app is for (fill in per site)
 ├── compose.yaml           Local PostgreSQL and telemetry
@@ -100,6 +100,10 @@ To build a new feature, follow the walkthrough in `docs/architecture.md`.
 | `pnpm db:migrate`       | Applies migrations                            |
 | `pnpm db:seed-admins`   | Creates the admin accounts in `ADMIN_EMAILS`  |
 | `pnpm db:studio`        | Opens Drizzle Studio                          |
+
+## Deploying
+
+The test site runs on Railway: every push to `main` builds the `Containerfile`, applies new migrations, and then starts the new version. `docs/deploy.md` lists the one-time setup, the server settings, and how to create the admin accounts.
 
 ## Requirements
 

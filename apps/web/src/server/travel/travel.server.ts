@@ -11,8 +11,9 @@ import { cityLabel } from "@/travel/city-label";
 import { withAuditEvent } from "../observability/audit.server";
 import {
   TravelData,
-  type FlightFare,
+  type FareAverages,
   type HotelOffer,
+  type LiveFare,
   type TravelCity,
   type TravelDataError,
 } from "./travel-data.server";
@@ -24,8 +25,9 @@ const DESTINATION = "OPO";
 const DEFAULT_NIGHTS = 2;
 
 /**
- * Google Flights needs dates. Without the visitor's dates, the estimate prices an example trip
- * this far ahead, which is far enough for normal fares and close enough to be bookable.
+ * Hotel prices, live flight prices, and the Google Flights link need dates. Without the visitor's
+ * dates, the estimate uses an example trip this far ahead, which is far enough for normal prices
+ * and close enough to be bookable.
  */
 const EXAMPLE_TRIP_DAYS_AHEAD = 28;
 
@@ -67,23 +69,6 @@ const tripDatesOf = (input: TravelEstimateInput, today: string) => {
   };
 };
 
-/** The cheapest fare of each airline, so the options differ; at most three. */
-const flightOptions = (fares: ReadonlyArray<FlightFare>) => {
-  const airlines = new Set<string>();
-  const options: Array<FlightFare> = [];
-
-  for (const fare of fares) {
-    if (options.length === MAX_FLIGHT_OPTIONS) break;
-
-    if (airlines.has(fare.airline)) continue;
-
-    airlines.add(fare.airline);
-    options.push(fare);
-  }
-
-  return options;
-};
-
 /** The average price per night of the hotels shown, or null when there are none. */
 const averageNightOf = (hotels: ReadonlyArray<HotelOffer>) => {
   if (hotels.length === 0) return null;
@@ -93,14 +78,40 @@ const averageNightOf = (hotels: ReadonlyArray<HotelOffer>) => {
   return Math.round(sum / hotels.length);
 };
 
+/** An average from recent fares, as the flight card lists it. `airline` null: all airlines. */
+const averageOption = (airline: string | null, averageEuros: number): FlightOption => ({
+  source: "average",
+  airline,
+  priceEuros: averageEuros,
+  stops: null,
+  durationMinutes: null,
+});
+
+/** The cheapest live fare of each airline, so the options differ; at most three. */
+const liveOptions = (fares: ReadonlyArray<LiveFare>) => {
+  const airlines = new Set<string>();
+  const options: Array<FlightOption> = [];
+
+  for (const fare of fares) {
+    if (options.length === MAX_FLIGHT_OPTIONS) break;
+
+    if (airlines.has(fare.airline)) continue;
+
+    airlines.add(fare.airline);
+    options.push({ source: "live", ...fare });
+  }
+
+  return options;
+};
+
 /**
  * The trip cost for one person: the flight, the bus both ways, and the hotel nights. The low end
- * uses the cheapest flight, the high end the dearest flight shown. The hotel nights use the live
+ * uses the cheapest flight shown, the high end the dearest one. The hotel nights use the live
  * average of the cheapest hotels, or the admin's typical range when there are no live prices.
  * Null when a part is missing, because a partial total misleads.
  */
 const tripTotal = (
-  flights: ReadonlyArray<FlightFare>,
+  flights: ReadonlyArray<FlightOption>,
   settings: TravelSettingsValues | null,
   nights: number,
   hotelAverage: number | null,
@@ -133,7 +144,36 @@ const orWhenUnavailable =
       ),
     );
 
-/** The live fares for the trip, and why there are none when there are none. */
+/**
+ * Live Google Flights prices for a route with too few recent fares. Each new search costs one
+ * SerpApi search, so a trip that has already started gets none. Null when the search failed, for
+ * example because the plan's searches are used up.
+ */
+const findLiveFlights = Effect.fn("findLiveFlights")(function* (
+  city: TravelCity,
+  tripDates: TripDates,
+  today: string,
+) {
+  if (tripDates.outbound < today) return [];
+
+  const travelData = yield* TravelData;
+
+  return yield* travelData
+    .findLiveFares({
+      origins: city.airports,
+      destination: DESTINATION,
+      outboundDate: tripDates.outbound,
+      returnDate: tripDates.return,
+    })
+    .pipe(orWhenUnavailable<ReadonlyArray<LiveFare> | null>(null));
+});
+
+/**
+ * The flights from the visitor's city, and why there are none when there are none. Most routes
+ * use the free average fares of each airline, which do not depend on the dates. A route with too
+ * few fares for that uses live Google Flights prices for the dates; when no live prices are
+ * available either, it uses the average of all airlines together, when there is one.
+ */
 const findFlights = Effect.fn("findFlights")(function* (
   city: TravelCity | null,
   citySearchFailed: boolean,
@@ -147,25 +187,36 @@ const findFlights = Effect.fn("findFlights")(function* (
     } satisfies FlightSearch;
   }
 
-  // Every flight search costs money; a trip that has already started has no fares to find.
-  if (tripDates.outbound < today) return { status: "past", fares: [] } satisfies FlightSearch;
-
   const travelData = yield* TravelData;
 
-  return yield* travelData
-    .findFares({
-      origins: city.airports,
-      destination: DESTINATION,
-      outboundDate: tripDates.outbound,
-      returnDate: tripDates.return,
-    })
-    .pipe(
-      Effect.map((fares): FlightSearch => ({
-        status: fares.length === 0 ? "none" : "found",
-        fares,
-      })),
-      orWhenUnavailable<FlightSearch>({ status: "unavailable", fares: [] }),
-    );
+  const averages = yield* travelData
+    .findAverageFares({ origin: city.code, destination: DESTINATION })
+    .pipe(orWhenUnavailable<FareAverages | null>(null));
+
+  if (averages !== null && averages.byAirline.length > 0) {
+    return {
+      status: "averages",
+      fares: averages.byAirline
+        .slice(0, MAX_FLIGHT_OPTIONS)
+        .map((average) => averageOption(average.airline, average.averageEuros)),
+    } satisfies FlightSearch;
+  }
+
+  const live = yield* findLiveFlights(city, tripDates, today);
+
+  if (live !== null && live.length > 0) {
+    return { status: "live", fares: liveOptions(live) } satisfies FlightSearch;
+  }
+
+  if (averages?.allAirlines) {
+    return {
+      status: "averages",
+      fares: [averageOption(null, averages.allAirlines.averageEuros)],
+    } satisfies FlightSearch;
+  }
+
+  // "none" when the fare data answered and had too few fares; "unavailable" when it failed.
+  return { status: averages === null ? "unavailable" : "none", fares: [] } satisfies FlightSearch;
 });
 
 /** The cheapest live hotels for the stay, and why there are none when there are none. */
@@ -204,7 +255,7 @@ export const estimateTrip = Effect.fn("estimateTrip")(function* (input: TravelEs
   const today = studioToday();
   const tripDates = tripDatesOf(input, today);
 
-  // The two searches take seconds each and do not depend on each other.
+  // The flight and hotel lookups do not depend on each other, and SerpApi searches take seconds.
   const [flightSearch, staySearch] = yield* Effect.all(
     [findFlights(city, cities === null, tripDates, today), findStay(tripDates, today)],
     { concurrency: "unbounded" },
@@ -213,7 +264,7 @@ export const estimateTrip = Effect.fn("estimateTrip")(function* (input: TravelEs
   const settings = yield* getTravelSettings();
 
   const nights = differenceInCalendarDays(parseISO(tripDates.return), parseISO(tripDates.outbound));
-  const flights = flightOptions(flightSearch.fares);
+  const flights = flightSearch.fares;
   const hotelAverage = averageNightOf(staySearch.hotels);
 
   return {
@@ -228,7 +279,8 @@ export const estimateTrip = Effect.fn("estimateTrip")(function* (input: TravelEs
     hotelAverage,
     settings,
     nights,
-    total: tripTotal(flights, settings, nights, hotelAverage),
+    // Dates that have passed have no trip to price, even though the average fares still show.
+    total: staySearch.status === "past" ? null : tripTotal(flights, settings, nights, hotelAverage),
   };
 });
 
@@ -261,16 +313,32 @@ export const updateTravelSettings = Effect.fn("updateTravelSettings")(
 type TripDates = ReturnType<typeof tripDatesOf>;
 
 /**
- * Live fares and why the flight card shows what it shows: `found`, `none` (Google Flights has no
- * flights), `unavailable` (no API key, or the search failed), `past` (the dates have passed), or
- * `unknownCity`.
+ * A flight as the flight card lists it: an average from recent fares (`airline` null for all
+ * airlines together), or a live Google Flights fare with its stops and journey time.
  */
-type FlightSearch = {
-  readonly status: "found" | "none" | "unavailable" | "past" | "unknownCity";
-  readonly fares: ReadonlyArray<FlightFare>;
+type FlightOption = {
+  readonly source: "average" | "live";
+  readonly airline: string | null;
+  /** The price both ways. */
+  readonly priceEuros: number;
+  readonly stops: number | null;
+  readonly durationMinutes: number | null;
 };
 
-/** The cheapest live hotels for the stay, with the same statuses as `FlightSearch`. */
+/**
+ * The flights and why the flight card shows what it shows: `averages` (average prices from recent
+ * fares), `live` (Google Flights prices for the dates), `none` (too few recent fares and no live
+ * prices), `unavailable` (the fare data failed and no live prices), or `unknownCity`.
+ */
+type FlightSearch = {
+  readonly status: "averages" | "live" | "none" | "unavailable" | "unknownCity";
+  readonly fares: ReadonlyArray<FlightOption>;
+};
+
+/**
+ * The cheapest live hotels for the stay: `found`, `none` (no rooms), `unavailable` (no API key,
+ * or the search failed), or `past` (the dates have passed).
+ */
 type StaySearch = {
   readonly status: "found" | "none" | "unavailable" | "past";
   readonly hotels: ReadonlyArray<HotelOffer>;

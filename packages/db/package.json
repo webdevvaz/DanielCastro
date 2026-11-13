@@ -9,6 +9,7 @@
     "./testing": "./tests/support/testing.ts"
   },
   "scripts": {
+    "build:release": "vp pack",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -21,6 +22,7 @@
   "dependencies": {
     "@daniel/shared": "workspace:*",
     "@daniel/utils": "workspace:*",
+    "@effect/platform-node": "catalog:",
     "@effect/sql-pg": "catalog:",
     "date-fns": "catalog:",
     "dotenv": "catalog:",

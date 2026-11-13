@@ -51,15 +51,15 @@ A server route (`apps/web/src/routes/api/`) runs its program with `runServerRout
 
 ## Services and layers
 
-| Service          | Package        | Layer                              | Notes                                                |
-| ---------------- | -------------- | ---------------------------------- | ---------------------------------------------------- |
-| `Database`       | `@daniel/db`   | `layerFromConfig` (`DATABASE_URL`) | `drizzle-orm/effect-postgres` on `@effect/sql-pg`    |
-| `Auth`           | `@daniel/auth` | `layer` (needs `Database`)         | Better Auth instance plus `call` and `getSession`    |
-| Observability    | `apps/web`     | `ObservabilityLive`                | Log format and level, optional OTLP export           |
-| `RequestHeaders` | `apps/web`     | provided by `runServerEffect`      | The current request's headers                        |
-| `PhotoStorage`   | `apps/web`     | `PhotoStorageLive`                 | Gallery files in `PHOTO_STORAGE_DIR`                 |
-| `TravelData`     | `apps/web`     | `TravelDataLive` (HTTP client)     | City search, flight and hotel prices (SerpApi)       |
-| `InstagramApi`   | `apps/web`     | `InstagramApiLive` (HTTP client)   | Instagram Login, tokens, posts (`docs/instagram.md`) |
+| Service          | Package        | Layer                              | Notes                                                                 |
+| ---------------- | -------------- | ---------------------------------- | --------------------------------------------------------------------- |
+| `Database`       | `@daniel/db`   | `layerFromConfig` (`DATABASE_URL`) | `drizzle-orm/effect-postgres` on `@effect/sql-pg`                     |
+| `Auth`           | `@daniel/auth` | `layer` (needs `Database`)         | Better Auth instance plus `call` and `getSession`                     |
+| Observability    | `apps/web`     | `ObservabilityLive`                | Log format and level, optional OTLP export                            |
+| `RequestHeaders` | `apps/web`     | provided by `runServerEffect`      | The current request's headers                                         |
+| `PhotoStorage`   | `apps/web`     | `PhotoStorageLive`                 | Gallery files in `PHOTO_STORAGE_DIR`                                  |
+| `TravelData`     | `apps/web`     | `TravelDataLive` (HTTP client)     | City search and average fares (Travelpayouts), hotel prices (SerpApi) |
+| `InstagramApi`   | `apps/web`     | `InstagramApiLive` (HTTP client)   | Instagram Login, tokens, posts (`docs/instagram.md`)                  |
 
 To add a service, write a `Context.Service` class with a `layer`, and add it to `AppLive`. Its type flows into `AppServices`, so every server program can use it. Do not call `Effect.provide` inside services.
 
