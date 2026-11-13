@@ -1,6 +1,8 @@
 import { useRouteContext } from "@tanstack/react-router";
 
+import { LocaleFlag } from "@/components/locale-flag";
 import { ADMIN_LOCALE_COOKIE, ADMIN_LOCALES, type AdminLocale } from "@/i18n/admin-locales";
+import { LOCALE_NAMES } from "@/i18n/locales";
 
 import { useAdminText } from "./use-admin-text";
 
@@ -34,10 +36,12 @@ export function AdminLanguageSwitch() {
           key={option}
           type="button"
           lang={option}
+          title={LOCALE_NAMES[option]}
+          aria-label={LOCALE_NAMES[option]}
           aria-pressed={option === locale}
           onClick={() => choose(option)}
         >
-          {option.toUpperCase()}
+          <LocaleFlag locale={option} />
         </button>
       ))}
     </div>

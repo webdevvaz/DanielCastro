@@ -321,7 +321,11 @@ h2 em {
 
 .language-switcher a,
 .language-switcher button {
-  padding: 4px 0;
+  display: grid;
+  place-items: center;
+  padding: 6px 0;
+  opacity: 0.5;
+  transition: opacity 0.15s;
 }
 
 .language-switcher button {
@@ -335,19 +339,31 @@ h2 em {
 
 .language-switcher a:hover,
 .language-switcher button:hover {
-  color: var(--bone);
+  opacity: 1;
 }
 
 .language-switcher a[aria-current="true"],
 .language-switcher button[aria-pressed="true"] {
-  color: var(--bone);
+  opacity: 1;
   box-shadow: inset 0 -2px var(--red);
+}
+
+.locale-flag {
+  display: block;
+  border-radius: 2px;
+  outline: 1px solid rgb(255 255 255 / 0.15);
+  outline-offset: -1px;
+}
+
+.language-switcher-compact .locale-flag {
+  width: 16px;
+  height: 11px;
 }
 
 .language-switcher-compact {
   flex-wrap: nowrap;
-  gap: 8px;
-  margin: 0 12px 0 auto;
+  gap: 6px;
+  margin: 0 0 0 auto;
   font-size: 10px;
   letter-spacing: 0.08em;
 }
@@ -2256,6 +2272,7 @@ html:has(.photo-viewer[open]) {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
     height: 60px;
     padding: 0 var(--gutter);
   }

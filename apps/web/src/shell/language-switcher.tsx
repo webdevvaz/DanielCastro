@@ -1,5 +1,6 @@
 import { useLocation } from "@tanstack/react-router";
 
+import { LocaleFlag } from "@/components/locale-flag";
 import { localizedPath, pathWithoutLocale } from "@/i18n/locale-path";
 import { LOCALE_COOKIE, LOCALE_NAMES, LOCALES, type Locale } from "@/i18n/locales";
 import { useSiteMessages } from "@/i18n/site-messages";
@@ -33,10 +34,11 @@ export function LanguageSwitcher({ className }: { className: string }) {
           hrefLang={option}
           lang={option}
           title={LOCALE_NAMES[option]}
+          aria-label={LOCALE_NAMES[option]}
           aria-current={option === locale ? "true" : undefined}
           onClick={() => rememberLocale(option)}
         >
-          {option.toUpperCase()}
+          <LocaleFlag locale={option} />
         </a>
       ))}
     </nav>
