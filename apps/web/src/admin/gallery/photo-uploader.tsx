@@ -1,3 +1,5 @@
+import type { GallerySection } from "@daniel/shared/gallery";
+
 import { GALLERY_UPLOAD_MAX_MEGABYTES, GalleryUploadFile } from "@daniel/shared/gallery";
 import { useMutation } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
@@ -19,10 +21,11 @@ const STATUS_LABELS = {
 } as const;
 
 /**
- * Uploads photos to the gallery: drop them on the area or pick them, from a phone or a computer.
- * Files upload one at a time; finished files leave the list, failed ones stay with the reason.
+ * Uploads photos to one section of the gallery: drop them on the area or pick them, from a phone
+ * or a computer. Files upload one at a time; finished files leave the list, failed ones stay with
+ * the reason.
  */
-export function PhotoUploader() {
+export function PhotoUploader({ section }: { section: GallerySection }) {
   const { queryClient } = useRouteContext({ from: "/admin/_dashboard/gallery" });
   const inputId = useId();
 
@@ -55,6 +58,7 @@ export function PhotoUploader() {
         const formData = new FormData();
 
         formData.append("photo", item.file);
+        formData.append("section", section);
 
         try {
           await upload({ data: formData });

@@ -6,6 +6,20 @@ const DETAIL_MAX_LENGTH = 120;
 /** Most photos one reorder request may list. */
 const REORDER_MAX_PHOTOS = 2000;
 
+/**
+ * The parts of the gallery: `work` is Daniel's tattoos (the Work page), `studio` is photos of the
+ * studio (the About page). Each part has its own order.
+ */
+export const GALLERY_SECTIONS = ["work", "studio"] as const;
+
+/** One part of the gallery. */
+export const GallerySection = Schema.Literals(GALLERY_SECTIONS);
+
+/** Selects one part of the gallery. */
+export const GallerySectionInput = Schema.Struct({
+  section: GallerySection,
+});
+
 /** Largest accepted gallery upload, in megabytes. */
 export const GALLERY_UPLOAD_MAX_MEGABYTES = 25;
 
@@ -21,7 +35,10 @@ export const GalleryUploadFile = Schema.Struct({
   size: Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: GALLERY_UPLOAD_MAX_BYTES })),
 });
 
-/** The multipart body of one upload: the image in the `photo` field. */
+/**
+ * The multipart body of one upload: the image in the `photo` field, and the part of the gallery
+ * it goes to in the `section` field.
+ */
 export const GalleryUploadFormData = Schema.instanceOf(FormData).pipe(
   Schema.check(
     Schema.makeFilter(
@@ -35,6 +52,9 @@ export const GalleryUploadFormData = Schema.instanceOf(FormData).pipe(
       },
       { message: `Upload a JPG, PNG, or WebP image up to ${GALLERY_UPLOAD_MAX_MEGABYTES} MB` },
     ),
+    Schema.makeFilter((data) => Schema.is(GallerySection)(data.get("section")), {
+      message: "Choose the part of the gallery for the photo",
+    }),
   ),
 );
 
@@ -65,15 +85,19 @@ export const DeleteGalleryPhotoInput = Schema.Struct({
 });
 
 /**
- * The new order of the whole gallery, first photo first. It must list every photo exactly once,
- * so a reorder made from a stale list cannot drop or duplicate a photo.
+ * The new order of one part of the gallery, first photo first. It must list every photo of that
+ * part exactly once, so a reorder made from a stale list cannot drop or duplicate a photo.
  */
 export const ReorderGalleryInput = Schema.Struct({
+  section: GallerySection,
   ids: Schema.Array(GalleryPhotoId).check(
     Schema.isMaxLength(REORDER_MAX_PHOTOS),
     Schema.makeFilter((ids) => new Set(ids).size === ids.length || "Each photo may appear once"),
   ),
 });
+
+/** One part of the gallery. */
+export type GallerySection = typeof GallerySection.Type;
 
 /** Decoded photo details. */
 export type UpdateGalleryPhotoInput = typeof UpdateGalleryPhotoInput.Type;

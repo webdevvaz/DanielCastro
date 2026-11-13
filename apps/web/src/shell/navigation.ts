@@ -8,5 +8,6 @@ export const SITE_PAGES = [
   { to: "/guest-spots", label: "Guest spots", exact: false },
   { to: "/travel", label: "Travel", exact: false },
   { to: "/how-to-book", label: "How to book", exact: false },
+  { to: "/aftercare", label: "Aftercare", exact: false },
   { to: "/about", label: "About", exact: false },
 ] as const;

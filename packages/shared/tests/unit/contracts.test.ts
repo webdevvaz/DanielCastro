@@ -1,7 +1,7 @@
 import { Predicate, Schema } from "effect";
 import { describe, expect, it } from "vite-plus/test";
 
-import { ReorderGalleryInput } from "../../src/gallery";
+import { GalleryUploadFormData, ReorderGalleryInput } from "../../src/gallery";
 import { CreateGuestSpotInput } from "../../src/guest-spots";
 import { ImportInstagramPostInput } from "../../src/instagram";
 import { TravelSearch, TravelSearchForm, UpdateTravelSettingsInput } from "../../src/travel";
@@ -44,6 +44,17 @@ const issuePaths =
     );
   };
 
+/** The multipart body of a gallery upload; `null` leaves the section out. */
+const uploadWith = (section: string | null, file: File) => {
+  const formData = new FormData();
+
+  formData.append("photo", file);
+
+  if (section !== null) formData.append("section", section);
+
+  return formData;
+};
+
 describe("CreateGuestSpotInput", () => {
   it.each([
     { name: "a valid spot", input: validSpot, ok: true },
@@ -77,12 +88,33 @@ describe("ReorderGalleryInput", () => {
   const second = "7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f";
 
   it.each([
-    { name: "distinct photos", ids: [first, second], ok: true },
-    { name: "an empty gallery", ids: [], ok: true },
-    { name: "a photo listed twice", ids: [first, second, first], ok: false },
-    { name: "an ID that is not a UUID", ids: [first, "photo-2"], ok: false },
-  ])("$name: valid $ok", ({ ids, ok }) => {
-    expect(Schema.decodeResult(ReorderGalleryInput)({ ids })._tag).toBe(ok ? "Success" : "Failure");
+    { name: "distinct work photos", section: "work", ids: [first, second], ok: true },
+    { name: "distinct studio photos", section: "studio", ids: [first, second], ok: true },
+    { name: "an empty section", section: "studio", ids: [], ok: true },
+    { name: "a photo listed twice", section: "work", ids: [first, second, first], ok: false },
+    { name: "an ID that is not a UUID", section: "work", ids: [first, "photo-2"], ok: false },
+    { name: "an unknown section", section: "shop", ids: [first], ok: false },
+    { name: "no section", section: undefined, ids: [first], ok: false },
+  ])("$name: valid $ok", ({ section, ids, ok }) => {
+    expect(Schema.decodeUnknownResult(ReorderGalleryInput)({ section, ids })._tag).toBe(
+      ok ? "Success" : "Failure",
+    );
+  });
+});
+
+// An upload names its gallery section; the server stores the photo there and nowhere else.
+describe("GalleryUploadFormData", () => {
+  const jpeg = new File([new Uint8Array([0xff, 0xd8, 0xff])], "photo.jpg", { type: "image/jpeg" });
+  const text = new File(["hello"], "notes.txt", { type: "text/plain" });
+
+  it.each([
+    { name: "a work photo", section: "work", file: jpeg, ok: true },
+    { name: "a studio photo", section: "studio", file: jpeg, ok: true },
+    { name: "an unknown section", section: "shop", file: jpeg, ok: false },
+    { name: "no section", section: null, file: jpeg, ok: false },
+    { name: "a file that is not an image", section: "work", file: text, ok: false },
+  ])("$name: valid $ok", ({ section, file, ok }) => {
+    expect(Schema.is(GalleryUploadFormData)(uploadWith(section, file))).toBe(ok);
   });
 });
 

@@ -16,6 +16,7 @@ export const appConfig: AppConfig = {
     enquiry:
       "https://docs.google.com/forms/d/e/1FAIpQLScIKMz-n1q6GchMpAc_Kb5gCie4_CfcEPv4tdrCgdhVPE_YmQ/viewform",
     instagram: "https://www.instagram.com/danielcastro_tattooartist/",
+    tiktok: "https://www.tiktok.com/@danielcastrotattooartist",
     youtube: "https://www.youtube.com/@DanielCastroTattooArtist",
     shop: "https://necroticwear.com/",
     map: "https://www.google.com/maps/place/Daniel+Castro+Tattoo+Studio/@41.5704216,-8.4521988,17z",
@@ -38,6 +39,7 @@ type AppConfig = {
     /** Where "Book a session" goes: the project enquiry form. */
     readonly enquiry: string;
     readonly instagram: string;
+    readonly tiktok: string;
     readonly youtube: string;
     readonly shop: string;
     readonly map: string;

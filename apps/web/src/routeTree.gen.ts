@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SiteRouteImport } from './routes/_site'
 import { Route as SiteIndexRouteImport } from './routes/_site/index'
 import { Route as SiteAboutRouteImport } from './routes/_site/about'
+import { Route as SiteAftercareRouteImport } from './routes/_site/aftercare'
 import { Route as SiteGuestSpotsRouteImport } from './routes/_site/guest-spots'
 import { Route as SiteHowToBookRouteImport } from './routes/_site/how-to-book'
 import { Route as SiteNewsRouteImport } from './routes/_site/news'
@@ -42,6 +43,11 @@ const SiteIndexRoute = SiteIndexRouteImport.update({
 const SiteAboutRoute = SiteAboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteAftercareRoute = SiteAftercareRouteImport.update({
+  id: '/aftercare',
+  path: '/aftercare',
   getParentRoute: () => SiteRoute,
 } as any)
 const SiteGuestSpotsRoute = SiteGuestSpotsRouteImport.update({
@@ -134,6 +140,7 @@ const ApiPhotosSplatRoute = ApiPhotosSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
   '/about': typeof SiteAboutRoute
+  '/aftercare': typeof SiteAftercareRoute
   '/guest-spots': typeof SiteGuestSpotsRoute
   '/how-to-book': typeof SiteHowToBookRoute
   '/news': typeof SiteNewsRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/about': typeof SiteAboutRoute
+  '/aftercare': typeof SiteAftercareRoute
   '/guest-spots': typeof SiteGuestSpotsRoute
   '/how-to-book': typeof SiteHowToBookRoute
   '/news': typeof SiteNewsRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_site': typeof SiteRouteWithChildren
   '/_site/about': typeof SiteAboutRoute
+  '/_site/aftercare': typeof SiteAftercareRoute
   '/_site/guest-spots': typeof SiteGuestSpotsRoute
   '/_site/how-to-book': typeof SiteHowToBookRoute
   '/_site/news': typeof SiteNewsRoute
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/aftercare'
     | '/guest-spots'
     | '/how-to-book'
     | '/news'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/about'
+    | '/aftercare'
     | '/guest-spots'
     | '/how-to-book'
     | '/news'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_site'
     | '/_site/about'
+    | '/_site/aftercare'
     | '/_site/guest-spots'
     | '/_site/how-to-book'
     | '/_site/news'
@@ -294,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof SiteAboutRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/aftercare': {
+      id: '/_site/aftercare'
+      path: '/aftercare'
+      fullPath: '/aftercare'
+      preLoaderRoute: typeof SiteAftercareRouteImport
       parentRoute: typeof SiteRoute
     }
     '/_site/guest-spots': {
@@ -420,6 +439,7 @@ declare module '@tanstack/react-router' {
 
 interface SiteRouteChildren {
   SiteAboutRoute: typeof SiteAboutRoute
+  SiteAftercareRoute: typeof SiteAftercareRoute
   SiteGuestSpotsRoute: typeof SiteGuestSpotsRoute
   SiteHowToBookRoute: typeof SiteHowToBookRoute
   SiteNewsRoute: typeof SiteNewsRoute
@@ -429,6 +449,7 @@ interface SiteRouteChildren {
 
 const SiteRouteChildren: SiteRouteChildren = {
   SiteAboutRoute: SiteAboutRoute,
+  SiteAftercareRoute: SiteAftercareRoute,
   SiteGuestSpotsRoute: SiteGuestSpotsRoute,
   SiteHowToBookRoute: SiteHowToBookRoute,
   SiteNewsRoute: SiteNewsRoute,

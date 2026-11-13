@@ -25,6 +25,10 @@ export function SiteContact() {
           Instagram
         </a>
         {" · "}
+        <a href={appConfig.links.tiktok} target="_blank" rel="noreferrer">
+          TikTok
+        </a>
+        {" · "}
         <a href={appConfig.links.youtube} target="_blank" rel="noreferrer">
           YouTube
         </a>

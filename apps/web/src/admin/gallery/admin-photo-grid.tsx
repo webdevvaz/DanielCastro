@@ -1,3 +1,5 @@
+import type { GallerySection } from "@daniel/shared/gallery";
+
 import { useMutation } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -24,10 +26,11 @@ const sameOrder = (left: ReadonlyArray<string>, right: ReadonlyArray<string>) =>
   left.length === right.length && left.every((id, index) => right[index] === id);
 
 /**
- * Every photo of the gallery in order. Dragging a card moves it live; dropping saves the whole
- * new order. While the save runs, the new order stays on screen and reordering is paused.
+ * Every photo of one gallery section in order. Dragging a card moves it live; dropping saves the
+ * section's whole new order. While the save runs, the new order stays on screen and reordering is
+ * paused. Cards cannot be dragged into another section.
  */
-export function AdminPhotoGrid({ photos }: { photos: ReadonlyArray<AdminGalleryPhoto> }) {
+export function AdminPhotoGrid({ section, photos }: AdminPhotoGridProps) {
   const { queryClient } = useRouteContext({ from: "/admin/_dashboard/gallery" });
 
   const [draftOrder, setDraftOrder] = useState<ReadonlyArray<string> | null>(null);
@@ -36,7 +39,7 @@ export function AdminPhotoGrid({ photos }: { photos: ReadonlyArray<AdminGalleryP
   const reorder = useServerFn(reorderGallery);
 
   const reorderMutation = useMutation({
-    mutationFn: (ids: ReadonlyArray<string>) => reorder({ data: { ids: [...ids] } }),
+    mutationFn: (ids: ReadonlyArray<string>) => reorder({ data: { section, ids: [...ids] } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: galleryQueryKeys.all });
     },
@@ -111,3 +114,8 @@ export function AdminPhotoGrid({ photos }: { photos: ReadonlyArray<AdminGalleryP
     </div>
   );
 }
+
+type AdminPhotoGridProps = {
+  readonly section: GallerySection;
+  readonly photos: ReadonlyArray<AdminGalleryPhoto>;
+};

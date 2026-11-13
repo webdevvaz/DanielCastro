@@ -4,7 +4,25 @@ import { useRouteContext } from "@tanstack/react-router";
 import { AdminPhotoGrid } from "./admin-photo-grid";
 import { PhotoUploader } from "./photo-uploader";
 
-/** Manages the gallery: upload, order, feature, hide, describe, and delete photos. */
+/** The parts of the gallery, each managed on its own: its photos, uploads, and order. */
+const SECTIONS = [
+  {
+    section: "work",
+    title: "Work",
+    description:
+      "Daniel's tattoos, on the Work page in this order. Featured photos show as large tiles.",
+  },
+  {
+    section: "studio",
+    title: "Studio",
+    description:
+      "Photos of the studio, on the About page in this order. The first photo shows large.",
+  },
+] as const;
+
+const countLabel = (count: number) => `${count} ${count === 1 ? "photo" : "photos"}`;
+
+/** Manages the gallery: upload, order, feature, hide, describe, and delete photos, per section. */
 export function AdminGalleryPage() {
   const context = useRouteContext({ from: "/admin/_dashboard/gallery" });
 
@@ -17,18 +35,23 @@ export function AdminGalleryPage() {
       </p>
       <h1>Gallery</h1>
       <p className="lead">
-        Drag photos to change their order, or use the arrows. The Work page shows the photos in the
-        same order; featured photos show as large tiles, and hidden photos stay here only.
+        Drag photos to change their order, or use the arrows. Hidden photos stay here only. A click
+        on a photo on the site shows it large, with its title and details.
       </p>
-      <section className="admin-section">
-        <PhotoUploader />
-      </section>
-      <section className="admin-section">
-        <h2>
-          {photos.length} {photos.length === 1 ? "photo" : "photos"}
-        </h2>
-        <AdminPhotoGrid photos={photos} />
-      </section>
+      {SECTIONS.map((item) => {
+        const sectionPhotos = photos.filter((photo) => photo.section === item.section);
+
+        return (
+          <section className="admin-section" key={item.section}>
+            <h2>
+              {item.title} <small>{countLabel(sectionPhotos.length)}</small>
+            </h2>
+            <p className="muted">{item.description}</p>
+            <PhotoUploader section={item.section} />
+            <AdminPhotoGrid section={item.section} photos={sectionPhotos} />
+          </section>
+        );
+      })}
     </>
   );
 }

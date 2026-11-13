@@ -11,8 +11,10 @@ export function AdminOverview() {
   const { data: travelSettings } = useSuspenseQuery(context.adminTravelSettingsQueryOptions);
 
   const today = studioToday();
-  const featured = photos.filter((photo) => photo.featured && !photo.hidden).length;
-  const hidden = photos.filter((photo) => photo.hidden).length;
+  const work = photos.filter((photo) => photo.section === "work");
+  const studio = photos.filter((photo) => photo.section === "studio");
+  const featured = work.filter((photo) => photo.featured && !photo.hidden).length;
+  const hidden = work.filter((photo) => photo.hidden).length;
   const upcoming = spots.filter((spot) => spot.endsOn >= today).length;
 
   return (
@@ -23,9 +25,9 @@ export function AdminOverview() {
       <h1>Welcome back</h1>
       <div className="stats">
         <div className="panel stat">
-          <strong>{photos.length}</strong>
+          <strong>{work.length}</strong>
           <span>
-            photos in the gallery · {featured} featured · {hidden} hidden
+            photos of work · {featured} featured · {hidden} hidden · {studio.length} of the studio
           </span>
           <br />
           <Link to="/admin/gallery">Manage gallery →</Link>

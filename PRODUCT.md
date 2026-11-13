@@ -26,12 +26,16 @@ The website of Daniel Castro, Tattoo Artist®: show the portfolio, turn visitors
 - Studio: Rua da Ramoa, loja 80, 4700-855 Merelim S. Pedro, Braga, Portugal. By appointment only. Outside the city centre.
 - Studio coordinates: 41.5704216, -8.4521988 (Google Maps place "Daniel Castro Tattoo Studio"). The travel estimator uses them as the destination.
 - Contact: danielcastrotattooshop@gmail.com. Enquiries arrive at this address.
-- Social: Instagram https://www.instagram.com/danielcastro_tattooartist/ · YouTube https://www.youtube.com/@DanielCastroTattooArtist
+- Social: Instagram https://www.instagram.com/danielcastro_tattooartist/ · TikTok https://www.tiktok.com/@danielcastrotattooartist · YouTube https://www.youtube.com/@DanielCastroTattooArtist
 - Shop manager: Joana. Joana answers every enquiry by email (it can take a few days), discusses the project with Daniel, and sends the private quote, session plan, and dates.
+- Career (from Daniel's CV, November 2026; the About page uses it): tattooing since 2015 after a course at EvaBelle, Guimarães; own studio since 2018 (Vila de Prado), the current Braga studio since June 2023; resident artist with Squid Ink aboard Virgin Voyages ships since April 2022; Pepax Pro Team member since October 2023.
+- Awards: Lisbon Tattoo Rock Fest 2023 (First place, Best Anime/Manga Tattoo; Best of Day), Lisbon Tattoo Rock Fest 2024 (Second place, Anime/Manga/Kawaii Tattoo), Urban Land Tattoo Expo Roma 2024 (Third place, Anime Cartoon).
+- Conventions: Oporto Tattoo (2017, 2019, 2022, 2023, 2025), Lisbon Tattoo Rock Fest (2023, 2024), Urban Land Tattoo Expo Roma (2024), The Tattooed Planet, Manchester (2024), Pyromaniacs, Luxembourg (2019).
+- Not on the site: Daniel's personal phone and email, his full legal name, his engineering degree, follower counts, and the studio's other artists.
 
 ## Main user journeys
 
-1. **Browse the gallery.** A curated portfolio that the studio team fills by hand (see journey 7). Known pieces: Skull Knight, Asta, Madara Uchiha, a God of War backpiece.
+1. **Browse the gallery.** A curated portfolio that the studio team fills by hand (see journey 7). Known pieces: Skull Knight, Asta, Madara Uchiha, a God of War backpiece. A click on a photo shows it at full size on the same page, with its title, series, and placement underneath; the arrows move to the next photo.
 2. **Read Daniel News.** A main page that shows Daniel's latest Instagram posts automatically, through Meta's official Instagram API. Daniel's Instagram account is already a professional account; Daniel connects it once from the admin area. The site refreshes the access token itself and caches the posts, so a slow or failed Instagram call never breaks the page.
 3. **Send a project enquiry.** The site has its own bilingual enquiry form, which replaces the Google Form ("Marcações / bookings - Daniel Castro"). It asks the same questions (see [Enquiry form](#enquiry-form)) without a Google sign-in. Each enquiry is emailed to danielcastrotattooshop@gmail.com with its photos and is listed in the admin area. Body and reference photos are personal data: store them privately, show them only to the studio team, and publish a privacy policy.
 4. **Booking process.** Enquiry → private quote, session plan, and dates → non-refundable deposit confirms the date → Daniel draws the design close to the appointment and sends it the night before. An enquiry does not reserve a date. Prices are never published.
@@ -46,6 +50,7 @@ The website of Daniel Castro, Tattoo Artist®: show the portfolio, turn visitors
    - Upload several photos at once by drag and drop, from a phone or a computer. The site resizes them for the web.
    - Add an Instagram post from Daniel News to the gallery with one click. The site copies the image, because Instagram image links expire.
    - Optional details per photo: title or character, series, body placement, and tags. Reorder by drag and drop, mark photos as featured (large tiles on the Work page), and hide or delete them.
+   - Two sections, each with its own uploads and order: **Work** (Daniel's tattoos, on the Work page) and **Studio** (photos of the studio, on the About page, where the first one shows large). The studio team changes the studio photos there without help.
 8. **Manage guest spots** (admin). A signed-in admin adds, edits, and removes guest spots: city, country, studio name and address, start and end dates, and whether booking is open or full. The public site lists upcoming guest spots, hides past ones automatically, and offers them as locations in the enquiry form.
 9. **Handle enquiries** (admin). The studio team sees every enquiry with its photos and trip estimate, and marks its status (new, quoted, booked, declined).
 
@@ -114,7 +119,9 @@ City and country (page 2) are also the starting point for the travel estimator, 
 
 The deposit amount varies per project. Never publish an amount; say that the deposit is set with the quote.
 
-The FAQ needs answers from Daniel on: the deadline to pay the deposit, payment methods, rescheduling and cancellation, minimum age and health limits, pricing approach, session length, preparation before a session, aftercare, touch-ups, and design changes.
+The FAQ needs answers from Daniel on: the deadline to pay the deposit, payment methods, rescheduling and cancellation, minimum age and health limits, pricing approach, session length, preparation before a session, touch-ups, and design changes.
+
+Aftercare is answered: the Aftercare page translates the studio's care sheet ("Informações e cuidados a ter com a tatuagem"). BALM TATTOO cream 2–3 times a day for 7 days (the sheet's chart says 3 times; the owner chose 2–3). The Portuguese sheet is the source for the Portuguese version.
 
 ## Accounts and hosting
 
@@ -130,7 +137,7 @@ The FAQ needs answers from Daniel on: the deadline to pay the deposit, payment m
 
 ## Placeholder content
 
-The artist biography and the list of awards on the site are placeholders until Daniel supplies the real text.
+None on the About page since November 2026: the biography, awards, conventions, and past guest spots come from Daniel's CV, and the portrait and studio photos from the photos he sent.
 
 ## Out of scope
 

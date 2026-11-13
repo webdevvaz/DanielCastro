@@ -116,6 +116,9 @@ export function HowToBookPage() {
                 </details>
               ))}
             </div>
+            <p className="muted">
+              After your session, follow the <Link to="/aftercare">aftercare guide</Link>.
+            </p>
           </section>
         </div>
       </div>

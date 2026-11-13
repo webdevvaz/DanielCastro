@@ -1,6 +1,7 @@
 import { listAllGalleryPhotos, listPublicGalleryPhotos } from "@daniel/db";
 import {
   DeleteGalleryPhotoInput,
+  GallerySectionInput,
   GalleryUploadFormData,
   ReorderGalleryInput,
   SetGalleryPhotoFlagsInput,
@@ -19,17 +20,17 @@ import {
   uploadGalleryPhoto as uploadGalleryPhotoEffect,
 } from "./gallery.server";
 
-/** The gallery as visitors see it. Public. */
-export const getGallery = createServerFn({ method: "GET" }).handler(() =>
-  runServerEffect(listPublicGalleryPhotos()),
-);
+/** One section of the gallery as visitors see it: the work, or the studio photos. Public. */
+export const getGallery = createServerFn({ method: "GET" })
+  .validator(validateInput(GallerySectionInput))
+  .handler(({ data }) => runServerEffect(listPublicGalleryPhotos(data.section)));
 
-/** Every photo, hidden ones included, for the admin area. */
+/** Every photo of every section, hidden ones included, for the admin area. */
 export const getAdminGallery = createServerFn({ method: "GET" })
   .middleware([adminMiddleware])
   .handler(() => runServerEffect(listAllGalleryPhotos()));
 
-/** Accepts multipart form data with one image in the `photo` field. */
+/** Accepts multipart form data with one image in `photo` and its section in `section`. */
 export const uploadGalleryPhoto = createServerFn({ method: "POST" })
   .middleware([adminMiddleware])
   .validator(validateInput(GalleryUploadFormData))
@@ -53,8 +54,10 @@ export const deleteGalleryPhoto = createServerFn({ method: "POST" })
   .validator(validateInput(DeleteGalleryPhotoInput))
   .handler(({ context, data }) => runServerEffect(removeGalleryPhoto(context.user.id, data.id)));
 
-/** Puts the whole gallery in a new order. */
+/** Puts one section of the gallery in a new order. */
 export const reorderGallery = createServerFn({ method: "POST" })
   .middleware([adminMiddleware])
   .validator(validateInput(ReorderGalleryInput))
-  .handler(({ context, data }) => runServerEffect(reorderGalleryEffect(context.user.id, data.ids)));
+  .handler(({ context, data }) =>
+    runServerEffect(reorderGalleryEffect(context.user.id, data.section, data.ids)),
+  );

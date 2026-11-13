@@ -48,13 +48,25 @@ const insertAdmin = Effect.gen(function* () {
   return id;
 });
 
-const formDataWith = (bytes: Uint8Array<ArrayBuffer>, name: string, type: string) => {
+const formDataWith = (
+  bytes: Uint8Array<ArrayBuffer>,
+  name: string,
+  type: string,
+  section = "work",
+) => {
   const formData = new FormData();
 
   formData.append("photo", new File([bytes], name, { type }));
+  formData.append("section", section);
 
   return formData;
 };
+
+const redPng = Effect.promise(() =>
+  sharp({ create: { width: 640, height: 480, channels: 3, background: "#c1121f" } })
+    .png()
+    .toBuffer(),
+);
 
 /**
  * The upload pipeline end to end: file check, image processing, file storage, and the database
@@ -63,23 +75,22 @@ const formDataWith = (bytes: Uint8Array<ArrayBuffer>, name: string, type: string
 layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })(
   "gallery upload",
   (it) => {
-    it.effect("stores both sizes and adds the photo at the start of the gallery", () =>
+    it.effect("stores both sizes and adds the photo at the start of its section", () =>
       Effect.gen(function* () {
         const adminId = yield* insertAdmin;
-        const png = yield* Effect.promise(() =>
-          sharp({ create: { width: 640, height: 480, channels: 3, background: "#c1121f" } })
-            .png()
-            .toBuffer(),
-        );
+        const png = yield* redPng;
 
         const { id } = yield* uploadGalleryPhoto(
           adminId,
-          formDataWith(new Uint8Array(png), "tattoo.png", "image/png"),
+          formDataWith(new Uint8Array(png), "studio.png", "image/png", "studio"),
         );
 
-        const first = (yield* listAllGalleryPhotos()).at(0);
+        const studio = (yield* listAllGalleryPhotos()).filter(
+          (photo) => photo.section === "studio",
+        );
+        const first = studio.at(0);
 
-        expect(first).toMatchObject({ id, width: 640, height: 480 });
+        expect(first).toMatchObject({ id, section: "studio", width: 640, height: 480 });
         expect(storedFiles()).toEqual(
           expect.arrayContaining([
             `${first?.storageKey}-large.webp`,
@@ -100,6 +111,27 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })(
 
         const error = yield* Effect.flip(
           uploadGalleryPhoto(adminId, formDataWith(fake, "renamed.png", "image/png")),
+        );
+
+        expect(error._tag).toBe("InvalidInputError");
+        expect((yield* listAllGalleryPhotos()).length).toBe(photosBefore);
+        expect(storedFilesOrNone()).toEqual(filesBefore);
+      }),
+    );
+
+    it.effect("rejects an upload to an unknown section, and stores nothing", () =>
+      Effect.gen(function* () {
+        const adminId = yield* insertAdmin;
+        const png = yield* redPng;
+
+        const photosBefore = (yield* listAllGalleryPhotos()).length;
+        const filesBefore = storedFilesOrNone();
+
+        const error = yield* Effect.flip(
+          uploadGalleryPhoto(
+            adminId,
+            formDataWith(new Uint8Array(png), "tattoo.png", "image/png", "shop"),
+          ),
         );
 
         expect(error._tag).toBe("InvalidInputError");

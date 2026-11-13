@@ -444,7 +444,7 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
       const photos = yield* listAllGalleryPhotos();
       const view = yield* getInstagramAdminView.pipe(Effect.provide(instagram.live));
 
-      expect(photos.at(0)).toMatchObject({ id, width: 1080, height: 1350 });
+      expect(photos.at(0)).toMatchObject({ id, section: "work", width: 1080, height: 1350 });
       expect(again._tag).toBe("ConflictError");
       expect(photos.filter((photo) => photo.id === id)).toHaveLength(1);
       expect(view.posts.find((post) => post.id === mediaId)?.imported).toBe(true);

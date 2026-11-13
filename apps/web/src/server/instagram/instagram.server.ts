@@ -224,7 +224,7 @@ export const importInstagramPost = Effect.fn("importInstagramPost")(
     const bytes = yield* fromInstagram(api.download(post.imageUrl));
     const photo = yield* checkPhotoBytes(bytes);
 
-    return yield* addPhotoToGallery(photo, { userId, instagramMediaId: mediaId });
+    return yield* addPhotoToGallery(photo, { userId, section: "work", instagramMediaId: mediaId });
   },
   (effect, userId, mediaId) =>
     effect.pipe(

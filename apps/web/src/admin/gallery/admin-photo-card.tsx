@@ -15,8 +15,8 @@ import { deleteGalleryPhoto, setGalleryPhotoFlags } from "@/server/gallery/galle
 import { PhotoDetailsForm } from "./photo-details-form";
 
 /**
- * One photo in the admin gallery: drag it to reorder, or use the arrows. Feature it as a large
- * tile on the Work page, hide it from visitors, edit its details, or delete it.
+ * One photo in the admin gallery: drag it to reorder, or use the arrows. Feature a work photo as a
+ * large tile on the Work page, hide it from visitors, edit its details, or delete it.
  */
 export function AdminPhotoCard({
   photo,
@@ -97,16 +97,18 @@ export function AdminPhotoCard({
               >
                 Edit
               </button>
-              <button
-                className="btn btn-ghost btn-small"
-                type="button"
-                disabled={busy}
-                onClick={() =>
-                  flagsMutation.mutate({ featured: !photo.featured, hidden: photo.hidden })
-                }
-              >
-                {photo.featured ? "Unfeature" : "Feature"}
-              </button>
+              {photo.section === "work" ? (
+                <button
+                  className="btn btn-ghost btn-small"
+                  type="button"
+                  disabled={busy}
+                  onClick={() =>
+                    flagsMutation.mutate({ featured: !photo.featured, hidden: photo.hidden })
+                  }
+                >
+                  {photo.featured ? "Unfeature" : "Feature"}
+                </button>
+              ) : null}
               <button
                 className="btn btn-ghost btn-small"
                 type="button"

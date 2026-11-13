@@ -8,7 +8,9 @@ import {
   setGalleryPhotoFlags,
   updateGalleryPhotoDetails,
 } from "@daniel/db";
-import { Effect } from "effect";
+import { InvalidInputError } from "@daniel/shared/errors";
+import { GallerySection } from "@daniel/shared/gallery";
+import { Effect, Schema } from "effect";
 import { randomUUID } from "node:crypto";
 
 import { PHOTO_SIZES, photoFileName } from "@/gallery/photo-files";
@@ -37,9 +39,17 @@ const removeStoredFiles = (storageKey: string) =>
     ),
   );
 
+/** The `section` field of an upload. The validator has checked it; this gives it its type. */
+const readUploadSection = (value: FormDataEntryValue | null) =>
+  Schema.decodeUnknownEffect(GallerySection)(value).pipe(
+    Effect.mapError(
+      () => new InvalidInputError({ reason: "Choose the part of the gallery for the photo" }),
+    ),
+  );
+
 /**
- * Resizes and stores a photo, then adds it at the start of the gallery. When a step fails, the
- * files already stored are deleted again.
+ * Resizes and stores a photo, then adds it at the start of its section of the gallery. When a
+ * step fails, the files already stored are deleted again.
  */
 export const addPhotoToGallery = Effect.fn("addPhotoToGallery")(function* (
   bytes: Uint8Array,
@@ -56,6 +66,7 @@ export const addPhotoToGallery = Effect.fn("addPhotoToGallery")(function* (
 
     return yield* insertGalleryPhoto({
       storageKey,
+      section: source.section,
       width: photo.width,
       height: photo.height,
       createdBy: source.userId,
@@ -64,12 +75,13 @@ export const addPhotoToGallery = Effect.fn("addPhotoToGallery")(function* (
   }).pipe(Effect.onError(() => removeStoredFiles(storageKey)));
 });
 
-/** Checks an uploaded photo and adds it at the start of the gallery. */
+/** Checks an uploaded photo and adds it at the start of the section the upload names. */
 export const uploadGalleryPhoto = Effect.fn("uploadGalleryPhoto")(
   function* (userId: string, formData: FormData) {
+    const section = yield* readUploadSection(formData.get("section"));
     const bytes = yield* readPhotoUpload(formData.get("photo"));
 
-    return yield* addPhotoToGallery(bytes, { userId, instagramMediaId: null });
+    return yield* addPhotoToGallery(bytes, { userId, section, instagramMediaId: null });
   },
   (effect, userId) =>
     effect.pipe(
@@ -135,19 +147,25 @@ export const removeGalleryPhoto = Effect.fn("removeGalleryPhoto")(
     ),
 );
 
-/** Puts the whole gallery in a new order. */
+/** Puts one section of the gallery in a new order. */
 export const reorderGallery = Effect.fn("reorderGallery")(
-  function* (_userId: string, ids: ReadonlyArray<string>) {
-    yield* reorderGalleryPhotos(ids);
+  function* (_userId: string, section: GallerySection, ids: ReadonlyArray<string>) {
+    yield* reorderGalleryPhotos(section, ids);
   },
-  (effect, userId) =>
+  (effect, userId, section) =>
     effect.pipe(
-      withAuditEvent({ action: "gallery.reordered", actorUserId: userId, targetType: "gallery" }),
+      withAuditEvent({
+        action: "gallery.reordered",
+        actorUserId: userId,
+        targetType: "gallery",
+        targetId: section,
+      }),
     ),
 );
 
-/** Who added a photo, and the Instagram post it came from, if any. */
+/** Who added a photo, the section it goes to, and the Instagram post it came from, if any. */
 export type PhotoSource = {
   readonly userId: string;
+  readonly section: GallerySection;
   readonly instagramMediaId: string | null;
 };

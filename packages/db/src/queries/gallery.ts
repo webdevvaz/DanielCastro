@@ -1,5 +1,7 @@
+import type { GallerySection } from "@daniel/shared/gallery";
+
 import { ConflictError, NotFoundError } from "@daniel/shared/errors";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import { Database } from "../database";
@@ -19,6 +21,7 @@ const publicPhotoColumns = {
 
 const adminPhotoColumns = {
   ...publicPhotoColumns,
+  section: true,
   hidden: true,
   createdAt: true,
 } as const;
@@ -29,20 +32,25 @@ const galleryOrder = { position: "asc", createdAt: "desc" } as const;
 const photoNotFound = () => new NotFoundError({ resource: "Photo" });
 
 /**
- * The gallery as visitors see it: every photo that is not hidden, in gallery order. Featured
- * photos show as large tiles.
+ * One part of the gallery as visitors see it: every photo of the section that is not hidden, in
+ * gallery order. Featured work photos show as large tiles.
  */
-export const listPublicGalleryPhotos = Effect.fn("db.listPublicGalleryPhotos")(function* () {
+export const listPublicGalleryPhotos = Effect.fn("db.listPublicGalleryPhotos")(function* (
+  section: GallerySection,
+) {
   const db = yield* Database;
 
   return yield* db.query.galleryPhoto.findMany({
     columns: publicPhotoColumns,
-    where: { hidden: { eq: false } },
+    where: { section: { eq: section }, hidden: { eq: false } },
     orderBy: galleryOrder,
   });
 }, mapDatabaseError("listPublicGalleryPhotos"));
 
-/** Every photo, hidden ones included, in gallery order, for the admin area. */
+/**
+ * Every photo of every section, hidden ones included, in gallery order, for the admin area. The
+ * admin area shows each section on its own.
+ */
 export const listAllGalleryPhotos = Effect.fn("db.listAllGalleryPhotos")(function* () {
   const db = yield* Database;
 
@@ -53,7 +61,7 @@ export const listAllGalleryPhotos = Effect.fn("db.listAllGalleryPhotos")(functio
 }, mapDatabaseError("listAllGalleryPhotos"));
 
 /**
- * Adds a stored photo at the start of the gallery and returns its ID. Fails with
+ * Adds a stored photo at the start of its section and returns its ID. Fails with
  * `ConflictError`, and adds nothing, when the photo's Instagram post is already in the gallery.
  */
 export const insertGalleryPhoto = Effect.fn("db.insertGalleryPhoto")(function* (
@@ -61,13 +69,12 @@ export const insertGalleryPhoto = Effect.fn("db.insertGalleryPhoto")(function* (
 ) {
   const db = yield* Database;
 
+  const firstPosition = sql`(select coalesce(min(${galleryPhoto.position}), 0) - 1 from ${galleryPhoto} where ${galleryPhoto.section} = ${photo.section})`;
+
   // Uploads have no Instagram post, and nulls never conflict, so only a repeated import skips.
   const inserted = yield* db
     .insert(galleryPhoto)
-    .values({
-      ...photo,
-      position: sql`(select coalesce(min(${galleryPhoto.position}), 0) - 1 from ${galleryPhoto})`,
-    })
+    .values({ ...photo, position: firstPosition })
     .onConflictDoNothing({ target: galleryPhoto.instagramMediaId })
     .returning({ id: galleryPhoto.id });
 
@@ -129,18 +136,25 @@ export const deleteGalleryPhoto = Effect.fn("db.deleteGalleryPhoto")(function* (
 }, mapDatabaseError("deleteGalleryPhoto"));
 
 /**
- * Puts the gallery in the given order, first ID first. Fails with `ConflictError`, and changes
- * nothing, unless `ids` lists every photo exactly once: a list made before another admin added
- * or deleted a photo must not drop or misplace it. The rows stay locked until the update ends.
+ * Puts one section of the gallery in the given order, first ID first. Fails with
+ * `ConflictError`, and changes nothing, unless `ids` lists every photo of the section exactly
+ * once: a list made before another admin added or deleted a photo must not drop or misplace it,
+ * and a photo of the other section must not move. The section's rows stay locked until the update
+ * ends.
  */
 export const reorderGalleryPhotos = Effect.fn("db.reorderGalleryPhotos")(function* (
+  section: GallerySection,
   ids: ReadonlyArray<string>,
 ) {
   const db = yield* Database;
 
   yield* db.transaction((tx) =>
     Effect.gen(function* () {
-      const current = yield* tx.select({ id: galleryPhoto.id }).from(galleryPhoto).for("update");
+      const current = yield* tx
+        .select({ id: galleryPhoto.id })
+        .from(galleryPhoto)
+        .where(eq(galleryPhoto.section, section))
+        .for("update");
 
       const currentIds = new Set(current.map((row) => row.id));
       const listsEveryPhoto =
@@ -162,7 +176,7 @@ export const reorderGalleryPhotos = Effect.fn("db.reorderGalleryPhotos")(functio
       yield* tx
         .update(galleryPhoto)
         .set({ position: sql`(case ${galleryPhoto.id} ${positions} end)::integer` })
-        .where(inArray(galleryPhoto.id, [...ids]));
+        .where(and(eq(galleryPhoto.section, section), inArray(galleryPhoto.id, [...ids])));
     }),
   );
 }, mapDatabaseError("reorderGalleryPhotos"));
@@ -171,7 +185,9 @@ export const reorderGalleryPhotos = Effect.fn("db.reorderGalleryPhotos")(functio
 export type NewGalleryPhoto = Pick<
   typeof galleryPhoto.$inferInsert,
   "storageKey" | "width" | "height" | "createdBy" | "instagramMediaId"
->;
+> & {
+  readonly section: GallerySection;
+};
 
 /** The descriptive text of a photo. `null` clears a field. */
 export type GalleryPhotoDetails = {
