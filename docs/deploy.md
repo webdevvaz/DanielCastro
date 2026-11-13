@@ -43,10 +43,11 @@ Railway changes the names in its dashboard from time to time, so a label may dif
    - Add `INSTAGRAM_APP_ID` and `INSTAGRAM_APP_SECRET` when the Meta app exists (`docs/instagram.md`).
    - Enquiry emails need no variable: an admin saves the Resend API key, the sender, and the recipients on the admin **Email** page, once the site's domain is verified in Resend. Until then, enquiries are saved and listed in the admin area only.
 
-6. **Deploy steps.** In the web service, open **Settings → Deploy**:
+6. **Clear what Railway filled in.** Railway detects the pnpm monorepo and may fill in a **Custom Build Command** (`pnpm --filter web build`), **Watch Paths** (`/apps/web/**`), and a **Custom Start Command** (`pnpm --filter web start`). Clear all three in **Settings → Build** and **Settings → Deploy**: the `Containerfile` builds and starts the site, the runtime image has no pnpm (the deploy fails with "The executable `pnpm` could not be found"), and the watch path would skip deploys for changes in `packages/`.
+7. **Deploy steps.** In the web service, open **Settings → Deploy**:
    - **Pre-deploy command:** `node /app/release/migrate.mjs`
    - **Healthcheck path:** `/api/ready`
-7. **First deploy.** Deploy the service, and wait until it is active. Open the address; the site shows an empty gallery.
+8. **First deploy.** Deploy the service, and wait until it is active. Open the address; the site shows an empty gallery.
 
 ## Admin accounts
 
