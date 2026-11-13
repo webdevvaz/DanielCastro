@@ -6,7 +6,13 @@ import { EnquiryDetails, EnquiryFormData } from "../../src/enquiry";
 import { GalleryUploadFormData, ReorderGalleryInput } from "../../src/gallery";
 import { CreateGuestSpotInput } from "../../src/guest-spots";
 import { ImportInstagramPostInput } from "../../src/instagram";
-import { ShopCheckoutInput, ShopProductInput } from "../../src/shop";
+import {
+  AddToShopCartInput,
+  ShopCartId,
+  ShopCheckoutInput,
+  ShopProductInput,
+  UpdateShopCartLineInput,
+} from "../../src/shop";
 import { TravelSearch, TravelSearchForm, UpdateTravelSettingsInput } from "../../src/travel";
 
 const decodeGuestSpot = Schema.decodeUnknownResult(CreateGuestSpotInput);
@@ -453,5 +459,65 @@ describe("SaveEmailSettingsInput", () => {
     },
   ])("$name: problems at $paths", async ({ input, paths }) => {
     expect(await issuePaths(SaveEmailSettingsInput)(input)).toEqual(paths);
+  });
+});
+
+// The cart's inputs come from the browser. Only real Shopify IDs and small quantities may reach
+// Shopify; the cart ID also comes from a cookie the visitor can edit.
+describe("shop cart inputs", () => {
+  const lineId =
+    "gid://shopify/CartLine/2aa000d8-be6f-4a57-89d9-78ae9541ea3a?cart=hWNJ6UbB2tAWL3PnHnedr5l5";
+  const variantId = "gid://shopify/ProductVariant/41463235641541";
+
+  it.each([
+    { name: "a new quantity", input: { locale: "pt", lineId, quantity: 3 }, paths: [] },
+    { name: "removing the line", input: { locale: "pt", lineId, quantity: 0 }, paths: [] },
+    { name: "too many items", input: { locale: "pt", lineId, quantity: 21 }, paths: ["quantity"] },
+    {
+      name: "a negative quantity",
+      input: { locale: "pt", lineId, quantity: -1 },
+      paths: ["quantity"],
+    },
+    {
+      name: "a variant ID instead of a line",
+      input: { locale: "pt", lineId: variantId, quantity: 1 },
+      paths: ["lineId"],
+    },
+    {
+      name: "a line ID with extra text",
+      input: { locale: "pt", lineId: `${lineId}&quantity=99`, quantity: 1 },
+      paths: ["lineId"],
+    },
+  ])("UpdateShopCartLineInput, $name: problems at $paths", async ({ input, paths }) => {
+    expect(await issuePaths(UpdateShopCartLineInput)(input)).toEqual(paths);
+  });
+
+  it.each([
+    { name: "one item", input: { locale: "de", variantId, quantity: 1 }, paths: [] },
+    {
+      name: "too many at once",
+      input: { locale: "de", variantId, quantity: 6 },
+      paths: ["quantity"],
+    },
+    {
+      name: "an unknown language",
+      input: { locale: "it", variantId, quantity: 1 },
+      paths: ["locale"],
+    },
+  ])("AddToShopCartInput, $name: problems at $paths", async ({ input, paths }) => {
+    expect(await issuePaths(AddToShopCartInput)(input)).toEqual(paths);
+  });
+
+  it.each([
+    {
+      name: "a cart ID",
+      value: "gid://shopify/Cart/hWNJ6UbB2tAWL3PnHnedr5l5?key=9175571464cdcb84b7a642814769468d",
+      ok: true,
+    },
+    { name: "another kind of ID", value: "gid://shopify/Customer/123", ok: false },
+    { name: "extra parameters", value: "gid://shopify/Cart/abc?key=1&other=2", ok: false },
+    { name: "a GraphQL fragment", value: 'gid://shopify/Cart/abc") { id }', ok: false },
+  ])("ShopCartId, $name: valid $ok", ({ value, ok }) => {
+    expect(Schema.is(ShopCartId)(value)).toBe(ok);
   });
 });

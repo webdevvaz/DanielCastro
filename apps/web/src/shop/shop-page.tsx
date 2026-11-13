@@ -9,6 +9,7 @@ import { localeParam, type Locale } from "@/i18n/locales";
 import { useSiteMessages } from "@/i18n/site-messages";
 import { useLocale } from "@/i18n/use-locale";
 
+import { CartLink } from "./cart-link";
 import { formatShopPrice } from "./shop-money";
 import { SHOP_TEXT } from "./shop-text";
 
@@ -75,7 +76,10 @@ export function ShopPage() {
               {t.headingFirst} <em>{t.headingSecond}</em>
             </h1>
           </div>
-          <p className="lead">{t.lead}</p>
+          <div className="shop-head-side">
+            <p className="lead">{t.lead}</p>
+            <CartLink />
+          </div>
         </div>
 
         {view.catalog === null ? (

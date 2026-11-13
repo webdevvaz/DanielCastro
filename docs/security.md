@@ -41,6 +41,7 @@ Return paths after sign-in come from the URL: accept only a path inside this app
 - **Errors:** only `AppError` classes reach the browser, with a status and a safe message. Anything else becomes a generic 500; the details go to the server log.
 - **Uploads:** check size and the file's magic bytes, not the name. Derive storage keys from the owner, so a path cannot reach another user's files.
 - **Public forms:** the enquiry form needs no sign-in. Its schema bounds every answer and the photo counts and types; a hidden field that people never see must stay empty (bots fill it in); the server checks each photo's magic bytes and re-encodes it, which drops camera metadata such as the location. Clients' photos are personal data: they are stored under random names outside the gallery's served names and only admins can open them.
+- **Cookies that visitors control:** the shop cart cookie holds a Shopify cart ID. The server decodes it with the `ShopCartId` schema and treats anything else as no cart, so only a well-formed ID reaches Shopify. A cart belongs to whoever holds its ID; it holds no personal data until Shopify's checkout.
 - **Secrets that admins enter:** the Resend API key is encrypted before it is stored (AES-256-GCM, with a key derived from `BETTER_AUTH_SECRET` through HKDF) and never sent back to a browser; the admin page shows its last four characters. Changing `BETTER_AUTH_SECRET` makes the stored key unreadable: the admin page says so, and the admin enters it again.
 
 ## Audit

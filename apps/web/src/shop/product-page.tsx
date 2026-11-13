@@ -9,10 +9,12 @@ import type { ShopProduct } from "@/server/shop/shopify.server";
 
 import { localeParam } from "@/i18n/locales";
 import { useLocale } from "@/i18n/use-locale";
-import { buyShopItem } from "@/server/shop/shop.functions";
+import { addToCart, buyShopItem } from "@/server/shop/shop.functions";
 
+import { CartLink } from "./cart-link";
 import { formatShopPrice } from "./shop-money";
 import { SHOP_TEXT } from "./shop-text";
+import { storeCart } from "./store-cart";
 
 /** Option names that mean "size" in the languages the shop may use. */
 const SIZE_OPTION_NAMES = new Set(["size", "tamanho", "taille", "größe", "talla"]);
@@ -52,8 +54,9 @@ const chosenVariant = (product: ShopProduct, chosen: Readonly<Record<string, str
   );
 
 /**
- * A product's page: its photos, text, price, options such as size, and "Buy now", which opens
- * Shopify's checkout for the chosen variant. Sizes that are sold out cannot be chosen.
+ * A product's page: its photos, text, price, options such as size, "Add to cart", and "Buy now",
+ * which opens Shopify's checkout for the chosen variant alone. Sizes that are sold out cannot be
+ * chosen.
  */
 export function ProductPage() {
   const context = useRouteContext({ from: "/{-$locale}/_site/shop/$handle" });
@@ -67,6 +70,7 @@ export function ProductPage() {
   const [problem, setProblem] = useState<string | null>(null);
 
   const buy = useServerFn(buyShopItem);
+  const add = useServerFn(addToCart);
 
   const { data: product } = useSuspenseQuery(context.shopProductQueryOptions(locale, handle));
 
@@ -80,13 +84,27 @@ export function ProductPage() {
     },
   });
 
+  const addition = useMutation({
+    mutationFn: (variantId: string) => add({ data: { locale, variantId, quantity } }),
+    onSuccess: (change) => {
+      storeCart(context.queryClient, context.shopCartQueryOptions(locale), change.cart);
+
+      if (change.limitedByStock) setProblem(t.notEnoughStock);
+    },
+    onError: (error) => {
+      setProblem(error instanceof ConflictError ? t.soldOutNow : t.cartFailed);
+    },
+  });
+
   const variant = chosenVariant(product, chosen);
   const image = product.images.at(imageIndex);
   const lowest = Math.min(...product.variants.map(({ price }) => price.amount));
   const currency = product.variants.at(0)?.price.currency ?? "EUR";
   const price = variant?.price ?? { amount: lowest, currency };
+  const busy = checkout.isPending || checkout.isSuccess || addition.isPending;
 
-  const buyNow = () => {
+  /** Runs an action for the chosen variant, or asks for the missing choice. */
+  const withVariant = (action: (variantId: string) => void) => () => {
     setProblem(null);
 
     if (variant === undefined) {
@@ -97,17 +115,20 @@ export function ProductPage() {
       return;
     }
 
-    checkout.mutate(variant.id);
+    action(variant.id);
   };
 
   return (
     <main className="page">
       <div className="wrap">
-        <p className="eyebrow">
-          <Link to="/{-$locale}/shop" params={{ locale: localeParam(locale) }}>
-            ← {t.backToShop}
-          </Link>
-        </p>
+        <div className="shop-product-bar">
+          <p className="eyebrow">
+            <Link to="/{-$locale}/shop" params={{ locale: localeParam(locale) }}>
+              ← {t.backToShop}
+            </Link>
+          </p>
+          <CartLink />
+        </div>
 
         <div className="shop-product">
           <div className="shop-gallery">
@@ -191,8 +212,16 @@ export function ProductPage() {
                 <button
                   className="btn btn-red"
                   type="button"
-                  disabled={checkout.isPending || checkout.isSuccess}
-                  onClick={buyNow}
+                  disabled={busy}
+                  onClick={withVariant((variantId) => addition.mutate(variantId))}
+                >
+                  {addition.isPending ? t.adding : t.addToCart}
+                </button>
+                <button
+                  className="btn btn-ghost"
+                  type="button"
+                  disabled={busy}
+                  onClick={withVariant((variantId) => checkout.mutate(variantId))}
                 >
                   {checkout.isPending || checkout.isSuccess ? t.opening : t.buyNow}
                 </button>

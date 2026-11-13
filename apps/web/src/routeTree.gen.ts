@@ -40,6 +40,7 @@ import { Route as AdminDashboardEnquiriesIndexRouteImport } from './routes/admin
 import { Route as AdminDashboardEnquiriesIdRouteImport } from './routes/admin/_dashboard/enquiries/$id'
 import { Route as Char123LocaleChar125SiteShopIndexRouteImport } from './routes/{-$locale}/_site/shop/index'
 import { Route as Char123LocaleChar125SiteShopHandleRouteImport } from './routes/{-$locale}/_site/shop/$handle'
+import { Route as Char123LocaleChar125SiteShopCartRouteImport } from './routes/{-$locale}/_site/shop/cart'
 
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
@@ -210,6 +211,12 @@ const Char123LocaleChar125SiteShopHandleRoute =
     path: '/shop/$handle',
     getParentRoute: () => Char123LocaleChar125SiteRoute,
   } as any)
+const Char123LocaleChar125SiteShopCartRoute =
+  Char123LocaleChar125SiteShopCartRouteImport.update({
+    id: '/shop/cart',
+    path: '/shop/cart',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
@@ -239,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/{-$locale}/': typeof Char123LocaleChar125SiteIndexRoute
   '/admin/enquiries/$id': typeof AdminDashboardEnquiriesIdRoute
   '/{-$locale}/shop/$handle': typeof Char123LocaleChar125SiteShopHandleRoute
+  '/{-$locale}/shop/cart': typeof Char123LocaleChar125SiteShopCartRoute
   '/admin/enquiries/': typeof AdminDashboardEnquiriesIndexRoute
   '/{-$locale}/shop/': typeof Char123LocaleChar125SiteShopIndexRoute
 }
@@ -268,6 +276,7 @@ export interface FileRoutesByTo {
   '/{-$locale}/travel': typeof Char123LocaleChar125SiteTravelRoute
   '/admin/enquiries/$id': typeof AdminDashboardEnquiriesIdRoute
   '/{-$locale}/shop/$handle': typeof Char123LocaleChar125SiteShopHandleRoute
+  '/{-$locale}/shop/cart': typeof Char123LocaleChar125SiteShopCartRoute
   '/admin/enquiries': typeof AdminDashboardEnquiriesIndexRoute
   '/{-$locale}/shop': typeof Char123LocaleChar125SiteShopIndexRoute
 }
@@ -302,6 +311,7 @@ export interface FileRoutesById {
   '/{-$locale}/_site/': typeof Char123LocaleChar125SiteIndexRoute
   '/admin/_dashboard/enquiries/$id': typeof AdminDashboardEnquiriesIdRoute
   '/{-$locale}/_site/shop/$handle': typeof Char123LocaleChar125SiteShopHandleRoute
+  '/{-$locale}/_site/shop/cart': typeof Char123LocaleChar125SiteShopCartRoute
   '/admin/_dashboard/enquiries/': typeof AdminDashboardEnquiriesIndexRoute
   '/{-$locale}/_site/shop/': typeof Char123LocaleChar125SiteShopIndexRoute
 }
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/'
     | '/admin/enquiries/$id'
     | '/{-$locale}/shop/$handle'
+    | '/{-$locale}/shop/cart'
     | '/admin/enquiries/'
     | '/{-$locale}/shop/'
   fileRoutesByTo: FileRoutesByTo
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/travel'
     | '/admin/enquiries/$id'
     | '/{-$locale}/shop/$handle'
+    | '/{-$locale}/shop/cart'
     | '/admin/enquiries'
     | '/{-$locale}/shop'
   id:
@@ -397,6 +409,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/_site/'
     | '/admin/_dashboard/enquiries/$id'
     | '/{-$locale}/_site/shop/$handle'
+    | '/{-$locale}/_site/shop/cart'
     | '/admin/_dashboard/enquiries/'
     | '/{-$locale}/_site/shop/'
   fileRoutesById: FileRoutesById
@@ -632,6 +645,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125SiteShopHandleRouteImport
       parentRoute: typeof Char123LocaleChar125SiteRoute
     }
+    '/{-$locale}/_site/shop/cart': {
+      id: '/{-$locale}/_site/shop/cart'
+      path: '/shop/cart'
+      fullPath: '/{-$locale}/shop/cart'
+      preLoaderRoute: typeof Char123LocaleChar125SiteShopCartRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
   }
 }
 
@@ -686,6 +706,7 @@ interface Char123LocaleChar125SiteRouteChildren {
   Char123LocaleChar125SiteTravelRoute: typeof Char123LocaleChar125SiteTravelRoute
   Char123LocaleChar125SiteIndexRoute: typeof Char123LocaleChar125SiteIndexRoute
   Char123LocaleChar125SiteShopHandleRoute: typeof Char123LocaleChar125SiteShopHandleRoute
+  Char123LocaleChar125SiteShopCartRoute: typeof Char123LocaleChar125SiteShopCartRoute
   Char123LocaleChar125SiteShopIndexRoute: typeof Char123LocaleChar125SiteShopIndexRoute
 }
 
@@ -705,6 +726,8 @@ const Char123LocaleChar125SiteRouteChildren: Char123LocaleChar125SiteRouteChildr
     Char123LocaleChar125SiteIndexRoute: Char123LocaleChar125SiteIndexRoute,
     Char123LocaleChar125SiteShopHandleRoute:
       Char123LocaleChar125SiteShopHandleRoute,
+    Char123LocaleChar125SiteShopCartRoute:
+      Char123LocaleChar125SiteShopCartRoute,
     Char123LocaleChar125SiteShopIndexRoute:
       Char123LocaleChar125SiteShopIndexRoute,
   }

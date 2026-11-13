@@ -60,7 +60,7 @@ A server route (`apps/web/src/routes/api/`) runs its program with `runServerRout
 | `PhotoStorage`   | `apps/web`     | `PhotoStorageLive`                 | Gallery and enquiry photos in `PHOTO_STORAGE_DIR`                     |
 | `TravelData`     | `apps/web`     | `TravelDataLive` (HTTP client)     | City search and average fares (Travelpayouts), hotel prices (SerpApi) |
 | `InstagramApi`   | `apps/web`     | `InstagramApiLive` (HTTP client)   | Instagram Login, tokens, posts (`docs/instagram.md`)                  |
-| `Shopify`        | `apps/web`     | `ShopifyLive` (HTTP client)        | Necrotic Wear products and checkouts (Storefront API)                 |
+| `Shopify`        | `apps/web`     | `ShopifyLive` (HTTP client)        | Necrotic Wear products, carts, and checkouts (Storefront API)         |
 | `Resend`         | `apps/web`     | `ResendLive` (HTTP client)         | Sends enquiry emails with the key an admin saved                      |
 | `SecretBox`      | `apps/web`     | `SecretBoxLive`                    | Encrypts secrets that admins enter (`BETTER_AUTH_SECRET` derives key) |
 

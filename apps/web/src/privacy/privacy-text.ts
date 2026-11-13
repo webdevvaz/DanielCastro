@@ -56,8 +56,8 @@ const en: PrivacyText = {
     {
       title: "Cookies and other services",
       paragraphs: [
-        "The website sets only the cookies it needs to work: one remembers the language you choose, and the studio team's sign-in uses others. There are no advertising or analytics cookies.",
-        "The website loads its fonts from Google Fonts, which receives your IP address to send them. The shop's checkout takes place on the Necrotic Wear shop, under its own privacy policy. The links to Instagram, TikTok, YouTube, Google Maps, Google Flights, and Booking.com lead to those services, under their own policies.",
+        "The website sets only the cookies it needs to work: one remembers the language you choose, one keeps your shopping cart (only an ID of the cart on Shopify), and the studio team's sign-in uses others. There are no advertising or analytics cookies.",
+        "The website loads its fonts from Google Fonts, which receives your IP address to send them. The shopping cart is kept by Shopify, and the checkout takes place on the Necrotic Wear shop, under its own privacy policy. The links to Instagram, TikTok, YouTube, Google Maps, Google Flights, and Booking.com lead to those services, under their own policies.",
         "The travel estimator sends the city you type, and your dates, to flight and hotel price services, to find prices. It does not send anything that identifies you.",
       ],
     },
@@ -117,8 +117,8 @@ export const PRIVACY_TEXT: Record<Locale, PrivacyText> = {
       {
         title: "Cookies e outros serviços",
         paragraphs: [
-          "O site usa apenas os cookies de que precisa para funcionar: um guarda o idioma que escolhe, e o acesso da equipa do estúdio usa outros. Não há cookies de publicidade nem de estatísticas.",
-          "O site carrega os tipos de letra do Google Fonts, que recebe o seu endereço IP para os enviar. O pagamento da loja é feito na loja Necrotic Wear, segundo a política de privacidade dela. Os links para o Instagram, TikTok, YouTube, Google Maps, Google Flights e Booking.com levam a esses serviços, segundo as políticas deles.",
+          "O site usa apenas os cookies de que precisa para funcionar: um guarda o idioma que escolhe, outro guarda o seu carrinho de compras (apenas um identificador do carrinho na Shopify), e o acesso da equipa do estúdio usa outros. Não há cookies de publicidade nem de estatísticas.",
+          "O site carrega os tipos de letra do Google Fonts, que recebe o seu endereço IP para os enviar. O carrinho de compras fica guardado na Shopify, e o pagamento é feito na loja Necrotic Wear, segundo a política de privacidade dela. Os links para o Instagram, TikTok, YouTube, Google Maps, Google Flights e Booking.com levam a esses serviços, segundo as políticas deles.",
           "O simulador de viagem envia a cidade que escreve, e as datas, a serviços de preços de voos e hotéis, para encontrar preços. Não envia nenhum dado pessoal.",
         ],
       },
