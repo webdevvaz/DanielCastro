@@ -1,7 +1,5 @@
 import { useEffect, useRef } from "react";
 
-import type { getGallery } from "@/server/gallery/gallery.functions";
-
 import { useSiteMessages } from "@/i18n/site-messages";
 
 import { photoUrl } from "./photo-files";
@@ -123,5 +121,13 @@ type Props = {
   readonly onClose: () => void;
 };
 
-/** A gallery photo as visitors receive it. */
-export type ViewerPhoto = Awaited<ReturnType<typeof getGallery>>[number];
+/** A gallery photo as the viewer shows it, with the name of its series in the page's language. */
+export type ViewerPhoto = {
+  readonly id: string;
+  readonly storageKey: string;
+  readonly width: number;
+  readonly height: number;
+  readonly title: string | null;
+  readonly series: string | null;
+  readonly placement: string | null;
+};

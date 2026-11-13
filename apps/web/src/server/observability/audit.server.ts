@@ -7,6 +7,11 @@ const AUDIT_ACTIONS = [
   "gallery.photo_deleted",
   "gallery.reordered",
   "gallery.photo_imported",
+  "gallery.tag_created",
+  "gallery.tag_updated",
+  "gallery.tag_deleted",
+  "gallery.tags_reordered",
+  "booking.settings_updated",
   "guest_spot.created",
   "guest_spot.updated",
   "guest_spot.deleted",
@@ -83,6 +88,8 @@ export type AuditEvent = {
   readonly targetType:
     | "gallery"
     | "gallery_photo"
+    | "gallery_tag"
+    | "booking_settings"
     | "guest_spot"
     | "travel_settings"
     | "instagram_connection"

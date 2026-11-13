@@ -6,6 +6,7 @@ import { FetchHttpClient } from "effect/unstable/http";
 
 import { ResendLive } from "./email/resend.server";
 import { SecretBoxLive } from "./email/secret-box.server";
+import { EnquiryRateLimitLive } from "./enquiries/enquiry-rate-limit.server";
 import { PhotoStorageLive } from "./gallery/photo-storage.server";
 import { InstagramApiLive } from "./instagram/instagram-api.server";
 import { ObservabilityLive } from "./observability/observability.server";
@@ -22,6 +23,7 @@ const AppLive = Layer.mergeAll(
   AuthLive,
   PhotoStorageLive,
   SecretBoxLive,
+  EnquiryRateLimitLive,
   Layer.mergeAll(TravelDataLive, InstagramApiLive, ShopifyLive, ResendLive).pipe(
     Layer.provide(FetchHttpClient.layer),
   ),

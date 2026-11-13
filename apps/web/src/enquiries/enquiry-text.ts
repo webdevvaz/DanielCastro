@@ -96,11 +96,18 @@ const en = {
     invalid: "Some answers need another look. Check the form and try again.",
     spotGone: "That guest spot is no longer available. Choose another place.",
     failed: "Your enquiry couldn't be sent. Check your connection and try again.",
+    tooMany: "Too many enquiries were sent from your connection. Please try again in an hour.",
   },
   done: {
     title: "Thank you for contacting me :)",
     text: "Your enquiry has arrived. Joana will reply by email within a few days, so keep an eye on your spam folder too.",
     another: "Send another enquiry",
+  },
+  closed: {
+    title: "My books are closed for now",
+    text: "I'm not taking new enquiries at the moment. Follow me on Instagram to hear when my books open again.",
+    reopens: (date: string) => `They open again on ${date}.`,
+    instagram: "Daniel on Instagram",
   },
 };
 
@@ -198,11 +205,19 @@ export const ENQUIRY_TEXT: Record<Locale, typeof en> = {
       invalid: "Há respostas por corrigir. Reveja o formulário e tente novamente.",
       spotGone: "Esse guest spot já não está disponível. Escolha outro local.",
       failed: "Não foi possível enviar o pedido. Verifique a ligação à internet e tente novamente.",
+      tooMany:
+        "Foram enviados demasiados pedidos a partir da sua ligação. Tente novamente daqui a uma hora.",
     },
     done: {
       title: "Obrigado pelo seu contacto :)",
       text: "O seu pedido chegou! A Joana vai responder por email dentro de alguns dias; espreite também a pasta de spam.",
       another: "Enviar outro pedido",
+    },
+    closed: {
+      title: "A agenda está fechada de momento",
+      text: "De momento não estou a aceitar novos pedidos. Siga-me no Instagram para saber quando a agenda volta a abrir.",
+      reopens: (date: string) => `Volta a abrir a ${date}.`,
+      instagram: "Daniel no Instagram",
     },
   },
   fr: {
@@ -296,11 +311,19 @@ export const ENQUIRY_TEXT: Record<Locale, typeof en> = {
       invalid: "Certaines réponses ne sont pas valides. Vérifiez le formulaire et réessayez.",
       spotGone: "Ce guest spot n’est plus disponible. Choisissez un autre lieu.",
       failed: "La demande n’a pas pu être envoyée. Vérifiez votre connexion et réessayez.",
+      tooMany:
+        "Trop de demandes ont été envoyées depuis votre connexion. Réessayez dans une heure.",
     },
     done: {
       title: "Merci pour votre message :)",
       text: "Votre demande est bien arrivée ! Joana vous répondra par e-mail sous quelques jours ; pensez à vérifier vos spams.",
       another: "Envoyer une autre demande",
+    },
+    closed: {
+      title: "Mon agenda est fermé pour le moment",
+      text: "Je ne prends pas de nouvelles demandes pour l’instant. Suivez-moi sur Instagram pour savoir quand il rouvrira.",
+      reopens: (date: string) => `Il rouvre le ${date}.`,
+      instagram: "Daniel sur Instagram",
     },
   },
   de: {
@@ -395,11 +418,19 @@ export const ENQUIRY_TEXT: Record<Locale, typeof en> = {
       spotGone: "Dieser Guest Spot ist nicht mehr verfügbar. Wähl einen anderen Ort.",
       failed:
         "Die Anfrage konnte nicht gesendet werden. Prüf deine Internetverbindung und versuch es noch einmal.",
+      tooMany:
+        "Von deiner Verbindung wurden zu viele Anfragen gesendet. Versuch es in einer Stunde noch einmal.",
     },
     done: {
       title: "Danke für deine Nachricht :)",
       text: "Deine Anfrage ist angekommen! Joana meldet sich in ein paar Tagen per E-Mail – schau zur Sicherheit auch in deinen Spam-Ordner.",
       another: "Weitere Anfrage senden",
+    },
+    closed: {
+      title: "Meine Termine sind gerade ausgebucht",
+      text: "Im Moment nehme ich keine neuen Anfragen an. Folge mir auf Instagram, dann erfährst du, wann ich wieder Termine vergebe.",
+      reopens: (date: string) => `Wieder geöffnet ab: ${date}.`,
+      instagram: "Daniel auf Instagram",
     },
   },
   es: {
@@ -493,11 +524,19 @@ export const ENQUIRY_TEXT: Record<Locale, typeof en> = {
       invalid: "Hay respuestas que revisar. Comprueba el formulario e inténtalo de nuevo.",
       spotGone: "Ese guest spot ya no está disponible. Elige otro lugar.",
       failed: "No se ha podido enviar la solicitud. Comprueba tu conexión e inténtalo de nuevo.",
+      tooMany:
+        "Se han enviado demasiadas solicitudes desde tu conexión. Vuelve a intentarlo dentro de una hora.",
     },
     done: {
       title: "Gracias por escribirme :)",
       text: "¡Tu solicitud ha llegado! Joana te responderá por email en unos días; revisa también la carpeta de spam.",
       another: "Enviar otra solicitud",
+    },
+    closed: {
+      title: "Mi agenda está cerrada por ahora",
+      text: "Ahora mismo no acepto nuevas solicitudes. Sígueme en Instagram para saber cuándo vuelve a abrir.",
+      reopens: (date: string) => `Vuelve a abrir el ${date}.`,
+      instagram: "Daniel en Instagram",
     },
   },
 };

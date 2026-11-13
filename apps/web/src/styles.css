@@ -909,6 +909,68 @@ html:has(.photo-viewer[open]) {
   text-align: center;
 }
 
+.empty-state .btn {
+  margin-top: 16px;
+}
+
+.gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin-bottom: 28px;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.filter-chip:hover {
+  color: var(--bone);
+  border-color: var(--muted);
+}
+
+.filter-chip[aria-pressed="true"] {
+  color: var(--bone);
+  border-color: var(--red);
+  background: rgb(193 18 31 / 0.14);
+}
+
+.filter-series {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.filter-series .input {
+  width: auto;
+  min-width: 200px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 /* News */
 
 .news-grid {
@@ -2531,4 +2593,79 @@ html:has(.photo-viewer[open]) {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Admin: themes and series, and the booking switch. */
+
+.tag-list {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  background: var(--ink-2);
+}
+
+.tag-row .tag-form {
+  flex: 1 1 100%;
+}
+
+.tag-name {
+  display: grid;
+  gap: 2px;
+  color: var(--bone);
+}
+
+.tag-name small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.tag-translations {
+  margin: 4px 0 12px;
+}
+
+.tag-translations summary {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.theme-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.theme-checks legend {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.booking-state {
+  margin-bottom: 16px;
+  color: var(--muted);
+}
+
+.booking-state b {
+  margin-right: 6px;
+  color: var(--bone);
+}
+
+.booking-state[data-open="false"] b {
+  color: var(--red);
 }

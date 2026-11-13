@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import { getAdminGallery, getGallery } from "@/server/gallery/gallery.functions";
+import { getAdminGallery, getGallery, getGalleryTags } from "@/server/gallery/gallery.functions";
 
 /** Query keys for gallery data. Invalidate `all` after any change to the gallery. */
 export const galleryQueryKeys = {
@@ -8,6 +8,7 @@ export const galleryQueryKeys = {
   work: ["gallery", "public", "work"] as const,
   studio: ["gallery", "public", "studio"] as const,
   admin: ["gallery", "admin"] as const,
+  tags: ["gallery", "tags"] as const,
 };
 
 /** Daniel's work as visitors see it: the Work page. */
@@ -26,4 +27,10 @@ export const studioPhotosQueryOptions = queryOptions({
 export const adminGalleryQueryOptions = queryOptions({
   queryKey: galleryQueryKeys.admin,
   queryFn: () => getAdminGallery(),
+});
+
+/** The themes and series that visitors filter the work by, in list order. */
+export const galleryTagsQueryOptions = queryOptions({
+  queryKey: galleryQueryKeys.tags,
+  queryFn: () => getGalleryTags(),
 });

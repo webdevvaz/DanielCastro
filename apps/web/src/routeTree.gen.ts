@@ -18,6 +18,7 @@ import { Route as ApiReadyRouteImport } from './routes/api/ready'
 import { Route as Char123LocaleChar125SiteRouteImport } from './routes/{-$locale}/_site'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/_dashboard/index'
 import { Route as AdminDashboardEmailRouteImport } from './routes/admin/_dashboard/email'
+import { Route as AdminDashboardFiltersRouteImport } from './routes/admin/_dashboard/filters'
 import { Route as AdminDashboardGalleryRouteImport } from './routes/admin/_dashboard/gallery'
 import { Route as AdminDashboardGuestSpotsRouteImport } from './routes/admin/_dashboard/guest-spots'
 import { Route as AdminDashboardInstagramRouteImport } from './routes/admin/_dashboard/instagram'
@@ -85,6 +86,11 @@ const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
 const AdminDashboardEmailRoute = AdminDashboardEmailRouteImport.update({
   id: '/email',
   path: '/email',
+  getParentRoute: () => AdminDashboardRoute,
+} as any)
+const AdminDashboardFiltersRoute = AdminDashboardFiltersRouteImport.update({
+  id: '/filters',
+  path: '/filters',
   getParentRoute: () => AdminDashboardRoute,
 } as any)
 const AdminDashboardGalleryRoute = AdminDashboardGalleryRouteImport.update({
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/api/health': typeof ApiHealthRoute
   '/api/ready': typeof ApiReadyRoute
   '/admin/email': typeof AdminDashboardEmailRoute
+  '/admin/filters': typeof AdminDashboardFiltersRoute
   '/admin/gallery': typeof AdminDashboardGalleryRoute
   '/admin/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/instagram': typeof AdminDashboardInstagramRoute
@@ -257,6 +264,7 @@ export interface FileRoutesByTo {
   '/api/health': typeof ApiHealthRoute
   '/api/ready': typeof ApiReadyRoute
   '/admin/email': typeof AdminDashboardEmailRoute
+  '/admin/filters': typeof AdminDashboardFiltersRoute
   '/admin/gallery': typeof AdminDashboardGalleryRoute
   '/admin/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/instagram': typeof AdminDashboardInstagramRoute
@@ -290,6 +298,7 @@ export interface FileRoutesById {
   '/api/ready': typeof ApiReadyRoute
   '/{-$locale}/_site': typeof Char123LocaleChar125SiteRouteWithChildren
   '/admin/_dashboard/email': typeof AdminDashboardEmailRoute
+  '/admin/_dashboard/filters': typeof AdminDashboardFiltersRoute
   '/admin/_dashboard/gallery': typeof AdminDashboardGalleryRoute
   '/admin/_dashboard/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/_dashboard/instagram': typeof AdminDashboardInstagramRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/ready'
     | '/admin/email'
+    | '/admin/filters'
     | '/admin/gallery'
     | '/admin/guest-spots'
     | '/admin/instagram'
@@ -356,6 +366,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/ready'
     | '/admin/email'
+    | '/admin/filters'
     | '/admin/gallery'
     | '/admin/guest-spots'
     | '/admin/instagram'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/api/ready'
     | '/{-$locale}/_site'
     | '/admin/_dashboard/email'
+    | '/admin/_dashboard/filters'
     | '/admin/_dashboard/gallery'
     | '/admin/_dashboard/guest-spots'
     | '/admin/_dashboard/instagram'
@@ -489,6 +501,13 @@ declare module '@tanstack/react-router' {
       path: '/email'
       fullPath: '/admin/email'
       preLoaderRoute: typeof AdminDashboardEmailRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
+    '/admin/_dashboard/filters': {
+      id: '/admin/_dashboard/filters'
+      path: '/filters'
+      fullPath: '/admin/filters'
+      preLoaderRoute: typeof AdminDashboardFiltersRouteImport
       parentRoute: typeof AdminDashboardRoute
     }
     '/admin/_dashboard/gallery': {
@@ -657,6 +676,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminDashboardRouteChildren {
   AdminDashboardEmailRoute: typeof AdminDashboardEmailRoute
+  AdminDashboardFiltersRoute: typeof AdminDashboardFiltersRoute
   AdminDashboardGalleryRoute: typeof AdminDashboardGalleryRoute
   AdminDashboardGuestSpotsRoute: typeof AdminDashboardGuestSpotsRoute
   AdminDashboardInstagramRoute: typeof AdminDashboardInstagramRoute
@@ -668,6 +688,7 @@ interface AdminDashboardRouteChildren {
 
 const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
   AdminDashboardEmailRoute: AdminDashboardEmailRoute,
+  AdminDashboardFiltersRoute: AdminDashboardFiltersRoute,
   AdminDashboardGalleryRoute: AdminDashboardGalleryRoute,
   AdminDashboardGuestSpotsRoute: AdminDashboardGuestSpotsRoute,
   AdminDashboardInstagramRoute: AdminDashboardInstagramRoute,

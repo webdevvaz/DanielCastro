@@ -70,7 +70,7 @@ Run it again to add an admin later; existing accounts are skipped.
 
 - `<address>/api/ready` answers `Ready`.
 - Upload a photo in the admin area, then deploy again (for example with **Redeploy**): the photo must still be there. If it is gone, the volume is not mounted at `/data`.
-- In the web service's logs, look for the Better Auth warning "Rate limiting could not determine a client IP". If it shows, Railway does not send `X-Real-IP`: try `AUTH_IP_ADDRESS_HEADER=x-forwarded-for`.
+- In the web service's logs, look for the Better Auth warning "Rate limiting could not determine a client IP". If it shows, Railway does not send `X-Real-IP`: try `AUTH_IP_ADDRESS_HEADER=x-forwarded-for`. The enquiry form's rate limit reads the same header.
 
 ## Costs and limits
 

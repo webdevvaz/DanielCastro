@@ -8,7 +8,11 @@ export * from "./queries/email-settings";
 
 export * from "./queries/enquiries";
 
+export * from "./queries/booking";
+
 export * from "./queries/gallery";
+
+export * from "./queries/gallery-tags";
 
 export * from "./queries/guest-spots";
 

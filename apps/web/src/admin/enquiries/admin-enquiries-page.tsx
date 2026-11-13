@@ -6,6 +6,7 @@ import { format, parseISO, subMonths } from "date-fns";
 import { DATE_LOCALES } from "@/i18n/locales";
 
 import { useAdminText } from "../use-admin-text";
+import { BookingSettingsForm } from "./booking-settings-form";
 
 /** How long the privacy notice lets an enquiry stay without a booking. */
 const RETENTION_MONTHS = 12;
@@ -22,6 +23,7 @@ export function AdminEnquiriesPage() {
 
   const { data: enquiries } = useSuspenseQuery(context.adminEnquiriesQueryOptions);
   const { data: settings } = useSuspenseQuery(context.emailSettingsQueryOptions);
+  const { data: booking } = useSuspenseQuery(context.bookingStatusQueryOptions);
 
   const retentionLimit = format(subMonths(parseISO(studioToday()), RETENTION_MONTHS), "yyyy-MM-dd");
 
@@ -38,6 +40,15 @@ export function AdminEnquiriesPage() {
           {e.emailOff} <Link to="/admin/email">{e.emailSettings}</Link>
         </p>
       )}
+
+      <section className="admin-section">
+        <h2>{t.booking.title}</h2>
+        <BookingSettingsForm
+          key={`${booking.booksOpen}-${booking.reopensOn}`}
+          booksOpen={booking.booksOpen}
+          reopensOn={booking.reopensOn}
+        />
+      </section>
 
       <section className="admin-section">
         {enquiries.length === 0 ? (

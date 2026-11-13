@@ -9,3 +9,5 @@ export * from "./travel";
 export * from "./instagram";
 
 export * from "./enquiries";
+
+export * from "./booking";

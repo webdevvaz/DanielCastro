@@ -1,6 +1,6 @@
 import { Effect, Schema, Struct } from "effect";
 
-import { CalendarDate, requiredText } from "./schema-fields";
+import { CalendarDate, numberInput, requiredText } from "./schema-fields";
 
 /** The highest price an admin can enter, in euros. It keeps an extra digit out of the site. */
 const MAX_EUROS = 5000;
@@ -41,14 +41,15 @@ const tripDatesInOrder = Schema.makeFilter(
 
 /** A whole number in a range, with one message per problem. An empty number input holds NaN. */
 const wholeNumber = (label: string, minimum: number, maximum: number) =>
-  Schema.Number.check(
-    Schema.makeFilter((value: number) => {
-      if (Number.isNaN(value)) return `${label} is required`;
+  numberInput(
+    Schema.Number.check(
+      Schema.makeFilter((value: number) => {
+        const inRange = Number.isInteger(value) && value >= minimum && value <= maximum;
 
-      const inRange = Number.isInteger(value) && value >= minimum && value <= maximum;
-
-      return inRange || `${label} must be a whole number from ${minimum} to ${maximum}`;
-    }),
+        return inRange || `${label} must be a whole number from ${minimum} to ${maximum}`;
+      }),
+    ),
+    `${label} is required`,
   );
 
 /**

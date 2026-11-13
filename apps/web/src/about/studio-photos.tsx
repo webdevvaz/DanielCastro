@@ -53,7 +53,15 @@ export function StudioPhotos() {
       </div>
       {openIndex === null ? null : (
         <PhotoViewer
-          photos={photos}
+          photos={photos.map((photo) => ({
+            id: photo.id,
+            storageKey: photo.storageKey,
+            width: photo.width,
+            height: photo.height,
+            title: photo.title,
+            series: null,
+            placement: photo.placement,
+          }))}
           index={openIndex}
           fallbackAlt={site.studioAlt}
           onIndexChange={setOpenIndex}

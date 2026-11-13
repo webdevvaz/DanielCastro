@@ -17,6 +17,15 @@ const en = {
     "Spooky",
   ],
   empty: "The gallery is being prepared. Come back soon.",
+  filters: {
+    label: "Filter the work",
+    themes: "Themes",
+    allThemes: "All",
+    series: "Series",
+    allSeries: "All series",
+    noMatch: "No work matches both filters yet.",
+    showAll: "Show all work",
+  },
 };
 
 /** The Work page's text, per language. */
@@ -38,6 +47,15 @@ export const WORK_PAGE_TEXT: Record<Locale, typeof en> = {
       "Macabro",
     ],
     empty: "A galeria está a ser preparada. Volte em breve.",
+    filters: {
+      label: "Filtrar os trabalhos",
+      themes: "Temas",
+      allThemes: "Todos",
+      series: "Série",
+      allSeries: "Todas as séries",
+      noMatch: "Ainda não há trabalhos com os dois filtros.",
+      showAll: "Ver todos os trabalhos",
+    },
   },
   fr: {
     eyebrow: "Réalisations",
@@ -55,6 +73,15 @@ export const WORK_PAGE_TEXT: Record<Locale, typeof en> = {
       "Macabre",
     ],
     empty: "La galerie est en préparation. Revenez bientôt.",
+    filters: {
+      label: "Filtrer les réalisations",
+      themes: "Thèmes",
+      allThemes: "Tous",
+      series: "Série",
+      allSeries: "Toutes les séries",
+      noMatch: "Aucune réalisation ne correspond encore aux deux filtres.",
+      showAll: "Voir toutes les réalisations",
+    },
   },
   de: {
     eyebrow: "Arbeiten",
@@ -72,6 +99,15 @@ export const WORK_PAGE_TEXT: Record<Locale, typeof en> = {
       "Grusel",
     ],
     empty: "Die Galerie wird gerade vorbereitet. Schau bald wieder vorbei.",
+    filters: {
+      label: "Arbeiten filtern",
+      themes: "Themen",
+      allThemes: "Alle",
+      series: "Serie",
+      allSeries: "Alle Serien",
+      noMatch: "Zu beiden Filtern gibt es noch keine Arbeit.",
+      showAll: "Alle Arbeiten zeigen",
+    },
   },
   es: {
     eyebrow: "Trabajos",
@@ -89,5 +125,14 @@ export const WORK_PAGE_TEXT: Record<Locale, typeof en> = {
       "Siniestro",
     ],
     empty: "La galería se está preparando. Vuelve pronto.",
+    filters: {
+      label: "Filtrar los trabajos",
+      themes: "Temas",
+      allThemes: "Todos",
+      series: "Serie",
+      allSeries: "Todas las series",
+      noMatch: "Todavía no hay trabajos con los dos filtros.",
+      showAll: "Ver todos los trabajos",
+    },
   },
 };

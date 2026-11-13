@@ -67,6 +67,18 @@ export class InvalidInputError extends Schema.TaggedError<InvalidInputError>()(
   }
 }
 
+/** The caller sent too many requests of this kind; `reason` is shown to the user. */
+export class TooManyRequestsError extends Schema.TaggedError<TooManyRequestsError>()(
+  "TooManyRequestsError",
+  { reason: Schema.String },
+) {
+  readonly status = 429;
+
+  override get message() {
+    return this.reason;
+  }
+}
+
 /** A dependency the action needs, named by `service`, is unavailable. */
 export class ServiceUnavailableError extends Schema.TaggedError<ServiceUnavailableError>()(
   "ServiceUnavailableError",
@@ -89,6 +101,7 @@ export const AppError = Schema.Union([
   NotFoundError,
   ConflictError,
   InvalidInputError,
+  TooManyRequestsError,
   ServiceUnavailableError,
 ]);
 

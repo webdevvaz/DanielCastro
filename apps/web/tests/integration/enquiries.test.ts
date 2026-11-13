@@ -1,5 +1,13 @@
 import { Auth, layer as AuthLayer } from "@daniel/auth";
-import { Database, getEmailSettings, getEnquiry, listEnquiries, saveResendKey } from "@daniel/db";
+import {
+  Database,
+  getBookingSettings,
+  getEmailSettings,
+  getEnquiry,
+  listEnquiries,
+  saveBookingSettings,
+  saveResendKey,
+} from "@daniel/db";
 import { guestSpot, user } from "@daniel/db/schema";
 import { TestDatabaseLive, TestDatabaseUrl } from "@daniel/db/testing";
 import { layer } from "@effect/vitest";
@@ -22,6 +30,7 @@ import {
 import { ResendLive } from "../../src/server/email/resend.server";
 import { SecretBox, SecretBoxLive } from "../../src/server/email/secret-box.server";
 import { getEnquiryPhotoResponse } from "../../src/server/enquiries/enquiry-photo-route.server";
+import { EnquiryRateLimitLive } from "../../src/server/enquiries/enquiry-rate-limit.server";
 import {
   removeEnquiry,
   sendEnquiryEmailAgain,
@@ -90,6 +99,7 @@ const TestConfigLive = Layer.unwrap(
         DATABASE_URL: databaseUrl,
         NODE_ENV: "test",
         PHOTO_STORAGE_DIR: photoDirectory,
+        AUTH_IP_ADDRESS_HEADER: "x-real-ip",
       }),
     );
   }),
@@ -99,6 +109,9 @@ const TestAppLive = Layer.mergeAll(
   AuthLayer,
   PhotoStorageLive,
   SecretBoxLive,
+  EnquiryRateLimitLive,
+  // A request without a client address; tests that need one provide their own headers.
+  Layer.succeed(RequestHeaders, new Headers()),
   ResendLive.pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, fakeResendClient))),
 ).pipe(Layer.provideMerge(TestConfigLive), Layer.provideMerge(TestDatabaseLive));
 
@@ -135,6 +148,7 @@ const details = (overrides: Record<string, unknown> = {}) => ({
   questions: "",
   consent: true,
   website: "",
+  secondsToFill: 90,
   ...overrides,
 });
 
@@ -152,6 +166,19 @@ const enquiryForm = (overrides: Record<string, unknown> = {}) =>
     formData.append("placement", new File([jpeg], "calf.jpg", { type: "image/jpeg" }));
 
     return formData;
+  });
+
+/**
+ * A bot's submission from a client address: complete, but filled at once. It counts toward the
+ * rate limit and saves nothing.
+ */
+const botSubmit = (address: string) =>
+  Effect.gen(function* () {
+    const formData = yield* enquiryForm({ secondsToFill: 1 });
+
+    return yield* submitEnquiry(formData).pipe(
+      Effect.provideService(RequestHeaders, new Headers({ "x-real-ip": address })),
+    );
   });
 
 /** The stored photo files of every enquiry, as `<enquiry ID>/<photo ID>.jpg`. */
@@ -425,5 +452,50 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "180 seconds" })("enqui
       expect(admin.headers.get("cache-control")).toContain("private");
       expect(traversal.status).toBe(404);
     }),
+  );
+
+  it.effect("refuses every enquiry while the books are closed, and saves nothing", () =>
+    Effect.gen(function* () {
+      const enquiriesBefore = (yield* listEnquiries()).length;
+      const filesBefore = storedEnquiryFiles();
+
+      yield* saveBookingSettings({ booksOpen: false, reopensOn: "2027-01-04" });
+
+      const error = yield* submitEnquiry(yield* enquiryForm()).pipe(Effect.flip);
+
+      expect(error._tag).toBe("ConflictError");
+      expect((yield* listEnquiries()).length).toBe(enquiriesBefore);
+      expect(storedEnquiryFiles()).toEqual(filesBefore);
+
+      yield* saveBookingSettings({ booksOpen: true, reopensOn: "2027-01-04" });
+
+      // Opening the books clears the reopening day, so visitors never see a stale one.
+      expect(yield* getBookingSettings()).toEqual({ booksOpen: true, reopensOn: null });
+    }),
+  );
+
+  it.effect(
+    "ignores enquiries sent too fast, and limits each client address without blocking others",
+    () =>
+      Effect.gen(function* () {
+        const enquiriesBefore = (yield* listEnquiries()).length;
+        const filesBefore = storedEnquiryFiles();
+
+        yield* Effect.gen(function* () {
+          yield* Effect.forEach(Array.from({ length: 5 }), () => botSubmit("203.0.113.5"), {
+            discard: true,
+          });
+
+          const limited = yield* botSubmit("203.0.113.5").pipe(Effect.flip);
+
+          expect(limited._tag).toBe("TooManyRequestsError");
+
+          // Another address still gets through.
+          yield* botSubmit("198.51.100.7");
+        }).pipe(Effect.provide(Layer.fresh(EnquiryRateLimitLive)));
+
+        expect((yield* listEnquiries()).length).toBe(enquiriesBefore);
+        expect(storedEnquiryFiles()).toEqual(filesBefore);
+      }),
   );
 });

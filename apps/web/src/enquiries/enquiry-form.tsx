@@ -1,11 +1,12 @@
 import type { EnquiryPhotoKind } from "@daniel/shared/enquiry";
 
 import { ENQUIRY_PHOTO_KINDS, ENQUIRY_PHOTO_LIMITS, EnquiryDetails } from "@daniel/shared/enquiry";
-import { ConflictError, InvalidInputError } from "@daniel/shared/errors";
+import { ConflictError, InvalidInputError, TooManyRequestsError } from "@daniel/shared/errors";
 import { revalidateLogic, useSelector } from "@tanstack/react-form";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { differenceInSeconds } from "date-fns";
 import { Schema } from "effect";
 import { useState } from "react";
 
@@ -25,6 +26,17 @@ const focusFirstProblem = () => {
   requestAnimationFrame(() => {
     document.querySelector<HTMLElement>('.enquiry-form [aria-invalid="true"]')?.focus();
   });
+};
+
+/** The message for a failed send, in the page's language. */
+const failureMessage = (error: unknown, text: FailureText) => {
+  if (error instanceof ConflictError) return text.spotGone;
+
+  if (error instanceof InvalidInputError) return text.invalid;
+
+  if (error instanceof TooManyRequestsError) return text.tooMany;
+
+  return text.failed;
 };
 
 /** The count problem of one photo group: too few or too many photos, or null. */
@@ -53,6 +65,7 @@ export function EnquiryForm({ onSent }: { onSent: () => void }) {
   const [photos, setPhotos] = useState<PhotoGroups>(NO_PHOTOS);
   const [checkedPhotos, setCheckedPhotos] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  const [openedAt] = useState(() => new Date());
 
   const send = useServerFn(submitEnquiry);
 
@@ -67,7 +80,7 @@ export function EnquiryForm({ onSent }: { onSent: () => void }) {
   const defaultValues: typeof EnquiryDetails.Encoded = {
     locale,
     name: "",
-    age: Number.NaN,
+    age: null,
     instagram: "",
     email: "",
     phone: "",
@@ -80,6 +93,7 @@ export function EnquiryForm({ onSent }: { onSent: () => void }) {
     questions: "",
     consent: false,
     website: "",
+    secondsToFill: 0,
   };
 
   const form = useAppForm({
@@ -96,7 +110,12 @@ export function EnquiryForm({ onSent }: { onSent: () => void }) {
 
       const formData = new FormData();
 
-      formData.append("details", JSON.stringify(value));
+      const details: typeof EnquiryDetails.Encoded = {
+        ...value,
+        secondsToFill: differenceInSeconds(new Date(), openedAt),
+      };
+
+      formData.append("details", JSON.stringify(details));
 
       for (const kind of ENQUIRY_PHOTO_KINDS) {
         for (const photo of photos[kind]) formData.append(kind, photo.file);
@@ -107,13 +126,14 @@ export function EnquiryForm({ onSent }: { onSent: () => void }) {
       try {
         await mutation.mutateAsync(formData);
       } catch (error) {
-        setFailure(
-          error instanceof ConflictError
-            ? t.errors.spotGone
-            : error instanceof InvalidInputError
-              ? t.errors.invalid
-              : t.errors.failed,
-        );
+        setFailure(failureMessage(error, t.errors));
+
+        // The books may have closed since the page loaded; the page then shows the notice.
+        if (error instanceof ConflictError) {
+          await context.queryClient.invalidateQueries({
+            queryKey: context.bookingStatusQueryOptions.queryKey,
+          });
+        }
 
         return;
       }
@@ -344,3 +364,5 @@ type PhotoCountText = {
   readonly tooFew: string;
   readonly tooMany: (max: number) => string;
 };
+
+type FailureText = (typeof ENQUIRY_TEXT)[keyof typeof ENQUIRY_TEXT]["errors"];

@@ -27,6 +27,7 @@ export function AdminNav() {
       </Link>
       <Link to="/admin/enquiries">{t.nav.enquiries}</Link>
       <Link to="/admin/gallery">{t.nav.gallery}</Link>
+      <Link to="/admin/filters">{t.nav.filters}</Link>
       <Link to="/admin/guest-spots">{t.nav.guestSpots}</Link>
       <Link to="/admin/travel">{t.nav.travel}</Link>
       <Link to="/admin/instagram">{t.nav.instagram}</Link>

@@ -21,7 +21,7 @@ function Caption({ photo }: { photo: ViewerPhoto }) {
  * Gallery photos in a grid of even tiles, in gallery order. Featured photos take a tile twice as
  * tall. A click on a photo shows it at full size on the same page, with its details.
  */
-export function GalleryGrid({ photos }: { photos: ReadonlyArray<ViewerPhoto> }) {
+export function GalleryGrid({ photos }: { photos: ReadonlyArray<GridPhoto> }) {
   const t = useSiteMessages();
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -64,3 +64,6 @@ export function GalleryGrid({ photos }: { photos: ReadonlyArray<ViewerPhoto> }) 
     </>
   );
 }
+
+/** A photo in the grid: as the viewer shows it, and whether it takes a tall tile. */
+export type GridPhoto = ViewerPhoto & { readonly featured: boolean };

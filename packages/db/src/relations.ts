@@ -1,4 +1,5 @@
 import { authRelations } from "./schema/auth";
+import { bookingRelations } from "./schema/booking";
 import { emailSettingsRelations, enquiryRelations } from "./schema/enquiries";
 import { galleryRelations } from "./schema/gallery";
 import { guestSpotRelations } from "./schema/guest-spots";
@@ -8,6 +9,7 @@ import { travelRelations } from "./schema/travel";
 /** Every relation part, merged for the relational query API. Add new parts here. */
 export const relations = {
   ...authRelations,
+  ...bookingRelations,
   ...emailSettingsRelations,
   ...enquiryRelations,
   ...galleryRelations,

@@ -3,7 +3,12 @@ import { describe, expect, it } from "vite-plus/test";
 
 import { SaveEmailSettingsInput } from "../../src/email-settings";
 import { EnquiryDetails, EnquiryFormData } from "../../src/enquiry";
-import { GalleryUploadFormData, ReorderGalleryInput } from "../../src/gallery";
+import {
+  CreateGalleryTagInput,
+  GalleryUploadFormData,
+  ReorderGalleryInput,
+  UpdateGalleryPhotoInput,
+} from "../../src/gallery";
 import { CreateGuestSpotInput } from "../../src/guest-spots";
 import { ImportInstagramPostInput } from "../../src/instagram";
 import {
@@ -111,6 +116,70 @@ describe("ReorderGalleryInput", () => {
   });
 });
 
+describe("CreateGalleryTagInput", () => {
+  const translations = { en: "", pt: "Fantasia sombria", fr: "", de: "", es: "" };
+
+  it.each([
+    {
+      name: "a theme with a translation",
+      input: { kind: "theme", name: "Dark fantasy", translations },
+      paths: [],
+    },
+    { name: "a series", input: { kind: "series", name: "Berserk", translations }, paths: [] },
+    { name: "a blank name", input: { kind: "theme", name: "   ", translations }, paths: ["name"] },
+    {
+      name: "a translation that is too long",
+      input: {
+        kind: "theme",
+        name: "Gothic",
+        translations: { ...translations, fr: "x".repeat(61) },
+      },
+      paths: ["translations.fr"],
+    },
+    {
+      name: "a missing language",
+      input: { kind: "theme", name: "Gothic", translations: { en: "", pt: "", fr: "", de: "" } },
+      paths: ["translations.es"],
+    },
+    {
+      name: "an unknown kind",
+      input: { kind: "style", name: "Gothic", translations },
+      paths: ["kind"],
+    },
+  ])("$name: problems at $paths", async ({ input, paths }) => {
+    expect(await issuePaths(CreateGalleryTagInput)(input)).toEqual(paths);
+  });
+});
+
+describe("UpdateGalleryPhotoInput", () => {
+  const photo = "3f2a1c9e-8b4d-4e6f-9a0b-1c2d3e4f5a6b";
+  const theme = "7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f";
+  const details = {
+    id: photo,
+    title: "Asta",
+    placement: "Forearm",
+    seriesId: null,
+    themeIds: [theme],
+  };
+
+  it.each([
+    { name: "themes and no series", input: details, paths: [] },
+    { name: "a series", input: { ...details, seriesId: theme }, paths: [] },
+    {
+      name: "a theme listed twice",
+      input: { ...details, themeIds: [theme, theme] },
+      paths: ["themeIds"],
+    },
+    {
+      name: "a series that is not a UUID",
+      input: { ...details, seriesId: "berserk" },
+      paths: ["seriesId"],
+    },
+  ])("$name: problems at $paths", async ({ input, paths }) => {
+    expect(await issuePaths(UpdateGalleryPhotoInput)(input)).toEqual(paths);
+  });
+});
+
 // An upload names its gallery section; the server stores the photo there and nowhere else.
 describe("GalleryUploadFormData", () => {
   const jpeg = new File([new Uint8Array([0xff, 0xd8, 0xff])], "photo.jpg", { type: "image/jpeg" });
@@ -187,10 +256,10 @@ describe("UpdateTravelSettingsInput", () => {
   it.each([
     { name: "valid figures", input: validSettings, paths: [] },
     { name: "a free coach", input: { ...validSettings, coachFareEuros: 0 }, paths: [] },
-    // An empty number input holds NaN.
+    // An empty number input holds null.
     {
       name: "an empty fare",
-      input: { ...validSettings, coachFareEuros: Number.NaN },
+      input: { ...validSettings, coachFareEuros: null },
       paths: ["coachFareEuros"],
     },
     {
@@ -225,7 +294,7 @@ describe("UpdateTravelSettingsInput", () => {
     },
     {
       name: "an empty drive time",
-      input: { ...validSettings, driveMinutes: Number.NaN },
+      input: { ...validSettings, driveMinutes: null },
       paths: ["driveMinutes"],
     },
     {
@@ -300,6 +369,7 @@ describe("EnquiryDetails", () => {
     questions: "",
     consent: true,
     website: "",
+    secondsToFill: 120,
   };
 
   it.each([
@@ -321,7 +391,12 @@ describe("EnquiryDetails", () => {
     },
     { name: "a made-up place", input: { ...answers, location: "paris" }, paths: ["location"] },
     { name: "a client under 18", input: { ...answers, age: 17 }, paths: ["age"] },
-    { name: "an empty age", input: { ...answers, age: Number.NaN }, paths: ["age"] },
+    { name: "an empty age", input: { ...answers, age: null }, paths: ["age"] },
+    {
+      name: "a negative fill time",
+      input: { ...answers, secondsToFill: -1 },
+      paths: ["secondsToFill"],
+    },
     { name: "no consent", input: { ...answers, consent: false }, paths: ["consent"] },
     {
       name: "a filled-in bot field",
@@ -366,6 +441,7 @@ describe("EnquiryFormData", () => {
     questions: "",
     consent: true,
     website: "",
+    secondsToFill: 120,
   });
 
   const formWith = (

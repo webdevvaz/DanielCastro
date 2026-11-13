@@ -99,9 +99,9 @@ export function TextField({
   );
 }
 
-/** A whole number. An empty input holds `NaN`, which the form's schema reports as an error. */
+/** A whole number. An empty input holds `null`, which the form's schema reports as an error. */
 export function NumberField({ label, hint, min, max, errorText }: NumberFieldProps) {
-  const field = useFieldContext<number>();
+  const field = useFieldContext<number | null>();
   const id = useId();
 
   const errors = useFieldErrors(errorText);
@@ -117,11 +117,17 @@ export function NumberField({ label, hint, min, max, errorText }: NumberFieldPro
         step={1}
         min={min}
         max={max}
-        value={Number.isNaN(field.state.value) ? "" : field.state.value}
+        value={field.state.value ?? ""}
         aria-invalid={errors.length > 0}
         aria-describedby={describedByOf(id, hint, errors)}
         onBlur={field.handleBlur}
-        onChange={(event) => field.handleChange(event.target.valueAsNumber)}
+        onChange={(event) => {
+          const value = event.target.valueAsNumber;
+
+          // An empty box is null, not NaN: the form compares values with `===`, and NaN never
+          // equals itself, so React would see a new value on every render.
+          field.handleChange(Number.isNaN(value) ? null : value);
+        }}
       />
     </FieldFrame>
   );

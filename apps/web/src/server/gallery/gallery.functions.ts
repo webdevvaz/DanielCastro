@@ -1,17 +1,27 @@
-import { listAllGalleryPhotos, listPublicGalleryPhotos } from "@daniel/db";
+import { listAllGalleryPhotos, listGalleryTags, listPublicGalleryPhotos } from "@daniel/db";
 import {
+  CreateGalleryTagInput,
   DeleteGalleryPhotoInput,
   GallerySectionInput,
+  GalleryTagIdInput,
   GalleryUploadFormData,
   ReorderGalleryInput,
+  ReorderGalleryTagsInput,
   SetGalleryPhotoFlagsInput,
   UpdateGalleryPhotoInput,
+  UpdateGalleryTagInput,
 } from "@daniel/shared/gallery";
 import { createServerFn } from "@tanstack/react-start";
 
 import { adminMiddleware } from "../auth/auth.middleware";
 import { runServerEffect } from "../run.server";
 import { validateInput } from "../validate-input";
+import {
+  createGalleryTag as createGalleryTagEffect,
+  removeGalleryTag,
+  renameGalleryTag,
+  reorderTags,
+} from "./gallery-tags.server";
 import {
   changeGalleryPhotoFlags,
   removeGalleryPhoto,
@@ -60,4 +70,35 @@ export const reorderGallery = createServerFn({ method: "POST" })
   .validator(validateInput(ReorderGalleryInput))
   .handler(({ context, data }) =>
     runServerEffect(reorderGalleryEffect(context.user.id, data.section, data.ids)),
+  );
+
+/** The themes and series that visitors filter the work by, in list order. Public. */
+export const getGalleryTags = createServerFn({ method: "GET" }).handler(() =>
+  runServerEffect(listGalleryTags()),
+);
+
+/** Adds a theme or series at the end of its list. */
+export const createGalleryTag = createServerFn({ method: "POST" })
+  .middleware([adminMiddleware])
+  .validator(validateInput(CreateGalleryTagInput))
+  .handler(({ context, data }) => runServerEffect(createGalleryTagEffect(context.user.id, data)));
+
+/** Renames a theme or series, or changes its translations. */
+export const updateGalleryTag = createServerFn({ method: "POST" })
+  .middleware([adminMiddleware])
+  .validator(validateInput(UpdateGalleryTagInput))
+  .handler(({ context, data }) => runServerEffect(renameGalleryTag(context.user.id, data)));
+
+/** Deletes a theme or series. */
+export const deleteGalleryTag = createServerFn({ method: "POST" })
+  .middleware([adminMiddleware])
+  .validator(validateInput(GalleryTagIdInput))
+  .handler(({ context, data }) => runServerEffect(removeGalleryTag(context.user.id, data.id)));
+
+/** Puts the themes, or the series, in a new order. */
+export const reorderGalleryTags = createServerFn({ method: "POST" })
+  .middleware([adminMiddleware])
+  .validator(validateInput(ReorderGalleryTagsInput))
+  .handler(({ context, data }) =>
+    runServerEffect(reorderTags(context.user.id, data.kind, data.ids)),
   );

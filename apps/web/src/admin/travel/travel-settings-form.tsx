@@ -13,17 +13,17 @@ import { updateTravelSettings } from "@/server/travel/travel.functions";
 import { useAdminText } from "../use-admin-text";
 
 /** Empty number inputs, for the first time an admin sets the figures. */
-const NO_SETTINGS: UpdateTravelSettingsInput = {
-  coachFareEuros: Number.NaN,
-  coachMinutes: Number.NaN,
-  carDayMinEuros: Number.NaN,
-  carDayMaxEuros: Number.NaN,
-  rideMinEuros: Number.NaN,
-  rideMaxEuros: Number.NaN,
-  driveMinutes: Number.NaN,
-  hotelFromEuros: Number.NaN,
-  hotelTypicalMinEuros: Number.NaN,
-  hotelTypicalMaxEuros: Number.NaN,
+const NO_SETTINGS: typeof UpdateTravelSettingsInput.Encoded = {
+  coachFareEuros: null,
+  coachMinutes: null,
+  carDayMinEuros: null,
+  carDayMaxEuros: null,
+  rideMinEuros: null,
+  rideMaxEuros: null,
+  driveMinutes: null,
+  hotelFromEuros: null,
+  hotelTypicalMinEuros: null,
+  hotelTypicalMaxEuros: null,
 };
 
 /** The transport and hotel figures that the travel page shows. */
@@ -36,7 +36,7 @@ export function TravelSettingsForm({ settings }: { settings: UpdateTravelSetting
   const save = useServerFn(updateTravelSettings);
 
   const mutation = useMutation({
-    mutationFn: (value: UpdateTravelSettingsInput) => save({ data: value }),
+    mutationFn: (value: typeof UpdateTravelSettingsInput.Encoded) => save({ data: value }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: travelQueryKeys.all });
     },

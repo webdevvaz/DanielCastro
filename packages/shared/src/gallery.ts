@@ -1,10 +1,29 @@
 import { Schema } from "effect";
 
-/** Longest title, series, or placement text on a gallery photo. */
+import { SiteLocale } from "./locales";
+import { optionalText, requiredText } from "./schema-fields";
+
+/** Longest title or placement text on a gallery photo. */
 const DETAIL_MAX_LENGTH = 120;
 
 /** Most photos one reorder request may list. */
 const REORDER_MAX_PHOTOS = 2000;
+
+/** Longest name of a theme or series, in any language. */
+const TAG_NAME_MAX_LENGTH = 60;
+
+/** Most themes or series one list may hold, and so the most one request may name. */
+const TAG_LIST_MAX = 500;
+
+/** A list of distinct theme or series IDs, as a reorder or a photo's themes send them. */
+const distinctTagIds = (label: string) =>
+  Schema.Array(GalleryTagId).check(
+    Schema.isMaxLength(TAG_LIST_MAX),
+    Schema.makeFilter(
+      (ids: ReadonlyArray<string>) =>
+        new Set(ids).size === ids.length || `Each ${label} may appear once`,
+    ),
+  );
 
 /**
  * The parts of the gallery: `work` is Daniel's tattoos (the Work page), `studio` is photos of the
@@ -64,12 +83,60 @@ export const GalleryPhotoId = Schema.String.check(Schema.isUUID());
 /** Optional text about a photo. An empty string clears it. */
 const PhotoDetail = Schema.Trim.check(Schema.isMaxLength(DETAIL_MAX_LENGTH));
 
-/** The descriptive details of a photo. */
+/**
+ * The kinds of gallery filter: a `theme`, such as anime or dark fantasy, and a `series`, such as
+ * Berserk or Naruto. A work photo has any number of themes and at most one series.
+ */
+export const GALLERY_TAG_KINDS = ["theme", "series"] as const;
+
+/** One kind of gallery filter. */
+export const GalleryTagKind = Schema.Literals(GALLERY_TAG_KINDS);
+
+/** A theme or series ID (a UUID). */
+export const GalleryTagId = Schema.String.check(Schema.isUUID());
+
+/**
+ * The name of a theme or series, and its name in each site language. A translation may be empty:
+ * visitors in that language then see `name`. Names such as "Naruto" need no translation.
+ */
+export const GalleryTagNames = Schema.Struct({
+  name: requiredText("Name", TAG_NAME_MAX_LENGTH),
+  translations: Schema.Record(SiteLocale, optionalText("Translation", TAG_NAME_MAX_LENGTH)),
+});
+
+/** Adds a theme or series at the end of its list. */
+export const CreateGalleryTagInput = Schema.Struct({
+  kind: GalleryTagKind,
+  ...GalleryTagNames.fields,
+});
+
+/** Renames a theme or series. */
+export const UpdateGalleryTagInput = Schema.Struct({
+  id: GalleryTagId,
+  ...GalleryTagNames.fields,
+});
+
+/** Selects one theme or series. */
+export const GalleryTagIdInput = Schema.Struct({
+  id: GalleryTagId,
+});
+
+/**
+ * The new order of the themes or of the series, first first. It must list every one of that kind
+ * exactly once, so an order made from a stale list cannot drop one.
+ */
+export const ReorderGalleryTagsInput = Schema.Struct({
+  kind: GalleryTagKind,
+  ids: distinctTagIds("theme or series"),
+});
+
+/** The descriptive details of a photo, its series, and its themes. */
 export const UpdateGalleryPhotoInput = Schema.Struct({
   id: GalleryPhotoId,
   title: PhotoDetail,
-  series: PhotoDetail,
   placement: PhotoDetail,
+  seriesId: Schema.NullOr(GalleryTagId),
+  themeIds: distinctTagIds("theme"),
 });
 
 /** Whether a photo is on the home page and whether visitors can see it. */
@@ -101,6 +168,18 @@ export type GallerySection = typeof GallerySection.Type;
 
 /** Decoded photo details. */
 export type UpdateGalleryPhotoInput = typeof UpdateGalleryPhotoInput.Type;
+
+/** One kind of gallery filter: a theme or a series. */
+export type GalleryTagKind = typeof GalleryTagKind.Type;
+
+/** Decoded names of a theme or series. */
+export type GalleryTagNames = typeof GalleryTagNames.Type;
+
+/** Decoded input for a new theme or series. */
+export type CreateGalleryTagInput = typeof CreateGalleryTagInput.Type;
+
+/** Decoded input for renaming a theme or series. */
+export type UpdateGalleryTagInput = typeof UpdateGalleryTagInput.Type;
 
 /** Decoded photo flags. */
 export type SetGalleryPhotoFlagsInput = typeof SetGalleryPhotoFlagsInput.Type;

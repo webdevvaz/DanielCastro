@@ -1,7 +1,7 @@
 import { Schema } from "effect";
 
 import { SiteLocale } from "./locales";
-import { EmailAddress, optionalText, requiredText } from "./schema-fields";
+import { EmailAddress, numberInput, optionalText, requiredText } from "./schema-fields";
 
 /** The youngest client the studio tattoos (PRODUCT.md, "Policies"). */
 export const ENQUIRY_MIN_AGE = 18;
@@ -61,15 +61,20 @@ const otherPlaceGiven = Schema.makeFilter(
 /**
  * What a client writes in the enquiry form, without the photos. `consent` is the privacy notice
  * checkbox; `website` is a field that people never see and bots fill in, so it must stay empty.
+ * `secondsToFill` is how long the form was open before sending; the server ignores an enquiry
+ * sent faster than a person can fill it in.
  */
 export const EnquiryDetails = Schema.Struct({
   locale: SiteLocale,
   name: requiredText("Name", 120),
-  age: Schema.Int.check(
-    Schema.isBetween(
-      { minimum: ENQUIRY_MIN_AGE, maximum: 120 },
-      { message: `You must be ${ENQUIRY_MIN_AGE} or older` },
+  age: numberInput(
+    Schema.Int.check(
+      Schema.isBetween(
+        { minimum: ENQUIRY_MIN_AGE, maximum: 120 },
+        { message: `You must be ${ENQUIRY_MIN_AGE} or older` },
+      ),
     ),
+    "Enter your age",
   ),
   instagram: InstagramHandle,
   email: EmailAddress,
@@ -85,6 +90,7 @@ export const EnquiryDetails = Schema.Struct({
     Schema.makeFilter((consent: boolean) => consent || "Accept the privacy notice"),
   ),
   website: Schema.String.check(Schema.isMaxLength(0)),
+  secondsToFill: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
 }).check(otherPlaceGiven);
 
 const decodeDetails = Schema.decodeUnknownOption(Schema.fromJsonString(EnquiryDetails));

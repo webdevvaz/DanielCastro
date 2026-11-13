@@ -1,5 +1,5 @@
 import { isMatch } from "date-fns";
-import { Schema } from "effect";
+import { Effect, Option, Schema, SchemaGetter, SchemaIssue } from "effect";
 
 /** How a calendar date travels between the browser, the server, and the database. */
 const CALENDAR_DATE_FORMAT = "yyyy-MM-dd";
@@ -15,6 +15,26 @@ export const requiredText = (label: string, maxLength: number) =>
 export const optionalText = (label: string, maxLength: number) =>
   Schema.Trim.check(
     Schema.isMaxLength(maxLength, { message: `${label} must be at most ${maxLength} characters` }),
+  );
+
+/**
+ * The value of a number box in a form: `null` while the box is empty, which fails with
+ * `emptyMessage`, and otherwise a number that `schema` checks. Forms keep an empty box as null,
+ * not NaN: the form library compares values with `===`, and NaN never equals itself.
+ */
+export const numberInput = <S extends Schema.Codec<number, number>>(
+  schema: S,
+  emptyMessage: string,
+) =>
+  Schema.NullOr(Schema.Number).pipe(
+    Schema.decodeTo(schema, {
+      decode: SchemaGetter.onSome((value: number | null) =>
+        value === null
+          ? Effect.fail(new SchemaIssue.InvalidValue({ message: emptyMessage }, value))
+          : Effect.succeed(Option.some(value)),
+      ),
+      encode: SchemaGetter.transform((value: number) => value),
+    }),
   );
 
 /** A calendar date without a time, such as `2026-11-19`. */

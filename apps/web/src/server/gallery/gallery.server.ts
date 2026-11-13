@@ -93,13 +93,14 @@ export const uploadGalleryPhoto = Effect.fn("uploadGalleryPhoto")(
     ),
 );
 
-/** Saves the title, series, and placement of a photo. Empty text clears a field. */
+/** Saves the title, placement, series, and themes of a photo. Empty text clears a field. */
 export const updateGalleryPhoto = Effect.fn("updateGalleryPhoto")(
   function* (_userId: string, input: UpdateGalleryPhotoInput) {
     yield* updateGalleryPhotoDetails(input.id, {
       title: emptyToNull(input.title),
-      series: emptyToNull(input.series),
       placement: emptyToNull(input.placement),
+      seriesId: input.seriesId,
+      themeIds: input.themeIds,
     });
   },
   (effect, userId, input) =>

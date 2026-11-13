@@ -4,6 +4,7 @@ import type { EnquiryDetails, UpdateEnquiryStatusInput } from "@daniel/shared/en
 import {
   deleteEnquiry,
   findBookableGuestSpot,
+  getBookingSettings,
   getEnquiry,
   insertEnquiry,
   setEnquiryEmailStatus,
@@ -30,9 +31,16 @@ import {
   type EnquiryEmailPhoto,
 } from "./enquiry-email.server";
 import { processEnquiryPhoto, removeEnquiryFiles } from "./enquiry-photos.server";
+import { EnquiryRateLimit } from "./enquiry-rate-limit.server";
 
 /** Photos are resized two at a time, so a large enquiry does not hold every image in memory. */
 const PHOTO_CONCURRENCY = 2;
+
+/**
+ * The shortest time a person needs for the form: it has ten answers and three groups of photos.
+ * An enquiry sent faster is a bot's.
+ */
+const MIN_SECONDS_TO_FILL = 15;
 
 const decodeDetails = Schema.decodeUnknownEffect(Schema.fromJsonString(EnquiryDetailsSchema));
 
@@ -103,9 +111,28 @@ const deliverEnquiryEmail = (
  * admin can send the email later.
  */
 export const submitEnquiry = Effect.fn("submitEnquiry")(function* (formData: FormData) {
+  const booking = yield* getBookingSettings();
+
+  if (!booking.booksOpen) {
+    return yield* new ConflictError({ reason: "Daniel is not taking new enquiries right now" });
+  }
+
+  const rateLimit = yield* EnquiryRateLimit;
+
+  yield* rateLimit.take;
+
   const details = yield* decodeDetails(formData.get("details")).pipe(
     Effect.mapError(() => new InvalidInputError({ reason: "Fill in every required field" })),
   );
+
+  // A bot fills the form at once. It gets the usual answer, so it learns nothing from it.
+  if (details.secondsToFill < MIN_SECONDS_TO_FILL) {
+    yield* Effect.logWarning("Enquiry ignored: sent too fast to be from a person").pipe(
+      Effect.annotateLogs({ secondsToFill: details.secondsToFill }),
+    );
+
+    return;
+  }
 
   const location = yield* resolveLocation(details);
 

@@ -1,6 +1,6 @@
 import type { DragEvent } from "react";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import type { getAdminGallery } from "@/server/gallery/gallery.functions";
 
 import { photoUrl } from "@/gallery/photo-files";
+import { tagLabel } from "@/gallery/tag-label";
 import { galleryQueryKeys } from "@/integrations/tanstack-query/gallery-query-options";
 import { deleteGalleryPhoto, setGalleryPhotoFlags } from "@/server/gallery/gallery.functions";
 
@@ -29,14 +30,18 @@ export function AdminPhotoCard({
   onMove,
   dragHandlers,
 }: AdminPhotoCardProps) {
-  const { queryClient } = useRouteContext({ from: "/admin/_dashboard/gallery" });
+  const { queryClient, galleryTagsQueryOptions } = useRouteContext({
+    from: "/admin/_dashboard/gallery",
+  });
 
-  const { t } = useAdminText();
+  const { locale, t } = useAdminText();
 
   const [editing, setEditing] = useState(false);
 
   const setFlags = useServerFn(setGalleryPhotoFlags);
   const deletePhoto = useServerFn(deleteGalleryPhoto);
+
+  const { data: tags } = useSuspenseQuery(galleryTagsQueryOptions);
 
   const refreshGallery = () => queryClient.invalidateQueries({ queryKey: galleryQueryKeys.all });
 
@@ -54,6 +59,14 @@ export function AdminPhotoCard({
   });
 
   const busy = flagsMutation.isPending || deleteMutation.isPending;
+
+  const tagNames = new Map(tags.map((tag) => [tag.id, tagLabel(tag, locale)]));
+
+  const details = [photo.seriesId, ...photo.themeIds]
+    .map((id) => (id === null ? undefined : tagNames.get(id)))
+    .concat(photo.placement ?? undefined)
+    .filter((detail) => detail !== undefined)
+    .join(" · ");
 
   return (
     <article
@@ -88,10 +101,7 @@ export function AdminPhotoCard({
           <>
             <p className="admin-photo-title">
               {photo.title ?? t.gallery.card.noTitle}
-              <small>
-                {[photo.series, photo.placement].filter(Boolean).join(" · ") ||
-                  t.gallery.card.noDetails}
-              </small>
+              <small>{details === "" ? t.gallery.card.noDetails : details}</small>
             </p>
             <div className="admin-photo-actions">
               <button

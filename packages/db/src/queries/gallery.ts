@@ -1,12 +1,12 @@
 import type { GallerySection } from "@daniel/shared/gallery";
 
-import { ConflictError, NotFoundError } from "@daniel/shared/errors";
+import { ConflictError, InvalidInputError, NotFoundError } from "@daniel/shared/errors";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import { Database } from "../database";
 import { mapDatabaseError } from "../errors";
-import { galleryPhoto } from "../schema/gallery";
+import { galleryPhoto, galleryPhotoTheme, galleryTag } from "../schema/gallery";
 
 const publicPhotoColumns = {
   id: true,
@@ -14,10 +14,13 @@ const publicPhotoColumns = {
   width: true,
   height: true,
   title: true,
-  series: true,
+  seriesId: true,
   placement: true,
   featured: true,
 } as const;
+
+/** The IDs of a photo's themes, read with the photo. */
+const withThemeIds = { themes: { columns: { id: true } } } as const;
 
 const adminPhotoColumns = {
   ...publicPhotoColumns,
@@ -31,6 +34,17 @@ const galleryOrder = { position: "asc", createdAt: "desc" } as const;
 
 const photoNotFound = () => new NotFoundError({ resource: "Photo" });
 
+const tagsGone = () =>
+  new ConflictError({
+    reason: "A theme or series was deleted meanwhile. Reload the page and try again.",
+  });
+
+/** Replaces a photo's nested theme rows with their IDs. */
+const flattenThemes = <P extends { readonly themes: ReadonlyArray<{ readonly id: string }> }>({
+  themes,
+  ...photo
+}: P) => ({ ...photo, themeIds: themes.map((theme) => theme.id) });
+
 /**
  * One part of the gallery as visitors see it: every photo of the section that is not hidden, in
  * gallery order. Featured work photos show as large tiles.
@@ -40,11 +54,14 @@ export const listPublicGalleryPhotos = Effect.fn("db.listPublicGalleryPhotos")(f
 ) {
   const db = yield* Database;
 
-  return yield* db.query.galleryPhoto.findMany({
+  const photos = yield* db.query.galleryPhoto.findMany({
     columns: publicPhotoColumns,
+    with: withThemeIds,
     where: { section: { eq: section }, hidden: { eq: false } },
     orderBy: galleryOrder,
   });
+
+  return photos.map(flattenThemes);
 }, mapDatabaseError("listPublicGalleryPhotos"));
 
 /**
@@ -54,10 +71,13 @@ export const listPublicGalleryPhotos = Effect.fn("db.listPublicGalleryPhotos")(f
 export const listAllGalleryPhotos = Effect.fn("db.listAllGalleryPhotos")(function* () {
   const db = yield* Database;
 
-  return yield* db.query.galleryPhoto.findMany({
+  const photos = yield* db.query.galleryPhoto.findMany({
     columns: adminPhotoColumns,
+    with: withThemeIds,
     orderBy: galleryOrder,
   });
+
+  return photos.map(flattenThemes);
 }, mapDatabaseError("listAllGalleryPhotos"));
 
 /**
@@ -87,20 +107,63 @@ export const insertGalleryPhoto = Effect.fn("db.insertGalleryPhoto")(function* (
   return created;
 }, mapDatabaseError("insertGalleryPhoto"));
 
-/** Replaces the title, series, and placement of a photo. */
+/**
+ * Replaces the title, placement, series, and themes of a photo in one transaction. Fails, and
+ * changes nothing, with `NotFoundError` when the photo is gone, with `ConflictError` when a named
+ * theme or series is gone, and with `InvalidInputError` when `seriesId` names a theme or
+ * `themeIds` names a series. The named tags stay locked until the update ends, so none can be
+ * deleted halfway.
+ */
 export const updateGalleryPhotoDetails = Effect.fn("db.updateGalleryPhotoDetails")(function* (
   id: string,
   details: GalleryPhotoDetails,
 ) {
   const db = yield* Database;
 
-  const updated = yield* db
-    .update(galleryPhoto)
-    .set(details)
-    .where(eq(galleryPhoto.id, id))
-    .returning({ id: galleryPhoto.id });
+  yield* db.transaction((tx) =>
+    Effect.gen(function* () {
+      const named = [...details.themeIds];
 
-  if (updated.length === 0) return yield* photoNotFound();
+      if (details.seriesId !== null) named.push(details.seriesId);
+
+      const tags =
+        named.length === 0
+          ? []
+          : yield* tx
+              .select({ id: galleryTag.id, kind: galleryTag.kind })
+              .from(galleryTag)
+              .where(inArray(galleryTag.id, named))
+              .for("share");
+
+      if (tags.length !== new Set(named).size) return yield* tagsGone();
+
+      const kindOf = new Map(tags.map((tag) => [tag.id, tag.kind]));
+      const seriesIsSeries = details.seriesId === null || kindOf.get(details.seriesId) === "series";
+      const themesAreThemes = details.themeIds.every((tagId) => kindOf.get(tagId) === "theme");
+
+      if (!seriesIsSeries || !themesAreThemes) {
+        return yield* new InvalidInputError({
+          reason: "Choose the series and the themes from their own lists",
+        });
+      }
+
+      const updated = yield* tx
+        .update(galleryPhoto)
+        .set({ title: details.title, placement: details.placement, seriesId: details.seriesId })
+        .where(eq(galleryPhoto.id, id))
+        .returning({ id: galleryPhoto.id });
+
+      if (updated.length === 0) return yield* photoNotFound();
+
+      yield* tx.delete(galleryPhotoTheme).where(eq(galleryPhotoTheme.photoId, id));
+
+      if (details.themeIds.length === 0) return;
+
+      yield* tx
+        .insert(galleryPhotoTheme)
+        .values(details.themeIds.map((tagId) => ({ photoId: id, tagId })));
+    }),
+  );
 }, mapDatabaseError("updateGalleryPhotoDetails"));
 
 /** Sets whether a photo is featured on the home page and whether it is hidden from visitors. */
@@ -189,11 +252,12 @@ export type NewGalleryPhoto = Pick<
   readonly section: GallerySection;
 };
 
-/** The descriptive text of a photo. `null` clears a field. */
+/** The descriptive text of a photo, its series, and its themes. `null` clears a field. */
 export type GalleryPhotoDetails = {
   readonly title: string | null;
-  readonly series: string | null;
   readonly placement: string | null;
+  readonly seriesId: string | null;
+  readonly themeIds: ReadonlyArray<string>;
 };
 
 /** Whether a photo is featured and whether it is hidden. */
