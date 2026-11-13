@@ -12,6 +12,7 @@ import { photoUrl } from "@/gallery/photo-files";
 import { galleryQueryKeys } from "@/integrations/tanstack-query/gallery-query-options";
 import { deleteGalleryPhoto, setGalleryPhotoFlags } from "@/server/gallery/gallery.functions";
 
+import { useAdminText } from "../use-admin-text";
 import { PhotoDetailsForm } from "./photo-details-form";
 
 /**
@@ -30,6 +31,8 @@ export function AdminPhotoCard({
 }: AdminPhotoCardProps) {
   const { queryClient } = useRouteContext({ from: "/admin/_dashboard/gallery" });
 
+  const { t } = useAdminText();
+
   const [editing, setEditing] = useState(false);
 
   const setFlags = useServerFn(setGalleryPhotoFlags);
@@ -41,13 +44,13 @@ export function AdminPhotoCard({
     mutationFn: (flags: { featured: boolean; hidden: boolean }) =>
       setFlags({ data: { id: photo.id, ...flags } }),
     onSuccess: refreshGallery,
-    onError: (error) => toast.error(error.message || "The photo could not be changed"),
+    onError: (error) => toast.error(error.message || t.gallery.card.changeFailed),
   });
 
   const deleteMutation = useMutation({
     mutationFn: () => deletePhoto({ data: { id: photo.id } }),
     onSuccess: refreshGallery,
-    onError: (error) => toast.error(error.message || "The photo could not be deleted"),
+    onError: (error) => toast.error(error.message || t.gallery.card.deleteFailed),
   });
 
   const busy = flagsMutation.isPending || deleteMutation.isPending;
@@ -67,15 +70,15 @@ export function AdminPhotoCard({
       <div className="admin-photo-image">
         <img
           src={photoUrl(photo.storageKey, "thumb")}
-          alt={photo.title ?? `Photo ${position}`}
+          alt={photo.title ?? t.gallery.card.photoAlt(position)}
           width={photo.width}
           height={photo.height}
           draggable={false}
         />
         <div className="admin-photo-badges">
           <span>#{position}</span>
-          {photo.featured ? <span data-kind="featured">Featured</span> : null}
-          {photo.hidden ? <span>Hidden</span> : null}
+          {photo.featured ? <span data-kind="featured">{t.gallery.card.featured}</span> : null}
+          {photo.hidden ? <span>{t.gallery.card.hidden}</span> : null}
         </div>
       </div>
       <div className="admin-photo-body">
@@ -84,9 +87,10 @@ export function AdminPhotoCard({
         ) : (
           <>
             <p className="admin-photo-title">
-              {photo.title ?? "No title"}
+              {photo.title ?? t.gallery.card.noTitle}
               <small>
-                {[photo.series, photo.placement].filter(Boolean).join(" · ") || "No details"}
+                {[photo.series, photo.placement].filter(Boolean).join(" · ") ||
+                  t.gallery.card.noDetails}
               </small>
             </p>
             <div className="admin-photo-actions">
@@ -95,7 +99,7 @@ export function AdminPhotoCard({
                 type="button"
                 onClick={() => setEditing(true)}
               >
-                Edit
+                {t.common.edit}
               </button>
               {photo.section === "work" ? (
                 <button
@@ -106,7 +110,7 @@ export function AdminPhotoCard({
                     flagsMutation.mutate({ featured: !photo.featured, hidden: photo.hidden })
                   }
                 >
-                  {photo.featured ? "Unfeature" : "Feature"}
+                  {photo.featured ? t.gallery.card.unfeature : t.gallery.card.feature}
                 </button>
               ) : null}
               <button
@@ -117,14 +121,14 @@ export function AdminPhotoCard({
                   flagsMutation.mutate({ featured: photo.featured, hidden: !photo.hidden })
                 }
               >
-                {photo.hidden ? "Show" : "Hide"}
+                {photo.hidden ? t.gallery.card.show : t.gallery.card.hide}
               </button>
             </div>
             <div className="admin-photo-actions">
               <button
                 className="btn btn-ghost btn-small"
                 type="button"
-                aria-label="Move earlier"
+                aria-label={t.gallery.card.moveEarlier}
                 disabled={reorderDisabled || isFirst}
                 onClick={() => onMove(-1)}
               >
@@ -133,7 +137,7 @@ export function AdminPhotoCard({
               <button
                 className="btn btn-ghost btn-small"
                 type="button"
-                aria-label="Move later"
+                aria-label={t.gallery.card.moveLater}
                 disabled={reorderDisabled || isLast}
                 onClick={() => onMove(1)}
               >
@@ -144,14 +148,12 @@ export function AdminPhotoCard({
                 type="button"
                 disabled={busy}
                 onClick={() => {
-                  if (
-                    window.confirm("Delete this photo from the gallery? This cannot be undone.")
-                  ) {
+                  if (window.confirm(t.gallery.card.confirmDelete)) {
                     deleteMutation.mutate();
                   }
                 }}
               >
-                Delete
+                {t.common.delete}
               </button>
             </div>
           </>

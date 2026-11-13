@@ -12,10 +12,7 @@ import { createGuestSpot, updateGuestSpot } from "@/server/guest-spots/guest-spo
 
 import type { AdminGuestSpot } from "./admin-guest-spot";
 
-const STATUS_OPTIONS = [
-  { value: "open", label: "Books open" },
-  { value: "full", label: "Fully booked" },
-];
+import { useAdminText } from "../use-admin-text";
 
 const EMPTY_SPOT: CreateGuestSpotInput = {
   city: "",
@@ -47,6 +44,8 @@ const valuesOf = (spot: AdminGuestSpot): CreateGuestSpotInput => ({
 export function GuestSpotForm({ spot, onDone }: GuestSpotFormProps) {
   const { queryClient } = useRouteContext({ from: "/admin/_dashboard/guest-spots" });
 
+  const { t } = useAdminText();
+
   const create = useServerFn(createGuestSpot);
   const update = useServerFn(updateGuestSpot);
 
@@ -68,7 +67,11 @@ export function GuestSpotForm({ spot, onDone }: GuestSpotFormProps) {
   });
 
   const defaultValues = spot === undefined ? EMPTY_SPOT : valuesOf(spot);
-  const submitLabel = spot === undefined ? "Add guest spot" : "Save";
+  const submitLabel = spot === undefined ? t.guestSpots.form.submit : t.common.save;
+  const statusOptions = [
+    { value: "open", label: t.guestSpots.status.open },
+    { value: "full", label: t.guestSpots.status.full },
+  ];
 
   const form = useAppForm({
     defaultValues,
@@ -80,7 +83,7 @@ export function GuestSpotForm({ spot, onDone }: GuestSpotFormProps) {
         .then(() => {
           if (spot === undefined) formApi.reset();
         })
-        .catch((error: unknown) => showFormError(form, error, "The guest spot could not be saved"));
+        .catch((error: unknown) => showFormError(form, error, t.guestSpots.form.saveFailed));
     },
   });
 
@@ -95,39 +98,46 @@ export function GuestSpotForm({ spot, onDone }: GuestSpotFormProps) {
     >
       <div className="form-grid">
         <form.AppField name="city">
-          {(field) => <field.TextField label="City" placeholder="Düsseldorf" />}
+          {(field) => <field.TextField label={t.guestSpots.form.city} placeholder="Düsseldorf" />}
         </form.AppField>
         <form.AppField name="country">
-          {(field) => <field.TextField label="Country" placeholder="Germany" />}
+          {(field) => (
+            <field.TextField
+              label={t.guestSpots.form.country}
+              placeholder={t.guestSpots.form.countryPlaceholder}
+            />
+          )}
         </form.AppField>
         <form.AppField name="studioName">
-          {(field) => <field.TextField label="Studio" />}
+          {(field) => <field.TextField label={t.guestSpots.form.studio} />}
         </form.AppField>
         <form.AppField name="address">
-          {(field) => <field.TextField label="Address" hint="Optional" />}
+          {(field) => (
+            <field.TextField label={t.guestSpots.form.address} hint={t.common.optional} />
+          )}
         </form.AppField>
         <form.AppField name="startsOn">
-          {(field) => <field.TextField label="First day" type="date" />}
+          {(field) => <field.TextField label={t.guestSpots.form.firstDay} type="date" />}
         </form.AppField>
         <form.AppField name="endsOn">
-          {(field) => <field.TextField label="Last day" type="date" />}
+          {(field) => <field.TextField label={t.guestSpots.form.lastDay} type="date" />}
         </form.AppField>
         <form.AppField name="status">
-          {(field) => <field.SelectField label="Booking" options={STATUS_OPTIONS} />}
+          {(field) => <field.SelectField label={t.guestSpots.booking} options={statusOptions} />}
         </form.AppField>
         <form.AppField name="note">
           {(field) => (
-            <field.TextField label="Note for visitors" hint="Optional, for example how to book" />
+            <field.TextField label={t.guestSpots.form.note} hint={t.guestSpots.form.noteHint} />
           )}
         </form.AppField>
       </div>
       <div className="admin-photo-actions">
         <button className="btn btn-red btn-small" type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Saving…" : submitLabel}
+          {mutation.isPending ? t.common.saving : submitLabel}
         </button>
         {spot === undefined ? null : (
           <button className="btn btn-ghost btn-small" type="button" onClick={onDone}>
-            Cancel
+            {t.common.cancel}
           </button>
         )}
       </div>

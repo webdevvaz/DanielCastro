@@ -9,11 +9,18 @@ import { useState } from "react";
 import { useAppForm } from "@/forms/form";
 import { clearQueryCacheForAuthTransition } from "@/integrations/tanstack-query/auth-cache";
 
-/** Email and password sign-in for the studio team. Opens the requested admin page afterwards. */
+import { useAdminText } from "./use-admin-text";
+
+/**
+ * Email and password sign-in for the studio team, in the admin language. Opens the requested admin
+ * page afterwards. Any failure shows the same message, so it never tells which part was wrong.
+ */
 export function SignInForm() {
   const { queryClient } = useRouteContext({ from: "/admin/sign-in" });
   const { redirect } = useSearch({ from: "/admin/sign-in" });
   const navigate = useNavigate();
+
+  const { t } = useAdminText();
 
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -22,7 +29,7 @@ export function SignInForm() {
       // Better Auth reports failures in `error` instead of rejecting.
       const { error } = await authClient.signIn.email(value);
 
-      if (error) throw new Error(error.message ?? "Invalid email or password");
+      if (error) throw new Error(t.signIn.invalid);
     },
     onSuccess: async () => {
       clearQueryCacheForAuthTransition(queryClient);
@@ -30,7 +37,7 @@ export function SignInForm() {
       await navigate({ href: redirect ?? "/admin" });
     },
     onError: (error) => {
-      setAuthError(error.message || "Invalid email or password");
+      setAuthError(error.message || t.signIn.invalid);
     },
   });
 
@@ -58,11 +65,15 @@ export function SignInForm() {
       }}
     >
       <form.AppField name="email">
-        {(field) => <field.TextField label="Email" type="email" autoComplete="email" />}
+        {(field) => <field.TextField label={t.signIn.email} type="email" autoComplete="email" />}
       </form.AppField>
       <form.AppField name="password">
         {(field) => (
-          <field.TextField label="Password" type="password" autoComplete="current-password" />
+          <field.TextField
+            label={t.signIn.password}
+            type="password"
+            autoComplete="current-password"
+          />
         )}
       </form.AppField>
       {authError ? (
@@ -71,7 +82,7 @@ export function SignInForm() {
         </p>
       ) : null}
       <button className="btn btn-red" type="submit" disabled={signInMutation.isPending}>
-        {signInMutation.isPending ? "Signing in…" : "Sign in"}
+        {signInMutation.isPending ? t.signIn.submitting : t.signIn.submit}
       </button>
     </form>
   );

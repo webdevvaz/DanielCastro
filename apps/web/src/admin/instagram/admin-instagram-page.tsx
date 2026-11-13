@@ -1,20 +1,19 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useRouteContext, useSearch } from "@tanstack/react-router";
 
+import { localeParam } from "@/i18n/locales";
+import { RichText } from "@/i18n/rich-text";
+
+import { useAdminText } from "../use-admin-text";
 import { InstagramAccount } from "./instagram-account";
 import { InstagramPostGrid } from "./instagram-post-grid";
-
-/** Why the page lists no posts, keyed by the posts status. */
-const NO_POSTS_TEXT = {
-  ready: "The account has no posts yet.",
-  not_connected: "Connect the account to see its posts here.",
-  unavailable: "The posts cannot load at this time. Try again later.",
-} as const;
 
 /** Connects Daniel's Instagram account and adds its posts to the gallery. */
 export function AdminInstagramPage() {
   const context = useRouteContext({ from: "/admin/_dashboard/instagram" });
   const search = useSearch({ from: "/admin/_dashboard/instagram" });
+
+  const { locale, t } = useAdminText();
 
   const { data: view } = useSuspenseQuery(context.adminInstagramQueryOptions);
 
@@ -23,43 +22,43 @@ export function AdminInstagramPage() {
   return (
     <>
       <p className="eyebrow">
-        <b>Admin</b> Instagram
+        <b>{t.nav.label}</b> {t.instagram.title}
       </p>
-      <h1>Instagram</h1>
+      <h1>{t.instagram.title}</h1>
       <p className="lead">
-        The{" "}
-        <Link to="/{-$locale}/news" params={{ locale: undefined }}>
-          News page
-        </Link>{" "}
-        shows the latest posts from Daniel&apos;s Instagram account. Connect the account once; the
-        site renews its access by itself. To show a post in the gallery too, use &ldquo;Add to
-        gallery&rdquo;.
+        <RichText
+          template={t.instagram.lead}
+          values={{
+            link: (
+              <Link to="/{-$locale}/news" params={{ locale: localeParam(locale) }}>
+                {t.instagram.link}
+              </Link>
+            ),
+          }}
+        />
       </p>
 
       <p className="news-status" data-live={newsLive}>
-        {newsLive
-          ? "News page: live. Visitors see the News tab in the menu."
-          : "News page: hidden. The News tab appears in the menu once Instagram is connected."}
+        {newsLive ? t.instagram.live : t.instagram.hidden}
       </p>
 
       {search.connect === "failed" ? (
         <p className="form-error" role="alert">
-          Instagram did not connect. Try again. If the problem continues, ask your web developer to
-          check the Instagram setup.
+          {t.instagram.connectFailed}
         </p>
       ) : null}
 
       <section className="admin-section">
-        <h2>Account</h2>
+        <h2>{t.instagram.account}</h2>
         <InstagramAccount view={view} />
       </section>
 
       <section className="admin-section">
-        <h2>Recent posts</h2>
+        <h2>{t.instagram.posts}</h2>
         {view.posts.length > 0 ? (
           <InstagramPostGrid posts={view.posts} />
         ) : (
-          <p className="muted">{NO_POSTS_TEXT[view.postsStatus]}</p>
+          <p className="muted">{t.instagram.noPosts[view.postsStatus]}</p>
         )}
       </section>
     </>

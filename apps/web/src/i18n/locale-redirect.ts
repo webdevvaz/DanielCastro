@@ -1,3 +1,4 @@
+import { cookieValue } from "./cookie-value";
 import { localeOfPath, localizedPath } from "./locale-path";
 import { DEFAULT_LOCALE, isLocale, LOCALE_COOKIE, type Locale } from "./locales";
 
@@ -37,13 +38,7 @@ const preferredLocale = (header: string | null): Locale | null => {
 
 /** The language the visitor chose in the switcher, from the `locale` cookie, or null. */
 const chosenLocale = (cookieHeader: string | null): Locale | null => {
-  if (cookieHeader === null) return null;
-
-  const value = cookieHeader
-    .split(";")
-    .map((pair) => pair.trim())
-    .find((pair) => pair.startsWith(`${LOCALE_COOKIE}=`))
-    ?.slice(LOCALE_COOKIE.length + 1);
+  const value = cookieValue(cookieHeader, LOCALE_COOKIE);
 
   return isLocale(value) ? value : null;
 };

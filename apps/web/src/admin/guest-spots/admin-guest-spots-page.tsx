@@ -9,13 +9,14 @@ import { formatDateRange } from "@/components/format-date-range";
 import { guestSpotQueryKeys } from "@/integrations/tanstack-query/guest-spot-query-options";
 import { deleteGuestSpot } from "@/server/guest-spots/guest-spots.functions";
 
+import { useAdminText } from "../use-admin-text";
 import { GuestSpotForm } from "./guest-spot-form";
-
-const STATUS_LABELS = { open: "Books open", full: "Fully booked" } as const;
 
 /** Manages guest spots. Past spots stay in the list, greyed out, and are hidden on the site. */
 export function AdminGuestSpotsPage() {
   const context = useRouteContext({ from: "/admin/_dashboard/guest-spots" });
+
+  const { locale, t } = useAdminText();
 
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -28,7 +29,7 @@ export function AdminGuestSpotsPage() {
     onSuccess: async () => {
       await context.queryClient.invalidateQueries({ queryKey: guestSpotQueryKeys.all });
     },
-    onError: (error) => toast.error(error.message || "The guest spot could not be deleted"),
+    onError: (error) => toast.error(error.message || t.guestSpots.deleteFailed),
   });
 
   const today = studioToday();
@@ -36,31 +37,29 @@ export function AdminGuestSpotsPage() {
   return (
     <>
       <p className="eyebrow">
-        <b>Admin</b> Guest spots
+        <b>{t.nav.label}</b> {t.guestSpots.title}
       </p>
-      <h1>Guest spots</h1>
-      <p className="lead">
-        Upcoming spots appear on the home page until their last day has passed.
-      </p>
+      <h1>{t.guestSpots.title}</h1>
+      <p className="lead">{t.guestSpots.lead}</p>
 
       <section className="admin-section">
-        <h2>Add a guest spot</h2>
+        <h2>{t.guestSpots.add}</h2>
         <GuestSpotForm onDone={() => undefined} />
       </section>
 
       <section className="admin-section">
-        <h2>All guest spots</h2>
+        <h2>{t.guestSpots.all}</h2>
         {spots.length === 0 ? (
-          <p className="empty-state">No guest spots yet.</p>
+          <p className="empty-state">{t.guestSpots.empty}</p>
         ) : (
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Dates</th>
-                <th>Place</th>
-                <th>Booking</th>
+                <th>{t.guestSpots.dates}</th>
+                <th>{t.guestSpots.place}</th>
+                <th>{t.guestSpots.booking}</th>
                 <th>
-                  <span className="visually-hidden">Actions</span>
+                  <span className="visually-hidden">{t.guestSpots.actions}</span>
                 </th>
               </tr>
             </thead>
@@ -68,33 +67,35 @@ export function AdminGuestSpotsPage() {
               {spots.map((spot) => (
                 <Fragment key={spot.id}>
                   <tr data-past={spot.endsOn < today}>
-                    <td>{formatDateRange(spot.startsOn, spot.endsOn, "en")}</td>
+                    <td>{formatDateRange(spot.startsOn, spot.endsOn, locale)}</td>
                     <td>
                       {spot.city}, {spot.country}
                       <br />
                       {spot.studioName}
                     </td>
-                    <td>{spot.endsOn < today ? "Past" : STATUS_LABELS[spot.status]}</td>
-                    <td aria-label={`Actions for ${spot.city}`}>
+                    <td>
+                      {spot.endsOn < today ? t.guestSpots.past : t.guestSpots.status[spot.status]}
+                    </td>
+                    <td aria-label={t.guestSpots.actionsFor(spot.city)}>
                       <div className="row-actions">
                         <button
                           className="btn btn-ghost btn-small"
                           type="button"
                           onClick={() => setEditingId(editingId === spot.id ? null : spot.id)}
                         >
-                          Edit
+                          {t.common.edit}
                         </button>
                         <button
                           className="btn btn-danger btn-small"
                           type="button"
                           disabled={deleteMutation.isPending}
                           onClick={() => {
-                            if (window.confirm(`Delete the guest spot in ${spot.city}?`)) {
+                            if (window.confirm(t.guestSpots.confirmDelete(spot.city))) {
                               deleteMutation.mutate(spot.id);
                             }
                           }}
                         >
-                          Delete
+                          {t.common.delete}
                         </button>
                       </div>
                     </td>

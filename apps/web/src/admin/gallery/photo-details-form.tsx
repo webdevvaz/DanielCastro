@@ -10,9 +10,13 @@ import { showFormError } from "@/forms/server-errors";
 import { galleryQueryKeys } from "@/integrations/tanstack-query/gallery-query-options";
 import { updateGalleryPhoto } from "@/server/gallery/gallery.functions";
 
+import { useAdminText } from "../use-admin-text";
+
 /** Edits the title, series, and placement of a photo. Closes after a successful save. */
 export function PhotoDetailsForm({ photo, onClose }: PhotoDetailsFormProps) {
   const { queryClient } = useRouteContext({ from: "/admin/_dashboard/gallery" });
+
+  const { t } = useAdminText();
 
   const update = useServerFn(updateGalleryPhoto);
 
@@ -39,7 +43,7 @@ export function PhotoDetailsForm({ photo, onClose }: PhotoDetailsFormProps) {
     onSubmit: async ({ value }) => {
       await mutation
         .mutateAsync(value)
-        .catch((error: unknown) => showFormError(form, error, "The details could not be saved"));
+        .catch((error: unknown) => showFormError(form, error, t.gallery.details.saveFailed));
     },
   });
 
@@ -53,20 +57,25 @@ export function PhotoDetailsForm({ photo, onClose }: PhotoDetailsFormProps) {
       }}
     >
       <form.AppField name="title">
-        {(field) => <field.TextField label="Title or character" placeholder="Skull Knight" />}
+        {(field) => <field.TextField label={t.gallery.details.title} placeholder="Skull Knight" />}
       </form.AppField>
       <form.AppField name="series">
-        {(field) => <field.TextField label="Series" placeholder="Berserk" />}
+        {(field) => <field.TextField label={t.gallery.details.series} placeholder="Berserk" />}
       </form.AppField>
       <form.AppField name="placement">
-        {(field) => <field.TextField label="Placement" placeholder="Forearm" />}
+        {(field) => (
+          <field.TextField
+            label={t.gallery.details.placement}
+            placeholder={t.gallery.details.placementPlaceholder}
+          />
+        )}
       </form.AppField>
       <div className="admin-photo-actions">
         <button className="btn btn-red btn-small" type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Saving…" : "Save"}
+          {mutation.isPending ? t.common.saving : t.common.save}
         </button>
         <button className="btn btn-ghost btn-small" type="button" onClick={onClose}>
-          Cancel
+          {t.common.cancel}
         </button>
       </div>
     </form>

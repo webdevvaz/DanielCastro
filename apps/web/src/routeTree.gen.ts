@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as Char123LocaleChar125RouteRouteImport } from './routes/{-$locale}/route'
 import { Route as AdminDashboardRouteImport } from './routes/admin/_dashboard'
 import { Route as AdminSignInRouteImport } from './routes/admin/sign-in'
@@ -32,6 +33,11 @@ import { Route as Char123LocaleChar125SiteHowToBookRouteImport } from './routes/
 import { Route as Char123LocaleChar125SiteNewsRouteImport } from './routes/{-$locale}/_site/news'
 import { Route as Char123LocaleChar125SiteTravelRouteImport } from './routes/{-$locale}/_site/travel'
 
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char123LocaleChar125RouteRoute =
   Char123LocaleChar125RouteRouteImport.update({
     id: '/{-$locale}',
@@ -39,14 +45,13 @@ const Char123LocaleChar125RouteRoute =
     getParentRoute: () => rootRouteImport,
   } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/_dashboard',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
+  id: '/_dashboard',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminSignInRoute = AdminSignInRouteImport.update({
-  id: '/admin/sign-in',
-  path: '/admin/sign-in',
-  getParentRoute: () => rootRouteImport,
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
@@ -153,8 +158,8 @@ const Char123LocaleChar125SiteTravelRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/admin': typeof AdminRouteRouteWithChildren
   '/{-$locale}': typeof Char123LocaleChar125RouteRouteWithChildren
-  '/admin': typeof AdminDashboardRouteWithChildren
   '/admin/sign-in': typeof AdminSignInRoute
   '/api/health': typeof ApiHealthRoute
   '/api/ready': typeof ApiReadyRoute
@@ -176,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/{-$locale}/': typeof Char123LocaleChar125SiteIndexRoute
 }
 export interface FileRoutesByTo {
+  '/admin': typeof AdminDashboardIndexRoute
   '/{-$locale}': typeof Char123LocaleChar125SiteIndexRoute
   '/admin/sign-in': typeof AdminSignInRoute
   '/api/health': typeof ApiHealthRoute
@@ -194,10 +200,10 @@ export interface FileRoutesByTo {
   '/{-$locale}/how-to-book': typeof Char123LocaleChar125SiteHowToBookRoute
   '/{-$locale}/news': typeof Char123LocaleChar125SiteNewsRoute
   '/{-$locale}/travel': typeof Char123LocaleChar125SiteTravelRoute
-  '/admin': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/admin': typeof AdminRouteRouteWithChildren
   '/{-$locale}': typeof Char123LocaleChar125RouteRouteWithChildren
   '/admin/_dashboard': typeof AdminDashboardRouteWithChildren
   '/admin/sign-in': typeof AdminSignInRoute
@@ -224,8 +230,8 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/{-$locale}'
     | '/admin'
+    | '/{-$locale}'
     | '/admin/sign-in'
     | '/api/health'
     | '/api/ready'
@@ -247,6 +253,7 @@ export interface FileRouteTypes {
     | '/{-$locale}/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/admin'
     | '/{-$locale}'
     | '/admin/sign-in'
     | '/api/health'
@@ -265,9 +272,9 @@ export interface FileRouteTypes {
     | '/{-$locale}/how-to-book'
     | '/{-$locale}/news'
     | '/{-$locale}/travel'
-    | '/admin'
   id:
     | '__root__'
+    | '/admin'
     | '/{-$locale}'
     | '/admin/_dashboard'
     | '/admin/sign-in'
@@ -293,9 +300,8 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   Char123LocaleChar125RouteRoute: typeof Char123LocaleChar125RouteRouteWithChildren
-  AdminDashboardRoute: typeof AdminDashboardRouteWithChildren
-  AdminSignInRoute: typeof AdminSignInRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiReadyRoute: typeof ApiReadyRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -306,6 +312,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/{-$locale}': {
       id: '/{-$locale}'
       path: '/{-$locale}'
@@ -315,17 +328,17 @@ declare module '@tanstack/react-router' {
     }
     '/admin/_dashboard': {
       id: '/admin/_dashboard'
-      path: '/admin'
+      path: ''
       fullPath: '/admin'
       preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/admin/sign-in': {
       id: '/admin/sign-in'
-      path: '/admin/sign-in'
+      path: '/sign-in'
       fullPath: '/admin/sign-in'
       preLoaderRoute: typeof AdminSignInRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/api/health': {
       id: '/api/health'
@@ -463,6 +476,40 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminDashboardRouteChildren {
+  AdminDashboardGalleryRoute: typeof AdminDashboardGalleryRoute
+  AdminDashboardGuestSpotsRoute: typeof AdminDashboardGuestSpotsRoute
+  AdminDashboardInstagramRoute: typeof AdminDashboardInstagramRoute
+  AdminDashboardTravelRoute: typeof AdminDashboardTravelRoute
+  AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
+}
+
+const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
+  AdminDashboardGalleryRoute: AdminDashboardGalleryRoute,
+  AdminDashboardGuestSpotsRoute: AdminDashboardGuestSpotsRoute,
+  AdminDashboardInstagramRoute: AdminDashboardInstagramRoute,
+  AdminDashboardTravelRoute: AdminDashboardTravelRoute,
+  AdminDashboardIndexRoute: AdminDashboardIndexRoute,
+}
+
+const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(
+  AdminDashboardRouteChildren,
+)
+
+interface AdminRouteRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRouteWithChildren
+  AdminSignInRoute: typeof AdminSignInRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRouteWithChildren,
+  AdminSignInRoute: AdminSignInRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 interface Char123LocaleChar125SiteRouteChildren {
   Char123LocaleChar125SiteAboutRoute: typeof Char123LocaleChar125SiteAboutRoute
   Char123LocaleChar125SiteAftercareRoute: typeof Char123LocaleChar125SiteAftercareRoute
@@ -506,30 +553,9 @@ const Char123LocaleChar125RouteRouteWithChildren =
     Char123LocaleChar125RouteRouteChildren,
   )
 
-interface AdminDashboardRouteChildren {
-  AdminDashboardGalleryRoute: typeof AdminDashboardGalleryRoute
-  AdminDashboardGuestSpotsRoute: typeof AdminDashboardGuestSpotsRoute
-  AdminDashboardInstagramRoute: typeof AdminDashboardInstagramRoute
-  AdminDashboardTravelRoute: typeof AdminDashboardTravelRoute
-  AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
-}
-
-const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
-  AdminDashboardGalleryRoute: AdminDashboardGalleryRoute,
-  AdminDashboardGuestSpotsRoute: AdminDashboardGuestSpotsRoute,
-  AdminDashboardInstagramRoute: AdminDashboardInstagramRoute,
-  AdminDashboardTravelRoute: AdminDashboardTravelRoute,
-  AdminDashboardIndexRoute: AdminDashboardIndexRoute,
-}
-
-const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(
-  AdminDashboardRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   Char123LocaleChar125RouteRoute: Char123LocaleChar125RouteRouteWithChildren,
-  AdminDashboardRoute: AdminDashboardRouteWithChildren,
-  AdminSignInRoute: AdminSignInRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiReadyRoute: ApiReadyRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

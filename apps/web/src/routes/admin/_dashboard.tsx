@@ -4,6 +4,7 @@ import { Outlet, createFileRoute, redirect, useNavigate } from "@tanstack/react-
 import { useEffect, useState } from "react";
 
 import { AdminNav } from "@/admin/admin-nav";
+import { useAdminText } from "@/admin/use-admin-text";
 import { getSessionQueryOptions } from "@/integrations/tanstack-query/auth-query-options";
 
 function AdminLayout() {
@@ -13,6 +14,8 @@ function AdminLayout() {
   // The account this document was loaded for. The route context follows the session cache on
   // the next navigation, so it cannot tell that the account changed.
   const [documentUserId] = useState(context.user.id);
+
+  const { locale } = useAdminText();
 
   const { data: session, isSuccess } = useQuery(context.getSessionQueryOptions);
 
@@ -27,7 +30,7 @@ function AdminLayout() {
   if (sessionEnded) return null;
 
   return (
-    <div className="admin">
+    <div className="admin" lang={locale}>
       <AdminNav />
       <main className="admin-main">
         <Outlet />

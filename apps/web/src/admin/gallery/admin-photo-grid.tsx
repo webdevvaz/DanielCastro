@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { galleryQueryKeys } from "@/integrations/tanstack-query/gallery-query-options";
 import { reorderGallery } from "@/server/gallery/gallery.functions";
 
+import { useAdminText } from "../use-admin-text";
 import { AdminPhotoCard, type AdminGalleryPhoto } from "./admin-photo-card";
 
 /** Drag type of a gallery card, so dropped files are not taken for a reorder. */
@@ -36,6 +37,8 @@ export function AdminPhotoGrid({ section, photos }: AdminPhotoGridProps) {
   const [draftOrder, setDraftOrder] = useState<ReadonlyArray<string> | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
+  const { t } = useAdminText();
+
   const reorder = useServerFn(reorderGallery);
 
   const reorderMutation = useMutation({
@@ -44,7 +47,7 @@ export function AdminPhotoGrid({ section, photos }: AdminPhotoGridProps) {
       await queryClient.invalidateQueries({ queryKey: galleryQueryKeys.all });
     },
     onError: (error) => {
-      toast.error(error.message || "The new order could not be saved");
+      toast.error(error.message || t.gallery.orderFailed);
     },
     onSettled: () => {
       setDraftOrder(null);
@@ -73,7 +76,7 @@ export function AdminPhotoGrid({ section, photos }: AdminPhotoGridProps) {
   };
 
   if (photos.length === 0) {
-    return <p className="empty-state">No photos yet. Add the first ones above.</p>;
+    return <p className="empty-state">{t.gallery.empty}</p>;
   }
 
   return (

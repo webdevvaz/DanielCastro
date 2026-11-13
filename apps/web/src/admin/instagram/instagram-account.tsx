@@ -6,12 +6,13 @@ import { toast } from "sonner";
 
 import type { getAdminInstagram } from "@/server/instagram/instagram.functions";
 
+import { DATE_LOCALES } from "@/i18n/locales";
 import { disconnectInstagram } from "@/server/instagram/instagram.functions";
+
+import { useAdminText } from "../use-admin-text";
 
 /** A server route, not a page: a full navigation that ends at Instagram Login. */
 const CONNECT_URL = "/api/instagram/connect";
-
-const dateOf = (date: Date) => format(date, "d MMM yyyy");
 
 /** Starts Instagram Login. */
 function ConnectButton({ label }: { label: string }) {
@@ -31,22 +32,23 @@ export function InstagramAccount({ view }: { view: InstagramAdminView }) {
     from: "/admin/_dashboard/instagram",
   });
 
+  const { locale, t } = useAdminText();
+
   const disconnect = useServerFn(disconnectInstagram);
 
   const disconnectMutation = useMutation({
     mutationFn: () => disconnect(),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: instagramQueryKeys.all }),
-    onError: (error) => toast.error(error.message || "Instagram could not be disconnected"),
+    onError: (error) => toast.error(error.message || t.instagram.disconnectFailed),
   });
+
+  const dateOf = (date: Date) => format(date, "d MMM yyyy", { locale: DATE_LOCALES[locale] });
 
   if (!view.configured) {
     return (
       <div className="panel">
-        <p>Instagram is not switched on for this site yet.</p>
-        <p className="field-hint">
-          Your web developer finishes a one-time setup with Meta. After that, a &ldquo;Connect
-          Instagram&rdquo; button appears here.
-        </p>
+        <p>{t.instagram.notConfigured}</p>
+        <p className="field-hint">{t.instagram.notConfiguredHint}</p>
       </div>
     );
   }
@@ -55,13 +57,10 @@ export function InstagramAccount({ view }: { view: InstagramAdminView }) {
     return (
       <div className="panel instagram-account">
         <div>
-          <p>No account is connected.</p>
-          <p className="field-hint">
-            Instagram asks you to log in: use Daniel&apos;s account. When you come back here, the
-            News page is live.
-          </p>
+          <p>{t.instagram.notConnected}</p>
+          <p className="field-hint">{t.instagram.notConnectedHint}</p>
         </div>
-        <ConnectButton label="Connect Instagram" />
+        <ConnectButton label={t.instagram.connect} />
       </div>
     );
   }
@@ -70,11 +69,9 @@ export function InstagramAccount({ view }: { view: InstagramAdminView }) {
     return (
       <div className="panel instagram-account">
         <p className="form-error">
-          The access to @{view.connection.username} expired on{" "}
-          {dateOf(view.connection.tokenExpiresAt)}. The News page shows no posts until you connect
-          again.
+          {t.instagram.expired(view.connection.username, dateOf(view.connection.tokenExpiresAt))}
         </p>
-        <ConnectButton label="Connect again" />
+        <ConnectButton label={t.instagram.connectAgain} />
       </div>
     );
   }
@@ -85,27 +82,19 @@ export function InstagramAccount({ view }: { view: InstagramAdminView }) {
         <p>
           <b>@{view.connection.username}</b>
         </p>
-        <p className="field-hint">
-          Connected on {dateOf(view.connection.connectedAt)}. The site renews its access by itself.
-        </p>
+        <p className="field-hint">{t.instagram.connectedOn(dateOf(view.connection.connectedAt))}</p>
       </div>
       <div className="admin-photo-actions">
-        <ConnectButton label="Connect another account" />
+        <ConnectButton label={t.instagram.connectAnother} />
         <button
           className="btn btn-danger"
           type="button"
           disabled={disconnectMutation.isPending}
           onClick={() => {
-            if (
-              window.confirm(
-                "Disconnect Instagram? The News page shows no posts until you connect again.",
-              )
-            ) {
-              disconnectMutation.mutate();
-            }
+            if (window.confirm(t.instagram.confirmDisconnect)) disconnectMutation.mutate();
           }}
         >
-          Disconnect
+          {t.instagram.disconnect}
         </button>
       </div>
     </div>

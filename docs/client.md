@@ -154,3 +154,5 @@ The public site is in English, Portuguese, French, German, and Spanish (`apps/we
 - **The first visit** (`i18n/locale-redirect.ts`, used in `start.ts`): a browser that opens a page without a prefix goes to its language when the visitor chose one in the switcher (the `locale` cookie) or, without a choice, when its `Accept-Language` prefers one. Admin pages, API routes, server functions, files, and prefixed addresses are never redirected. `tests/unit/locale-redirect.test.ts` protects these rules.
 
 Text that admins type (photo titles, guest spot notes, Instagram captions) is shown as written, in one language. The studio answers enquiries in Portuguese and English only.
+
+The admin area has its own two languages, Portuguese (the default) and English, in `admin/admin-text.ts`. The `admin_locale` cookie keeps the choice; `routes/admin/route.tsx` reads it through the `getAdminLocale` server function before any admin page renders, so the server and the browser agree. Components read the text with `useAdminText()`, and `AdminLanguageSwitch` updates the query and the cookie together. Messages that the server sends, such as validation errors, stay in English.

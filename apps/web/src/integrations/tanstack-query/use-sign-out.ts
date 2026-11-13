@@ -8,10 +8,10 @@ import { clearQueryCacheForAuthTransition } from "./auth-cache";
 /**
  * Signs out, clears every cached query, and loads the sign-in page again as a new document. The
  * reload stops every request and callback of the account that signed out: a mutation still in
- * flight could otherwise restore its cache snapshot after the
- * next person signs in.
+ * flight could otherwise restore its cache snapshot after the next person signs in. A failure
+ * shows `failureMessage`, in the caller's language.
  */
-export function useSignOut(queryClient: QueryClient) {
+export function useSignOut(queryClient: QueryClient, failureMessage: string) {
   const navigate = useNavigate();
 
   return useMutation({
@@ -27,7 +27,7 @@ export function useSignOut(queryClient: QueryClient) {
       void navigate({ to: "/admin/sign-in", replace: true, reloadDocument: true });
     },
     onError: () => {
-      toast.error("Failed to log out");
+      toast.error(failureMessage);
     },
   });
 }

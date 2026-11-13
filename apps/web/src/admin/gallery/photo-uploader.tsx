@@ -10,15 +10,11 @@ import { useId, useState } from "react";
 import { galleryQueryKeys } from "@/integrations/tanstack-query/gallery-query-options";
 import { uploadGalleryPhoto } from "@/server/gallery/gallery.functions";
 
+import { useAdminText } from "../use-admin-text";
+
 const ACCEPTED_TYPES = "image/jpeg,image/png,image/webp";
 
 const isAcceptedFile = Schema.is(GalleryUploadFile);
-
-const STATUS_LABELS = {
-  waiting: "Waiting",
-  uploading: "Uploading…",
-  failed: "Failed",
-} as const;
 
 /**
  * Uploads photos to one section of the gallery: drop them on the area or pick them, from a phone
@@ -28,6 +24,8 @@ const STATUS_LABELS = {
 export function PhotoUploader({ section }: { section: GallerySection }) {
   const { queryClient } = useRouteContext({ from: "/admin/_dashboard/gallery" });
   const inputId = useId();
+
+  const { t } = useAdminText();
 
   const [uploads, setUploads] = useState<ReadonlyArray<UploadItem>>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -44,11 +42,7 @@ export function PhotoUploader({ section }: { section: GallerySection }) {
     mutationFn: async (items: ReadonlyArray<UploadItem>) => {
       for (const item of items) {
         if (!isAcceptedFile({ type: item.file.type, size: item.file.size })) {
-          setStatus(
-            item.id,
-            "failed",
-            `Use a JPG, PNG, or WebP image up to ${GALLERY_UPLOAD_MAX_MEGABYTES} MB`,
-          );
+          setStatus(item.id, "failed", t.gallery.uploader.wrongFile(GALLERY_UPLOAD_MAX_MEGABYTES));
 
           continue;
         }
@@ -65,7 +59,11 @@ export function PhotoUploader({ section }: { section: GallerySection }) {
 
           setUploads((current) => current.filter((entry) => entry.id !== item.id));
         } catch (error) {
-          setStatus(item.id, "failed", error instanceof Error ? error.message : "Upload failed");
+          setStatus(
+            item.id,
+            "failed",
+            error instanceof Error ? error.message : t.gallery.uploader.failed,
+          );
         }
       }
 
@@ -107,11 +105,10 @@ export function PhotoUploader({ section }: { section: GallerySection }) {
           addFiles(event.dataTransfer.files);
         }}
       >
-        <strong>{uploadMutation.isPending ? "Uploading…" : "Add photos"}</strong>
-        <span>
-          Drop photos here, or click to choose them. JPG, PNG, or WebP up to{" "}
-          {GALLERY_UPLOAD_MAX_MEGABYTES} MB each. New photos go first.
-        </span>
+        <strong>
+          {uploadMutation.isPending ? t.gallery.uploader.uploading : t.gallery.uploader.add}
+        </strong>
+        <span>{t.gallery.uploader.drop(GALLERY_UPLOAD_MAX_MEGABYTES)}</span>
         <input
           className="visually-hidden"
           id={inputId}
@@ -131,7 +128,7 @@ export function PhotoUploader({ section }: { section: GallerySection }) {
           {uploads.map((item) => (
             <li key={item.id} data-status={item.status}>
               <span>{item.file.name}</span>
-              <span>{item.error ?? STATUS_LABELS[item.status]}</span>
+              <span>{item.error ?? t.gallery.uploader.status[item.status]}</span>
             </li>
           ))}
         </ul>

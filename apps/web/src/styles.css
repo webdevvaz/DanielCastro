@@ -306,15 +306,27 @@ h2 em {
   color: var(--muted);
 }
 
-.language-switcher a {
+.language-switcher a,
+.language-switcher button {
   padding: 4px 0;
 }
 
-.language-switcher a:hover {
+.language-switcher button {
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.language-switcher a:hover,
+.language-switcher button:hover {
   color: var(--bone);
 }
 
-.language-switcher a[aria-current="true"] {
+.language-switcher a[aria-current="true"],
+.language-switcher button[aria-pressed="true"] {
   color: var(--bone);
   box-shadow: inset 0 -2px var(--red);
 }
