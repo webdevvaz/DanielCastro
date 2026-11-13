@@ -30,6 +30,8 @@ Railway changes the names in its dashboard from time to time, so a label may dif
    HIDE_FROM_SEARCH_ENGINES=true
    TRAVELPAYOUTS_TOKEN=<the Travelpayouts token>
    SERPAPI_API_KEY=<the SerpApi key>
+   SHOPIFY_STORE_DOMAIN=necrotic-wear.myshopify.com
+   SHOPIFY_STOREFRONT_TOKEN=<the Storefront token>
    ```
 
    - `RAILWAY_DOCKERFILE_PATH` tells Railway to build from the `Containerfile`, because it looks only for a file named `Dockerfile`.
@@ -37,6 +39,7 @@ Railway changes the names in its dashboard from time to time, so a label may dif
    - `BETTER_AUTH_URL` must be the exact address, with `https://` and without a slash at the end. Sign-in cookies and the Instagram login depend on it.
    - `BETTER_AUTH_SECRET` must be new: never reuse the one in your `.env.local`.
    - `HIDE_FROM_SEARCH_ENGINES=true` keeps the test site out of Google. Leave it out on the real site.
+   - `TRAVELPAYOUTS_TOKEN`, `SERPAPI_API_KEY`, and `SHOPIFY_STOREFRONT_TOKEN` have the same values as in your `.env.local`. Without the Shopify ones, the Shop page says the shop is unavailable.
    - Add `INSTAGRAM_APP_ID` and `INSTAGRAM_APP_SECRET` when the Meta app exists (`docs/instagram.md`).
    - Enquiry emails need no variable: an admin saves the Resend API key, the sender, and the recipients on the admin **Email** page, once the site's domain is verified in Resend. Until then, enquiries are saved and listed in the admin area only.
 
