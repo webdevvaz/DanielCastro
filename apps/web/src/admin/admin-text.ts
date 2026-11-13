@@ -208,7 +208,7 @@ const en = {
   },
   instagram: {
     title: "Instagram",
-    lead: "The {link} shows the latest posts from Daniel's Instagram account. Connect the account once; the site renews its access by itself. To show a post in the gallery too, use “Add to gallery”.",
+    lead: "The {link} shows the latest posts from Daniel's Instagram account. Connect the account once; the access does not expire. To show a post in the gallery too, use “Add to gallery”.",
     link: "News page",
     live: "News page: live. Visitors see the News tab in the menu.",
     hidden: "News page: hidden. The News tab appears in the menu once Instagram is connected.",
@@ -236,7 +236,7 @@ const en = {
     disconnectFailed: "Instagram could not be disconnected",
     expired: (username: string, date: string) =>
       `The access to @${username} expired on ${date}. The News page shows no posts until you connect again.`,
-    connectedOn: (date: string) => `Connected on ${date}. The site renews its access by itself.`,
+    connectedOn: (date: string) => `Connected on ${date}. The access does not expire.`,
     kinds: { image: null, video: "Video", carousel: "Album" } as {
       readonly image: null;
       readonly video: string;
@@ -587,7 +587,7 @@ const pt: AdminText = {
   },
   instagram: {
     title: "Instagram",
-    lead: "A {link} mostra as publicações mais recentes da conta de Instagram do Daniel. Ligue a conta uma vez; o site renova o acesso sozinho. Para mostrar uma publicação também na galeria, use “Adicionar à galeria”.",
+    lead: "A {link} mostra as publicações mais recentes da conta de Instagram do Daniel. Ligue a conta uma vez; o acesso não expira. Para mostrar uma publicação também na galeria, use “Adicionar à galeria”.",
     link: "página Novidades",
     live: "Página Novidades: ativa. Os visitantes veem o separador Novidades no menu.",
     hidden:
@@ -616,7 +616,7 @@ const pt: AdminText = {
     disconnectFailed: "Não foi possível desligar o Instagram",
     expired: (username, date) =>
       `O acesso a @${username} expirou a ${date}. A página Novidades não mostra publicações até voltar a ligar.`,
-    connectedOn: (date) => `Ligado a ${date}. O site renova o acesso sozinho.`,
+    connectedOn: (date) => `Ligado a ${date}. O acesso não expira.`,
     kinds: { image: null, video: "Vídeo", carousel: "Álbum" },
     inGallery: "Na galeria",
     adding: "A adicionar…",

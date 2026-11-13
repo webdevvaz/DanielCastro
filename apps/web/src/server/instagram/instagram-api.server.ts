@@ -1,5 +1,5 @@
 import "@tanstack/react-start/server-only";
-import { addSeconds } from "date-fns";
+import { addYears, fromUnixTime } from "date-fns";
 import {
   Array as Arr,
   Cache,
@@ -11,7 +11,6 @@ import {
   Exit,
   Layer,
   Option,
-  Predicate,
   Redacted,
   Schema,
 } from "effect";
@@ -19,15 +18,22 @@ import { HttpClient, HttpClientRequest, HttpClientResponse } from "effect/unstab
 
 import { describeHttpFailure } from "../describe-http-failure";
 
-const AUTHORIZE_URL = "https://www.instagram.com/oauth/authorize";
-const TOKEN_URL = "https://api.instagram.com/oauth/access_token";
-const GRAPH_URL = "https://graph.instagram.com";
-
 /** The Graph API version these requests were written for. */
 const GRAPH_VERSION = "v26.0";
 
-/** Read access to the professional account's profile and posts. */
-const SCOPE = "instagram_business_basic";
+/**
+ * Meta's login dialog for "Instagram API with Unified login" (Facebook Login for Business). The
+ * configuration (`config_id`) sets the permissions and the token type, so there is no `scope`.
+ */
+const AUTHORIZE_URL = `https://www.facebook.com/${GRAPH_VERSION}/dialog/oauth`;
+
+const GRAPH_URL = "https://graph.facebook.com";
+
+/**
+ * How long a token that Meta says never expires is treated as valid. The configuration's
+ * system-user token has no expiry (`expires_at` 0); the database keeps a date.
+ */
+const NEVER_EXPIRES_YEARS = 100;
 
 const REQUEST_TIMEOUT = "10 seconds";
 const DOWNLOAD_TIMEOUT = "30 seconds";
@@ -65,31 +71,26 @@ const postsTimeToLive = (exit: Exit.Exit<unknown, unknown>): Duration.Input =>
 
 const NumericId = Schema.Union([Schema.String, Schema.Finite]);
 
-const TokenFields = Schema.Struct({
+const TokenResponse = Schema.Struct({
   access_token: Schema.String,
-  user_id: NumericId,
 });
 
-// The documentation shows the short-lived token inside a `data` list; some answers are flat.
-const ShortLivedTokenResponse = Schema.Union([
-  TokenFields,
-  Schema.Struct({ data: Schema.NonEmptyArray(TokenFields) }),
-]);
-
-const LongLivedTokenResponse = Schema.Struct({
-  access_token: Schema.String,
-  expires_in: Schema.Finite,
+/** The token's details; `expires_at` is seconds since 1970, or 0 when it never expires. */
+const DebugTokenResponse = Schema.Struct({
+  data: Schema.Struct({
+    expires_at: Schema.optional(Schema.Finite),
+  }),
 });
 
-const ProfileFields = Schema.Struct({
-  user_id: NumericId,
-  username: Schema.String,
+/** The Instagram accounts the login gave this app access to. */
+const AssignedAccountsResponse = Schema.Struct({
+  data: Schema.Array(
+    Schema.Struct({
+      id: NumericId,
+      username: Schema.String,
+    }),
+  ),
 });
-
-const ProfileResponse = Schema.Union([
-  ProfileFields,
-  Schema.Struct({ data: Schema.NonEmptyArray(ProfileFields) }),
-]);
 
 const Media = Schema.Struct({
   id: Schema.String,
@@ -111,19 +112,18 @@ const ItemList = Schema.Struct({
   data: Schema.Array(Schema.Unknown),
 });
 
-/** A Graph API request; Instagram takes the access token as an address parameter. */
+/** A Graph API request; Meta takes the access token as an address parameter. */
 const graph = (path: string, params: Readonly<Record<string, string>>) =>
   HttpClientRequest.get(`${GRAPH_URL}/${GRAPH_VERSION}/${path}`, { urlParams: params });
 
 const decodeMedia = Schema.decodeUnknownOption(Media);
 const decodeAlbumChild = Schema.decodeUnknownOption(AlbumChild);
 
-const isDataList = <A>(answer: A | DataList<A>): answer is DataList<A> =>
-  Predicate.hasProperty(answer, "data");
-
-/** The single item of an answer that Instagram may or may not wrap in a `data` list. */
-const unwrap = <A>(answer: A | DataList<A>): A =>
-  isDataList(answer) ? Arr.headNonEmpty(answer.data) : answer;
+/** When a token stops working: its `expires_at`, or far in the future when it never expires. */
+const expiryOf = (expiresAt: number | undefined) =>
+  expiresAt === undefined || expiresAt === 0
+    ? addYears(new Date(), NEVER_EXPIRES_YEARS)
+    : fromUnixTime(expiresAt);
 
 /** A post as the site uses it. A video shows its cover image; a video with licensed music may have none. */
 const postOf = (media: typeof Media.Type): InstagramPost => ({
@@ -146,12 +146,13 @@ const makeInstagramApi = Effect.gen(function* () {
 
   const appId = yield* Config.option(Config.String("INSTAGRAM_APP_ID"));
   const appSecret = yield* Config.option(Config.Redacted("INSTAGRAM_APP_SECRET"));
+  const configId = yield* Config.option(Config.String("INSTAGRAM_CONFIG_ID"));
   const siteUrl = yield* Config.String("BETTER_AUTH_URL");
 
-  const app = Option.all({ appId, appSecret });
+  const app = Option.all({ appId, appSecret, configId });
   const redirectUri = new URL("/api/instagram/callback", siteUrl).toString();
 
-  // Instagram takes tokens and the app secret in the address, and the HTTP client traces
+  // Meta takes tokens and the app secret in the address, and the HTTP client traces
   // addresses, so tracing is off for every request here.
   const send = <S extends Schema.Constraint>(
     operation: string,
@@ -175,21 +176,9 @@ const makeInstagramApi = Effect.gen(function* () {
         () =>
           new InstagramError({
             operation,
-            cause: "INSTAGRAM_APP_ID or INSTAGRAM_APP_SECRET is not set",
+            cause: "INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET, or INSTAGRAM_CONFIG_ID is not set",
           }),
       ),
-    );
-
-  const longLivedToken = (
-    operation: string,
-    url: string,
-    params: Readonly<Record<string, string>>,
-  ) =>
-    send(operation, HttpClientRequest.get(url, { urlParams: params }), LongLivedTokenResponse).pipe(
-      Effect.map((token): InstagramToken => ({
-        accessToken: token.access_token,
-        tokenExpiresAt: addSeconds(new Date(), token.expires_in),
-      })),
     );
 
   const posts = yield* Cache.makeWith(
@@ -210,41 +199,61 @@ const makeInstagramApi = Effect.gen(function* () {
     { capacity: 4, timeToLive: postsTimeToLive },
   );
 
-  const connect = Effect.fn("instagram.connect")(function* (code: string) {
+  const connect = Effect.fn("instagram.connect")(function* (
+    code: string,
+    preferredUsername: string | null,
+  ) {
     const credentials = yield* requireApp("connect");
     const secret = Redacted.value(credentials.appSecret);
 
-    const shortLived = yield* send(
+    const token = yield* send(
       "exchangeCode",
-      HttpClientRequest.post(TOKEN_URL).pipe(
-        HttpClientRequest.bodyUrlParams({
-          client_id: credentials.appId,
-          client_secret: secret,
-          grant_type: "authorization_code",
-          redirect_uri: redirectUri,
-          code,
-        }),
-      ),
-      ShortLivedTokenResponse,
-    ).pipe(Effect.map(unwrap));
+      graph("oauth/access_token", {
+        client_id: credentials.appId,
+        client_secret: secret,
+        redirect_uri: redirectUri,
+        code,
+      }),
+      TokenResponse,
+    );
 
-    const token = yield* longLivedToken("exchangeToken", `${GRAPH_URL}/access_token`, {
-      grant_type: "ig_exchange_token",
-      client_secret: secret,
-      access_token: shortLived.access_token,
-    });
+    // The exchange does not say when the token expires; the token's details do.
+    const details = yield* send(
+      "debugToken",
+      graph("debug_token", {
+        input_token: token.access_token,
+        access_token: `${credentials.appId}|${secret}`,
+      }),
+      DebugTokenResponse,
+    );
 
-    const profile = yield* send(
-      "profile",
-      graph("me", { fields: "user_id,username", access_token: token.accessToken }),
-      ProfileResponse,
-    ).pipe(Effect.map(unwrap));
+    const assigned = yield* send(
+      "assignedAccounts",
+      graph("me/assigned_instagram_accounts", {
+        fields: "id,username",
+        access_token: token.access_token,
+      }),
+      AssignedAccountsResponse,
+    );
+
+    // A login may give access to several accounts; a connect link names the one it wants.
+    const chosen =
+      assigned.data.find((account) => account.username.toLowerCase() === preferredUsername) ??
+      assigned.data.at(0);
+
+    if (chosen === undefined) {
+      return yield* new InstagramError({
+        operation: "assignedAccounts",
+        cause:
+          "The login gave access to no Instagram account. Add business_management to the configuration in Facebook Login for Business.",
+      });
+    }
 
     const account: InstagramAccount = {
-      instagramUserId: String(profile.user_id),
-      username: profile.username,
-      accessToken: token.accessToken,
-      tokenExpiresAt: token.tokenExpiresAt,
+      instagramUserId: String(chosen.id),
+      username: chosen.username,
+      accessToken: token.access_token,
+      tokenExpiresAt: expiryOf(details.data.expires_at),
     };
 
     return account;
@@ -303,29 +312,22 @@ const makeInstagramApi = Effect.gen(function* () {
   return InstagramApi.of({
     configured: Option.isSome(app),
     authorizeUrl: (state) =>
-      Option.match(appId, {
+      Option.match(app, {
         onNone: () => null,
-        onSome: (id) => {
+        onSome: (credentials) => {
           const url = new URL(AUTHORIZE_URL);
 
-          url.searchParams.set("client_id", id);
+          url.searchParams.set("client_id", credentials.appId);
+          url.searchParams.set("config_id", credentials.configId);
           url.searchParams.set("redirect_uri", redirectUri);
           url.searchParams.set("response_type", "code");
-          url.searchParams.set("scope", SCOPE);
+          url.searchParams.set("override_default_response_type", "true");
           url.searchParams.set("state", state);
-          // Asks for the account's password, so a browser logged in to another account cannot
-          // connect the wrong one.
-          url.searchParams.set("force_reauth", "true");
 
           return url.toString();
         },
       }),
     connect,
-    refresh: (accessToken) =>
-      longLivedToken("refreshToken", `${GRAPH_URL}/refresh_access_token`, {
-        grant_type: "ig_refresh_token",
-        access_token: accessToken,
-      }),
     recentPosts: (instagramUserId, accessToken) =>
       Cache.get(posts, new PostsQuery({ instagramUserId, accessToken })),
     forgetPosts: Cache.invalidateAll(posts),
@@ -340,30 +342,29 @@ export class InstagramError extends Schema.TaggedError<InstagramError>()("Instag
   cause: Schema.String,
 }) {}
 
-/** Instagram Login and Daniel's posts, through the Instagram API with Instagram Login. */
+/**
+ * Instagram login and Daniel's posts, through Meta's "Instagram API with Unified login": a
+ * Facebook Login for Business configuration that gives a system-user token, which never expires.
+ */
 export class InstagramApi extends Context.Service<InstagramApi, InstagramApiService>()(
   "web/InstagramApi",
 ) {}
 
 /**
- * Instagram over HTTP. Needs `INSTAGRAM_APP_ID` and `INSTAGRAM_APP_SECRET` from the Meta app;
- * without them the admin cannot connect an account. Instagram sends the browser back to
- * `BETTER_AUTH_URL` + `/api/instagram/callback`, which must be a valid redirect URI in the app.
+ * Instagram over HTTP. Needs the Meta app's ID and secret (`INSTAGRAM_APP_ID`,
+ * `INSTAGRAM_APP_SECRET`) and its login configuration (`INSTAGRAM_CONFIG_ID`); without them nobody
+ * can connect an account. Meta sends the browser back to `BETTER_AUTH_URL` +
+ * `/api/instagram/callback`, which must be a redirect URI of the configuration and of Facebook
+ * Login for Business.
  */
 export const InstagramApiLive = Layer.effect(InstagramApi, makeInstagramApi);
 
-type DataList<A> = { readonly data: readonly [A, ...Array<A>] };
-
-/** A renewed long-lived access token. */
-export type InstagramToken = {
-  readonly accessToken: string;
-  readonly tokenExpiresAt: Date;
-};
-
-/** The connected account and its first long-lived token. */
-export type InstagramAccount = InstagramToken & {
+/** The connected account and its access token. */
+export type InstagramAccount = {
   readonly instagramUserId: string;
   readonly username: string;
+  readonly accessToken: string;
+  readonly tokenExpiresAt: Date;
 };
 
 /** One Instagram post. */
@@ -381,14 +382,18 @@ export type InstagramPost = {
 
 /** What the rest of the site can ask Instagram. Every request fails with `InstagramError`. */
 export type InstagramApiService = {
-  /** Whether the Meta app's ID and secret are set. */
+  /** Whether the Meta app's ID, secret, and login configuration are set. */
   readonly configured: boolean;
-  /** Where "Connect Instagram" sends the admin; null when the app is not configured. */
+  /** Where "Connect Instagram" sends the browser; null when the app is not configured. */
   readonly authorizeUrl: (state: string) => string | null;
-  /** Exchanges the code from Instagram Login for a long-lived token and the account. */
-  readonly connect: (code: string) => Effect.Effect<InstagramAccount, InstagramError>;
-  /** Renews a long-lived token that is at least a day old. */
-  readonly refresh: (accessToken: string) => Effect.Effect<InstagramToken, InstagramError>;
+  /**
+   * Exchanges the code from the login for a token and the Instagram account it reaches: the one
+   * named `preferredUsername` (lowercase) when the login reaches several, else the first.
+   */
+  readonly connect: (
+    code: string,
+    preferredUsername: string | null,
+  ) => Effect.Effect<InstagramAccount, InstagramError>;
   /** The most recent posts, newest first, read again every 15 minutes. */
   readonly recentPosts: (
     instagramUserId: string,

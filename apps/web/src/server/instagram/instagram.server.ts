@@ -4,10 +4,9 @@ import {
   getInstagramConnection,
   listImportedInstagramMediaIds,
   saveInstagramConnection,
-  updateInstagramToken,
 } from "@daniel/db";
 import { ConflictError, InvalidInputError, ServiceUnavailableError } from "@daniel/shared/errors";
-import { addDays, differenceInHours, isAfter } from "date-fns";
+import { isAfter } from "date-fns";
 import { Config, Effect, Option } from "effect";
 
 import { addPhotoToGallery } from "../gallery/gallery.server";
@@ -20,17 +19,7 @@ import {
   readConnectLinkToken,
 } from "./instagram-connect-link.server";
 
-/** A token lasts about 60 days; it is renewed once fewer than this many remain. */
-const RENEW_WITHIN_DAYS = 30;
-
-/** Instagram renews only tokens that are at least a day old. */
-const MIN_TOKEN_AGE_HOURS = 24;
-
 const ALREADY_IMPORTED = "This Instagram post is already in the gallery";
-
-const renewalDue = (connection: StoredConnection, now: Date) =>
-  isAfter(addDays(now, RENEW_WITHIN_DAYS), connection.tokenExpiresAt) &&
-  differenceInHours(now, connection.tokenRefreshedAt) >= MIN_TOKEN_AGE_HOURS;
 
 /** Logs why Instagram failed and reports only that it is unavailable. */
 const fromInstagram = <A, R>(effect: Effect.Effect<A, InstagramError, R>) =>
@@ -41,30 +30,15 @@ const fromInstagram = <A, R>(effect: Effect.Effect<A, InstagramError, R>) =>
 
 /**
  * The connected account with a usable token; null when no account is connected or its token
- * expired. A token is renewed while the site is in use, so it does not expire. A failed renewal
- * is logged, and the current token is used until the next try.
+ * expired. Unified login gives a system-user token that never expires, so nothing is renewed;
+ * a token from a configuration with an expiry needs a new login when it ends.
  */
 const activeConnection = Effect.gen(function* () {
   const connection = yield* getInstagramConnection();
-  const now = new Date();
 
-  if (connection === null || !isAfter(connection.tokenExpiresAt, now)) return null;
+  if (connection === null || !isAfter(connection.tokenExpiresAt, new Date())) return null;
 
-  if (!renewalDue(connection, now)) return connection;
-
-  const api = yield* InstagramApi;
-
-  return yield* api.refresh(connection.accessToken).pipe(
-    Effect.tap((token) => updateInstagramToken(token.accessToken, token.tokenExpiresAt)),
-    Effect.map((token): StoredConnection => ({
-      ...connection,
-      accessToken: token.accessToken,
-      tokenExpiresAt: token.tokenExpiresAt,
-    })),
-    Effect.catchTag("InstagramError", (error) =>
-      Effect.logWarning("Could not renew the Instagram token", error).pipe(Effect.as(connection)),
-    ),
-  );
+  return connection;
 }).pipe(Effect.withSpan("instagram.activeConnection"));
 
 /** The recent posts of the connected account, or why there are none. */
@@ -171,7 +145,7 @@ export const connectInstagram = Effect.fn("connectInstagram")(
   function* (userId: string, code: string, expectedUsername: string | null) {
     const api = yield* InstagramApi;
 
-    const account = yield* api.connect(code);
+    const account = yield* api.connect(code, expectedUsername);
 
     const wrongAccount =
       expectedUsername !== null &&
@@ -319,8 +293,6 @@ export const importInstagramPost = Effect.fn("importInstagramPost")(
       }),
     ),
 );
-
-type StoredConnection = NonNullable<Effect.Success<ReturnType<typeof getInstagramConnection>>>;
 
 /** A post on the News page. Posts without an image are left out. */
 export type NewsPost = Omit<InstagramPost, "imageUrl"> & { readonly imageUrl: string };

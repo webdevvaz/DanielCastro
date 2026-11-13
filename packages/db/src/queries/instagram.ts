@@ -42,19 +42,6 @@ export const saveInstagramConnection = Effect.fn("db.saveInstagramConnection")(f
     .onConflictDoUpdate({ target: instagramConnection.id, set: row });
 }, mapDatabaseError("saveInstagramConnection"));
 
-/** Stores a renewed access token. Does nothing when the account was disconnected meanwhile. */
-export const updateInstagramToken = Effect.fn("db.updateInstagramToken")(function* (
-  accessToken: string,
-  tokenExpiresAt: Date,
-) {
-  const db = yield* Database;
-
-  yield* db
-    .update(instagramConnection)
-    .set({ accessToken, tokenExpiresAt, tokenRefreshedAt: new Date() })
-    .where(eq(instagramConnection.id, INSTAGRAM_CONNECTION_ID));
-}, mapDatabaseError("updateInstagramToken"));
-
 /** Forgets the connected account and its token. */
 export const deleteInstagramConnection = Effect.fn("db.deleteInstagramConnection")(function* () {
   const db = yield* Database;

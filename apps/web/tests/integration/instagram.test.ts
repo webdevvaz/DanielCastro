@@ -9,7 +9,7 @@ import {
 import { instagramConnection } from "@daniel/db/schema";
 import { TestDatabaseLive, TestDatabaseUrl } from "@daniel/db/testing";
 import { layer } from "@effect/vitest";
-import { addDays, subDays, subHours } from "date-fns";
+import { addDays, addYears, subHours } from "date-fns";
 import { ConfigProvider, Deferred, Effect, Layer } from "effect";
 import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 import { mkdtempSync, rmSync } from "node:fs";
@@ -41,12 +41,10 @@ const APP_SECRET = "test-instagram-app-secret";
 const ACCOUNT_ID = "17841400000000000";
 const USERNAME = "danielcastro_tattooartist";
 
-const SHORT_TOKEN = "short-lived-token";
-const LONG_TOKEN = "long-lived-token";
-const RENEWED_TOKEN = "renewed-token";
+const CONFIG_ID = "9876543210";
 
-/** About 60 days, as Instagram gives long-lived tokens. */
-const TOKEN_SECONDS = 5_183_944;
+/** The system-user token Unified login gives; it never expires. */
+const ACCESS_TOKEN = "system-user-token";
 
 const IMAGE_URL = "https://scontent.cdninstagram.com/v/t51/photo.jpg?token=abc";
 
@@ -96,25 +94,30 @@ const media = (id: string, mediaType: string, extra: Record<string, unknown> = {
 
 const json = (body: unknown, status = 200): Answer => ({ status, body: JSON.stringify(body) });
 
-/** Instagram as it answers when everything works, for the posts in `posts`. */
+/**
+ * Meta as it answers when everything works, for the posts in `posts`. `assigned` is what the
+ * login gave access to; it is empty when the configuration lacks `business_management`.
+ */
 const workingInstagram =
-  (posts: ReadonlyArray<ReturnType<typeof media>> = []) =>
+  (
+    posts: ReadonlyArray<ReturnType<typeof media>> = [],
+    assigned: ReadonlyArray<{ readonly id: string; readonly username: string }> = [
+      { id: ACCOUNT_ID, username: USERNAME },
+    ],
+  ) =>
   (request: SeenRequest): Answer | Effect.Effect<Answer> => {
     const { url } = request;
 
-    if (url.hostname === "api.instagram.com") {
-      return json({ data: [{ access_token: SHORT_TOKEN, user_id: ACCOUNT_ID }] });
+    if (url.pathname === "/v26.0/oauth/access_token") {
+      return json({ access_token: ACCESS_TOKEN, token_type: "bearer" });
     }
 
-    if (url.pathname === "/access_token") {
-      return json({ access_token: LONG_TOKEN, token_type: "bearer", expires_in: TOKEN_SECONDS });
+    // A system-user token from a configuration with "Never" has no expiry.
+    if (url.pathname === "/v26.0/debug_token") {
+      return json({ data: { is_valid: true, expires_at: 0, type: "SYSTEM_USER" } });
     }
 
-    if (url.pathname === "/refresh_access_token") {
-      return json({ access_token: RENEWED_TOKEN, token_type: "bearer", expires_in: TOKEN_SECONDS });
-    }
-
-    if (url.pathname === "/v26.0/me") return json({ user_id: ACCOUNT_ID, username: USERNAME });
+    if (url.pathname === "/v26.0/me/assigned_instagram_accounts") return json({ data: assigned });
 
     if (url.pathname === `/v26.0/${ACCOUNT_ID}/media`) return json({ data: posts });
 
@@ -163,6 +166,7 @@ const instagramWith = (answer: (request: SeenRequest) => Answer | Effect.Effect<
           BETTER_AUTH_URL: BASE_URL,
           INSTAGRAM_APP_ID: APP_ID,
           INSTAGRAM_APP_SECRET: APP_SECRET,
+          INSTAGRAM_CONFIG_ID: CONFIG_ID,
         }),
       ),
     ),
@@ -223,7 +227,7 @@ const saveConnection = Effect.fn("test.saveConnection")(function* (
   yield* saveInstagramConnection({
     instagramUserId: ACCOUNT_ID,
     username: USERNAME,
-    accessToken: LONG_TOKEN,
+    accessToken: ACCESS_TOKEN,
     tokenExpiresAt: token.expiresAt,
     connectedBy: userId,
   });
@@ -254,15 +258,18 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
       const stateCookie = start.headers.get("set-cookie") ?? "";
       const state = authorizeUrl.searchParams.get("state") ?? "";
 
+      // Unified login: Meta's dialog with the configuration, which sets the permissions.
       expect(authorizeUrl.origin + authorizeUrl.pathname).toBe(
-        "https://www.instagram.com/oauth/authorize",
+        "https://www.facebook.com/v26.0/dialog/oauth",
       );
       expect(Object.fromEntries(authorizeUrl.searchParams)).toMatchObject({
         client_id: APP_ID,
+        config_id: CONFIG_ID,
         redirect_uri: `${BASE_URL}/api/instagram/callback`,
         response_type: "code",
-        scope: "instagram_business_basic",
+        override_default_response_type: "true",
       });
+      expect(authorizeUrl.searchParams.has("scope")).toBe(false);
       expect(state.length).toBeGreaterThanOrEqual(32);
       expect(stateCookie).toContain(`instagram_oauth_state=${state}`);
       expect(stateCookie).toMatch(/HttpOnly/);
@@ -285,19 +292,20 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
       expect(saved).toMatchObject({
         instagramUserId: ACCOUNT_ID,
         username: USERNAME,
-        accessToken: LONG_TOKEN,
+        accessToken: ACCESS_TOKEN,
       });
-      expect(saved?.tokenExpiresAt.getTime()).toBeGreaterThan(addDays(new Date(), 59).getTime());
+      // The token never expires, so the site never has to renew it.
+      expect(saved?.tokenExpiresAt.getTime()).toBeGreaterThan(addYears(new Date(), 50).getTime());
 
       const [exchange] = instagram.requests;
 
-      // The code is exchanged with the app secret in the body, for the redirect URI Instagram
-      // checked; the long-lived token request is the only one with the secret in the address.
-      expect(exchange?.method).toBe("POST");
-      expect(Object.fromEntries(new URLSearchParams(exchange?.body))).toEqual({
+      // The code is exchanged for the redirect URI the login used, as Meta requires.
+      expect(exchange?.url.origin + (exchange?.url.pathname ?? "")).toBe(
+        "https://graph.facebook.com/v26.0/oauth/access_token",
+      );
+      expect(Object.fromEntries(exchange?.url.searchParams ?? [])).toEqual({
         client_id: APP_ID,
         client_secret: APP_SECRET,
-        grant_type: "authorization_code",
         redirect_uri: `${BASE_URL}/api/instagram/callback`,
         code: "one-time-code",
       });
@@ -461,42 +469,44 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
     }),
   );
 
+  // Without business_management in the configuration, Meta's answer lists no account. The site
+  // must say the connection failed and keep the account it had, not save a token with no account.
+  it.effect("connects nothing when the login gives access to no Instagram account", () =>
+    Effect.gen(function* () {
+      yield* deleteInstagramConnection();
+
+      const admin = yield* signedInAs("admin");
+      const instagram = instagramWith(workingInstagram([], []));
+
+      const startRequest = routeRequest("/api/instagram/connect", [admin.cookie]);
+      const start = yield* runRoute(startRequest, startInstagramConnection(startRequest)).pipe(
+        Effect.provide(instagram.live),
+      );
+
+      const state = new URL(start.headers.get("location") ?? "").searchParams.get("state") ?? "";
+      const cookie = (start.headers.get("set-cookie") ?? "").split(";")[0] ?? "";
+      const callback = routeRequest(`/api/instagram/callback?code=c&state=${state}`, [
+        admin.cookie,
+        cookie,
+      ]);
+
+      const finish = yield* runRoute(callback, finishInstagramConnection(callback)).pipe(
+        Effect.provide(instagram.live),
+      );
+
+      expect(finish.headers.get("location")).toBe("/admin/instagram?connect=failed");
+      expect(yield* getInstagramConnection()).toBeNull();
+    }),
+  );
+
   it.effect.each([
     {
-      name: "renews a token with fewer than 30 days left",
-      expiresInDays: 20,
-      refreshedDaysAgo: 40,
-      renewals: 1,
-      token: RENEWED_TOKEN,
+      name: "reads the posts with a token that has not expired",
+      expiresInDays: 3650,
       status: "ready",
     },
-    {
-      // Instagram refuses to renew a token less than a day old.
-      name: "keeps a token renewed less than a day ago",
-      expiresInDays: 20,
-      refreshedDaysAgo: 0,
-      renewals: 0,
-      token: LONG_TOKEN,
-      status: "ready",
-    },
-    {
-      name: "keeps a token with more than 30 days left",
-      expiresInDays: 45,
-      refreshedDaysAgo: 15,
-      renewals: 0,
-      token: LONG_TOKEN,
-      status: "ready",
-    },
-    {
-      // Instagram does not renew an expired token; only a new login works.
-      name: "shows no posts once the token expired",
-      expiresInDays: -1,
-      refreshedDaysAgo: 61,
-      renewals: 0,
-      token: LONG_TOKEN,
-      status: "not_connected",
-    },
-  ])("$name", ({ expiresInDays, refreshedDaysAgo, renewals, token, status }) =>
+    { name: "shows no posts once the token expired", expiresInDays: -1, status: "not_connected" },
+  ])("$name", ({ expiresInDays, status }) =>
     Effect.gen(function* () {
       const admin = yield* signedInAs("admin");
       const mediaId = newMediaId();
@@ -504,22 +514,20 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
 
       yield* saveConnection(admin.userId, {
         expiresAt: addDays(new Date(), expiresInDays),
-        refreshedAt: subHours(subDays(new Date(), refreshedDaysAgo), 1),
+        refreshedAt: subHours(new Date(), 1),
       });
 
       const feed = yield* getNewsFeed.pipe(Effect.provide(instagram.live));
 
-      const renewalRequests = instagram.requests.filter(
-        ({ url }) => url.pathname === "/refresh_access_token",
-      );
       const postRequests = instagram.requests.filter(({ url }) => url.pathname.endsWith("/media"));
 
       expect(feed.status).toBe(status);
-      expect(renewalRequests).toHaveLength(renewals);
-      expect((yield* getInstagramConnection())?.accessToken).toBe(token);
-      // The posts are read with the token that is valid now.
+      // Posts come from Meta's Graph API with the stored token, and only while it is valid.
+      expect(postRequests.map(({ url }) => url.origin)).toEqual(
+        status === "ready" ? ["https://graph.facebook.com"] : [],
+      );
       expect(postRequests.map(({ url }) => url.searchParams.get("access_token"))).toEqual(
-        status === "ready" ? [token] : [],
+        status === "ready" ? [ACCESS_TOKEN] : [],
       );
     }),
   );
@@ -551,7 +559,7 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
       expect(again._tag).toBe("ConflictError");
       expect(photos.filter((photo) => photo.id === id)).toHaveLength(1);
       expect(view.posts.find((post) => post.id === mediaId)?.imported).toBe(true);
-      expect(JSON.stringify(view)).not.toContain(LONG_TOKEN);
+      expect(JSON.stringify(view)).not.toContain(ACCESS_TOKEN);
     }),
   );
 
@@ -632,7 +640,7 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
       );
 
       const downloads = instagram.requests.filter(
-        ({ url }) => url.hostname !== "graph.instagram.com",
+        ({ url }) => url.hostname !== "graph.facebook.com",
       );
 
       expect(failure._tag).toBe(error);

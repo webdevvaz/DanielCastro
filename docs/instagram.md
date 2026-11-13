@@ -1,35 +1,49 @@
 # Instagram
 
-The News page (`/news`) shows Daniel's latest Instagram posts. An admin connects Daniel's account once at `/admin/instagram`; after that the site works by itself:
+The News page (`/news`) shows Daniel's latest Instagram posts. Daniel connects his account once, from a link an admin sends him (or an admin connects it at `/admin/instagram`); after that the site works by itself:
 
-- The menu shows **News only while it is live**: while an account is connected and its token has not expired. Connecting puts the tab in the menu; disconnecting, or an expired token, takes it out. The admin page shows the status ("News page: live" or "hidden"). The check reads the stored connection only, so it costs every public page one small database read and no Instagram request.
-
-- It keeps the access token in the database, and renews it when fewer than 30 days of its 60 are left and it is at least a day old. A renewal happens when someone opens the News page or the admin page, so the token expires only when nobody opens either page for about 60 days. The admin page then says so, and "Connect again" fixes it.
-- It reads the posts again every 15 minutes, because Instagram's image addresses expire. When Instagram fails, the News page links to Instagram and does not break.
+- The menu shows **News only while it is live**: while an account is connected and its token has not expired. Connecting puts the tab in the menu; disconnecting takes it out. The admin page shows the status ("News page: live" or "hidden"). The check reads the stored connection only, so it costs every public page one small database read and no request to Meta.
+- The access token is a **system-user token that never expires** (see below), so the site never renews it. If the configuration is ever changed to give tokens with an expiry, the account needs a new login when the token ends; the admin page then says so.
+- It reads the posts again every 15 minutes, because Instagram's image addresses expire. When Meta fails, the News page links to Instagram and does not break.
 - "Add to gallery" on the admin page copies a post's photo into the gallery (for an album, its first photo). Videos cannot be added. A post can be in the gallery only once.
 
-The site uses Meta's **Instagram API with Instagram Login**, with the `instagram_business_basic` permission only: it reads the profile and the posts, and cannot post, comment, or read messages. Daniel's account must be a professional account (Business or Creator), which it already is.
+## Which Meta login the site uses
+
+Since October 2026, new Meta apps cannot use "API setup with Instagram login" (`instagram.com/oauth/authorize`, which answers "Invalid platform app"). They must use **"Instagram API with Unified login"**: Facebook Login for Business with a **configuration** that gives a system-user access token. The site uses that:
+
+| Step    | Request                                                                                                                                                                                                                |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Login   | `https://www.facebook.com/v26.0/dialog/oauth` with `client_id`, `config_id`, `redirect_uri`, `response_type=code`, `override_default_response_type=true`, `state`. No `scope`: the configuration sets the permissions. |
+| Token   | `GET https://graph.facebook.com/v26.0/oauth/access_token` with `client_id`, `client_secret`, `redirect_uri`, `code`.                                                                                                   |
+| Expiry  | `GET /v26.0/debug_token`; `expires_at` 0 means the token never expires.                                                                                                                                                |
+| Account | `GET /v26.0/me/assigned_instagram_accounts?fields=id,username`.                                                                                                                                                        |
+| Posts   | `GET /v26.0/{instagram-account-id}/media` on `graph.facebook.com`.                                                                                                                                                     |
+
+Meta's documentation for Unified login is thin. These steps follow what other developers reported working in November 2026 (for example [OpenReply #104](https://github.com/diwenne/openreply/issues/104) and [Postiz #2404](https://github.com/gitroomhq/postiz-app/pull/2404)); check them against the first real connection.
 
 ## One-time setup: the Meta app
 
-Do these steps once, logged in with the Meta account that owns the site's accounts (Daniel's; add the work email as a team member). Meta changes the names in its dashboard from time to time, so a label may differ a little.
+Do these steps once, logged in to developers.facebook.com with your own account. Meta changes the names in its dashboard from time to time, so a label may differ a little.
 
-1. Open https://developers.facebook.com/apps and create an app. Choose the **Business** app type, and add the **Instagram** product ("API setup with Instagram login").
-2. In the Instagram product, under **Business login settings**, add the redirect address (OAuth redirect URI):
+1. **Create the app.** On Use cases, filter by **Content management**, tick **Manage messaging & content on Instagram**, and create the app without a business portfolio.
+2. **Business portfolio.** Open **Use cases → Customize → API setup with Unified login**. It asks for a business portfolio first; create one with your own name and email. A brand-new Facebook account must wait an hour or more before Meta allows it.
+3. **Redirect URL.** In **1. Configure your app**, register:
 
    ```
    https://<the site's domain>/api/instagram/callback
    ```
 
-   It must be exactly the server setting `BETTER_AUTH_URL` followed by `/api/instagram/callback`. Meta may refuse an `http://` address; if it refuses `http://localhost:3000/api/instagram/callback`, test the connection on the live site.
+   It must be exactly `BETTER_AUTH_URL` followed by `/api/instagram/callback`.
 
-3. Add Daniel's Instagram account to the app (**App roles → Roles**, as an Instagram tester), and accept the invitation in Instagram: **Settings → Website permissions → Apps and websites → Tester invites**. Only accounts with a role in the app can connect while the app is in development, which is all this site needs, so the app does not need Meta's review.
-4. Copy the **Instagram app ID** and the **Instagram app secret** from the Instagram product's settings. These are not the Facebook app ID and secret at the top of the dashboard.
-5. Put them in the server settings (`.env.local` on a computer, the host's secret settings in production), then restart the site:
+4. **Configuration.** Click **Create new configuration**: system-user access token, expiration **Never**, asset **Instagram account**. The site needs only `instagram_basic`; untick the other permissions if Meta allows it. Copy the **configuration ID**.
+5. **Facebook Login for Business.** Add this product. In its **Settings → Valid OAuth Redirect URIs**, add the same redirect URL. In its **Configurations**, edit the configuration and add `business_management`: without it, Meta lists no Instagram account after the login (the admin page then says the connection failed).
+6. **Tester.** In **App roles → Roles**, add `danielcastro_tattooartist` as an **Instagram Tester**. Daniel accepts the invitation once (instagram.com → Settings → Website permissions → Apps and websites → Tester invites). With a role in the app, the app needs no App Review.
+7. **Keys.** From **App settings → Basic**, copy the **App ID** and **App secret**. Put them and the configuration ID in the server settings (`.env.local` on a computer, the host's variables in production), then restart the site:
 
    ```
-   INSTAGRAM_APP_ID=...
-   INSTAGRAM_APP_SECRET=...
+   INSTAGRAM_APP_ID=<App ID>
+   INSTAGRAM_APP_SECRET=<App secret>
+   INSTAGRAM_CONFIG_ID=<configuration ID>
    ```
 
    The app secret is a password: never put it in the code, a message, or a screenshot.
@@ -37,10 +51,10 @@ Do these steps once, logged in with the Meta account that owns the site's accoun
 ## Connecting the account
 
 1. Sign in to the admin area and open **Instagram**.
-2. Select **Connect Instagram**. Instagram asks for a login: log in with Daniel's account (`@danielcastro_tattooartist`), and allow access.
-3. Instagram sends you back to the admin page, which shows the account and its recent posts.
+2. Select **Connect Instagram**. Meta's login opens: choose to continue with Instagram, log in with Daniel's account (`@danielcastro_tattooartist`), and allow access.
+3. Meta sends you back to the admin page, which shows the account and its recent posts.
 
-If the connection fails, the admin page says so. The usual causes: the redirect address in the Meta app is not exactly the one above, the account has no role in the app, or the app ID and secret are the Facebook ones.
+If the connection fails, the admin page says so. The usual causes: the redirect address is missing from the configuration or from Facebook Login for Business, the configuration lacks `business_management`, or the account has no role in the app. The server log names the failed step (`exchangeCode`, `debugToken`, `assignedAccounts`).
 
 ### From a link, without an admin account
 
@@ -65,11 +79,11 @@ To connect a different account, use **Connect another account**. **Disconnect** 
 Security:
 
 - **Login CSRF:** "Connect Instagram" sets a random `state` in an HTTP-only cookie limited to `/api/instagram`, for 10 minutes. The callback connects an account only when Instagram returns the same `state`, and then only for a signed-in admin or a valid connect link (whose token rides in the same cookie, after the state). Without this check, another site could make an admin's browser connect the wrong account.
-- **Secrets in addresses:** Instagram takes the access token, and for one request the app secret, as address parameters. Effect's HTTP client records addresses in traces, so tracing is off for every Instagram request, and errors keep only the error type and status.
+- **Secrets in addresses:** Meta takes the access token, and for the token exchange and `debug_token` the app secret, as address parameters. Effect's HTTP client records addresses in traces, so tracing is off for every Instagram request, and errors keep only the error type and status.
 - **The token** stays on the server. No server function returns it.
 - **Downloads** go only to Instagram's image servers (`*.cdninstagram.com`, `*.fbcdn.net`) over HTTPS, are limited to 25 MB, and must be JPG, PNG, or WebP images.
 - **Media IDs** from the browser must be digits only, because they become part of a Graph API address.
 
-The integration tests in `apps/web/tests/integration/instagram.test.ts` run all of this against a fake Instagram.
+The integration tests in `apps/web/tests/integration/instagram.test.ts` run all of this against a fake Meta.
 
 Captions: Meta's documentation lists `caption` among the fields only for Facebook Login. The site asks for it anyway; if the first connection shows "No caption" on posts that have one, the API does not give captions to Instagram Login apps, and the News page shows the photos without text.

@@ -40,7 +40,7 @@ Railway changes the names in its dashboard from time to time, so a label may dif
    - `BETTER_AUTH_SECRET` must be new: never reuse the one in your `.env.local`.
    - `HIDE_FROM_SEARCH_ENGINES=true` keeps the test site out of Google. Leave it out on the real site.
    - `TRAVELPAYOUTS_TOKEN`, `SERPAPI_API_KEY`, and `SHOPIFY_STOREFRONT_TOKEN` have the same values as in your `.env.local`. Without the Shopify ones, the Shop page says the shop is unavailable.
-   - Add `INSTAGRAM_APP_ID` and `INSTAGRAM_APP_SECRET` when the Meta app exists (`docs/instagram.md`).
+   - Add `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, and `INSTAGRAM_CONFIG_ID` when the Meta app exists (`docs/instagram.md`).
    - Enquiry emails need no variable: an admin saves the Resend API key, the sender, and the recipients on the admin **Email** page, once the site's domain is verified in Resend. Until then, enquiries are saved and listed in the admin area only.
 
 6. **Clear what Railway filled in.** Railway detects the pnpm monorepo and may fill in a **Custom Build Command** (`pnpm --filter web build`), **Watch Paths** (`/apps/web/**`), and a **Custom Start Command** (`pnpm --filter web start`). Clear all three in **Settings → Build** and **Settings → Deploy**: the `Containerfile` builds and starts the site, the runtime image has no pnpm (the deploy fails with "The executable `pnpm` could not be found"), and the watch path would skip deploys for changes in `packages/`.
