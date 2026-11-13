@@ -1607,6 +1607,230 @@ html:has(.photo-viewer[open]) {
   gap: 6px;
 }
 
+/* Shop */
+
+.shop-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.shop-filters button,
+.shop-option-values span {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.shop-filters button:hover,
+.shop-filters button[aria-pressed="true"] {
+  border-color: var(--red);
+  color: var(--bone);
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px 16px;
+  list-style: none;
+}
+
+.shop-tile a {
+  display: grid;
+  gap: 6px;
+}
+
+.shop-tile-image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--ink-3);
+}
+
+.shop-tile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.shop-tile a:hover img {
+  transform: scale(1.03);
+}
+
+.shop-tile[data-sold-out="true"] img {
+  opacity: 0.55;
+}
+
+.shop-tile-name {
+  font-family: var(--serif);
+  font-size: 21px;
+}
+
+.shop-tile-price {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.shop-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.shop-tile-image .shop-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.shop-product {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 48px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.shop-gallery-main {
+  width: 100%;
+  height: auto;
+  background: var(--ink-3);
+}
+
+.shop-gallery-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.shop-gallery-thumbs button {
+  width: 72px;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--ink-3);
+  cursor: pointer;
+}
+
+.shop-gallery-thumbs button[aria-pressed="true"] {
+  border-color: var(--red);
+}
+
+.shop-gallery-thumbs img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shop-details {
+  position: sticky;
+  top: 32px;
+  display: grid;
+  gap: 18px;
+}
+
+.shop-details h1 {
+  font-size: 44px;
+}
+
+.shop-price {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 22px;
+}
+
+.shop-option {
+  border: 0;
+}
+
+.shop-option legend {
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.shop-option-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shop-option-values input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shop-option-values span {
+  display: inline-block;
+  min-width: 48px;
+  text-align: center;
+  color: var(--bone);
+}
+
+.shop-option-values input:checked + span {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+
+.shop-option-values input:focus-visible + span {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+.shop-option-values label[data-sold-out="true"] span {
+  color: var(--muted);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.shop-buy {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.shop-quantity {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.shop-quantity select {
+  width: 84px;
+}
+
+.shop-description {
+  white-space: pre-line;
+  font-size: 14px;
+  color: var(--muted);
+}
+
 /* Phone */
 
 @media (max-width: 900px) {
@@ -1701,9 +1925,23 @@ html:has(.photo-viewer[open]) {
   .book-steps,
   .book-details,
   .about,
-  .aftercare {
+  .aftercare,
+  .shop-product {
     grid-template-columns: minmax(0, 1fr);
     gap: 28px;
+  }
+
+  .shop-details {
+    position: static;
+  }
+
+  .shop-details h1 {
+    font-size: 34px;
+  }
+
+  .shop-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 8px;
   }
 
   .about-portrait {

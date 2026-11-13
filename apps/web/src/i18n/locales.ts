@@ -1,15 +1,10 @@
 import type { Locale as DateFnsLocale } from "date-fns";
 
+import { DEFAULT_LOCALE, LOCALES, type Locale } from "@daniel/shared/locales";
 import { de, enGB, es, fr, pt } from "date-fns/locale";
 
-/** The languages with an address prefix, such as `/pt/about`. */
-export const PREFIXED_LOCALES = ["pt", "fr", "de", "es"] as const;
-
-/** The language of a page without a prefix. */
-export const DEFAULT_LOCALE = "en";
-
-/** The languages of the public site, the default first. */
-export const LOCALES = [DEFAULT_LOCALE, ...PREFIXED_LOCALES] as const;
+// The language list is a shared contract: server functions validate it too.
+export { DEFAULT_LOCALE, LOCALES, PREFIXED_LOCALES, type Locale } from "@daniel/shared/locales";
 
 /** The cookie that remembers the language a visitor chose in the switcher. */
 export const LOCALE_COOKIE = "locale";
@@ -45,6 +40,3 @@ export const localeFromParam = (param: string | undefined): Locale =>
 
 /** The `{-$locale}` address segment of a language: none for English, the code for the others. */
 export const localeParam = (locale: Locale) => (locale === DEFAULT_LOCALE ? undefined : locale);
-
-/** A language of the public site. */
-export type Locale = (typeof LOCALES)[number];

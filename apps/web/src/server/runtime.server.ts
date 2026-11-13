@@ -7,6 +7,7 @@ import { FetchHttpClient } from "effect/unstable/http";
 import { PhotoStorageLive } from "./gallery/photo-storage.server";
 import { InstagramApiLive } from "./instagram/instagram-api.server";
 import { ObservabilityLive } from "./observability/observability.server";
+import { ShopifyLive } from "./shop/shopify.server";
 import { RUNTIME_SHUTDOWN_EVENT } from "./shutdown";
 import { TravelDataLive } from "./travel/travel-data.server";
 
@@ -18,7 +19,9 @@ import { TravelDataLive } from "./travel/travel-data.server";
 const AppLive = Layer.mergeAll(
   AuthLive,
   PhotoStorageLive,
-  Layer.mergeAll(TravelDataLive, InstagramApiLive).pipe(Layer.provide(FetchHttpClient.layer)),
+  Layer.mergeAll(TravelDataLive, InstagramApiLive, ShopifyLive).pipe(
+    Layer.provide(FetchHttpClient.layer),
+  ),
 ).pipe(Layer.provideMerge(DatabaseLive), Layer.provideMerge(ObservabilityLive));
 
 /** Releases every layer: closes pools and flushes telemetry. */

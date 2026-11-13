@@ -32,6 +32,8 @@ import { Route as Char123LocaleChar125SiteGuestSpotsRouteImport } from './routes
 import { Route as Char123LocaleChar125SiteHowToBookRouteImport } from './routes/{-$locale}/_site/how-to-book'
 import { Route as Char123LocaleChar125SiteNewsRouteImport } from './routes/{-$locale}/_site/news'
 import { Route as Char123LocaleChar125SiteTravelRouteImport } from './routes/{-$locale}/_site/travel'
+import { Route as Char123LocaleChar125SiteShopIndexRouteImport } from './routes/{-$locale}/_site/shop/index'
+import { Route as Char123LocaleChar125SiteShopHandleRouteImport } from './routes/{-$locale}/_site/shop/$handle'
 
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
@@ -156,6 +158,18 @@ const Char123LocaleChar125SiteTravelRoute =
     path: '/travel',
     getParentRoute: () => Char123LocaleChar125SiteRoute,
   } as any)
+const Char123LocaleChar125SiteShopIndexRoute =
+  Char123LocaleChar125SiteShopIndexRouteImport.update({
+    id: '/shop/',
+    path: '/shop/',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
+const Char123LocaleChar125SiteShopHandleRoute =
+  Char123LocaleChar125SiteShopHandleRouteImport.update({
+    id: '/shop/$handle',
+    path: '/shop/$handle',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
@@ -179,6 +193,8 @@ export interface FileRoutesByFullPath {
   '/{-$locale}/travel': typeof Char123LocaleChar125SiteTravelRoute
   '/admin/': typeof AdminDashboardIndexRoute
   '/{-$locale}/': typeof Char123LocaleChar125SiteIndexRoute
+  '/{-$locale}/shop/$handle': typeof Char123LocaleChar125SiteShopHandleRoute
+  '/{-$locale}/shop/': typeof Char123LocaleChar125SiteShopIndexRoute
 }
 export interface FileRoutesByTo {
   '/admin': typeof AdminDashboardIndexRoute
@@ -200,6 +216,8 @@ export interface FileRoutesByTo {
   '/{-$locale}/how-to-book': typeof Char123LocaleChar125SiteHowToBookRoute
   '/{-$locale}/news': typeof Char123LocaleChar125SiteNewsRoute
   '/{-$locale}/travel': typeof Char123LocaleChar125SiteTravelRoute
+  '/{-$locale}/shop/$handle': typeof Char123LocaleChar125SiteShopHandleRoute
+  '/{-$locale}/shop': typeof Char123LocaleChar125SiteShopIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -226,6 +244,8 @@ export interface FileRoutesById {
   '/{-$locale}/_site/travel': typeof Char123LocaleChar125SiteTravelRoute
   '/admin/_dashboard/': typeof AdminDashboardIndexRoute
   '/{-$locale}/_site/': typeof Char123LocaleChar125SiteIndexRoute
+  '/{-$locale}/_site/shop/$handle': typeof Char123LocaleChar125SiteShopHandleRoute
+  '/{-$locale}/_site/shop/': typeof Char123LocaleChar125SiteShopIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -251,6 +271,8 @@ export interface FileRouteTypes {
     | '/{-$locale}/travel'
     | '/admin/'
     | '/{-$locale}/'
+    | '/{-$locale}/shop/$handle'
+    | '/{-$locale}/shop/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/admin'
@@ -272,6 +294,8 @@ export interface FileRouteTypes {
     | '/{-$locale}/how-to-book'
     | '/{-$locale}/news'
     | '/{-$locale}/travel'
+    | '/{-$locale}/shop/$handle'
+    | '/{-$locale}/shop'
   id:
     | '__root__'
     | '/admin'
@@ -297,6 +321,8 @@ export interface FileRouteTypes {
     | '/{-$locale}/_site/travel'
     | '/admin/_dashboard/'
     | '/{-$locale}/_site/'
+    | '/{-$locale}/_site/shop/$handle'
+    | '/{-$locale}/_site/shop/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -473,6 +499,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125SiteTravelRouteImport
       parentRoute: typeof Char123LocaleChar125SiteRoute
     }
+    '/{-$locale}/_site/shop/': {
+      id: '/{-$locale}/_site/shop/'
+      path: '/shop'
+      fullPath: '/{-$locale}/shop/'
+      preLoaderRoute: typeof Char123LocaleChar125SiteShopIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
+    '/{-$locale}/_site/shop/$handle': {
+      id: '/{-$locale}/_site/shop/$handle'
+      path: '/shop/$handle'
+      fullPath: '/{-$locale}/shop/$handle'
+      preLoaderRoute: typeof Char123LocaleChar125SiteShopHandleRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
   }
 }
 
@@ -518,6 +558,8 @@ interface Char123LocaleChar125SiteRouteChildren {
   Char123LocaleChar125SiteNewsRoute: typeof Char123LocaleChar125SiteNewsRoute
   Char123LocaleChar125SiteTravelRoute: typeof Char123LocaleChar125SiteTravelRoute
   Char123LocaleChar125SiteIndexRoute: typeof Char123LocaleChar125SiteIndexRoute
+  Char123LocaleChar125SiteShopHandleRoute: typeof Char123LocaleChar125SiteShopHandleRoute
+  Char123LocaleChar125SiteShopIndexRoute: typeof Char123LocaleChar125SiteShopIndexRoute
 }
 
 const Char123LocaleChar125SiteRouteChildren: Char123LocaleChar125SiteRouteChildren =
@@ -532,6 +574,10 @@ const Char123LocaleChar125SiteRouteChildren: Char123LocaleChar125SiteRouteChildr
     Char123LocaleChar125SiteNewsRoute: Char123LocaleChar125SiteNewsRoute,
     Char123LocaleChar125SiteTravelRoute: Char123LocaleChar125SiteTravelRoute,
     Char123LocaleChar125SiteIndexRoute: Char123LocaleChar125SiteIndexRoute,
+    Char123LocaleChar125SiteShopHandleRoute:
+      Char123LocaleChar125SiteShopHandleRoute,
+    Char123LocaleChar125SiteShopIndexRoute:
+      Char123LocaleChar125SiteShopIndexRoute,
   }
 
 const Char123LocaleChar125SiteRouteWithChildren =

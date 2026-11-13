@@ -296,4 +296,4 @@ export const descriptionFor = (param: string | undefined) =>
 export type SiteMessages = typeof en;
 
 /** A public page with a menu label. */
-export type SitePage = Exclude<keyof SiteMessages["nav"], "mainLabel" | "tabsLabel" | "shop">;
+export type SitePage = Exclude<keyof SiteMessages["nav"], "mainLabel" | "tabsLabel">;

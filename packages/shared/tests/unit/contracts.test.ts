@@ -4,6 +4,7 @@ import { describe, expect, it } from "vite-plus/test";
 import { GalleryUploadFormData, ReorderGalleryInput } from "../../src/gallery";
 import { CreateGuestSpotInput } from "../../src/guest-spots";
 import { ImportInstagramPostInput } from "../../src/instagram";
+import { ShopCheckoutInput, ShopProductInput } from "../../src/shop";
 import { TravelSearch, TravelSearchForm, UpdateTravelSettingsInput } from "../../src/travel";
 
 const decodeGuestSpot = Schema.decodeUnknownResult(CreateGuestSpotInput);
@@ -226,5 +227,48 @@ describe("UpdateTravelSettingsInput", () => {
     },
   ])("$name: problems at $paths", async ({ input, paths }) => {
     expect(await issuePaths(UpdateTravelSettingsInput)(input)).toEqual(paths);
+  });
+});
+
+// "Buy now" sends a variant ID and a quantity from the browser; only real variant IDs and small
+// quantities may reach Shopify.
+describe("ShopCheckoutInput", () => {
+  const variantId = "gid://shopify/ProductVariant/41463235641541";
+
+  it.each([
+    { name: "one item", input: { variantId, quantity: 1 }, paths: [] },
+    { name: "the most items", input: { variantId, quantity: 5 }, paths: [] },
+    { name: "no items", input: { variantId, quantity: 0 }, paths: ["quantity"] },
+    { name: "too many items", input: { variantId, quantity: 6 }, paths: ["quantity"] },
+    { name: "part of an item", input: { variantId, quantity: 1.5 }, paths: ["quantity"] },
+    {
+      name: "a product ID instead of a variant",
+      input: { variantId: "gid://shopify/Product/7380000000000", quantity: 1 },
+      paths: ["variantId"],
+    },
+    {
+      name: "an ID with extra text",
+      input: { variantId: `${variantId}?quantity=99`, quantity: 1 },
+      paths: ["variantId"],
+    },
+  ])("$name: problems at $paths", async ({ input, paths }) => {
+    expect(await issuePaths(ShopCheckoutInput)(input)).toEqual(paths);
+  });
+});
+
+// A product page's address names the product and the language; both come from the address bar.
+describe("ShopProductInput", () => {
+  it.each([
+    { name: "a product in Portuguese", input: { locale: "pt", handle: "dark-virgo" }, paths: [] },
+    {
+      name: "an unknown language",
+      input: { locale: "it", handle: "dark-virgo" },
+      paths: ["locale"],
+    },
+    { name: "capital letters", input: { locale: "en", handle: "Dark-Virgo" }, paths: ["handle"] },
+    { name: "a path", input: { locale: "en", handle: "../admin" }, paths: ["handle"] },
+    { name: "an empty handle", input: { locale: "en", handle: "" }, paths: ["handle"] },
+  ])("$name: problems at $paths", async ({ input, paths }) => {
+    expect(await issuePaths(ShopProductInput)(input)).toEqual(paths);
   });
 });

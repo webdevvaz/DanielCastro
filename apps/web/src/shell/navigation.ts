@@ -11,4 +11,5 @@ export const SITE_PAGES = [
   { to: "/{-$locale}/how-to-book", label: "howToBook", exact: false, newsOnly: false },
   { to: "/{-$locale}/aftercare", label: "aftercare", exact: false, newsOnly: false },
   { to: "/{-$locale}/about", label: "about", exact: false, newsOnly: false },
+  { to: "/{-$locale}/shop", label: "shop", exact: false, newsOnly: false },
 ] as const;
