@@ -27,7 +27,7 @@ const en = {
   nextGuestSpot: "Next guest spot",
   bookSession: "Book a session",
   bookShort: "Book",
-  cartCount: (count: number) => `${String(count)} in the cart`,
+  cartCount: (count: number) => `${String(count)} in your cart`,
   contact: {
     heading: "Studio",
     byAppointment: "By appointment only",
@@ -50,16 +50,17 @@ const en = {
   errors: {
     eyebrow: "Error",
     signInTitle: "Please sign in",
-    signInText: "Your session has ended. Sign in again to continue.",
+    signInText: "Your session has ended. Sign in again to carry on.",
     forbiddenTitle: "No access",
-    forbiddenText: "Your account is not allowed to open this page.",
+    forbiddenText: "Your account doesn't have access to this page.",
     genericTitle: "Something went wrong",
-    genericText: "The page could not be loaded, and the error was logged. Try again in a moment.",
+    genericText:
+      "This page couldn't load. The error has been logged; please try again in a moment.",
     signIn: "Sign in",
     tryAgain: "Try again",
     home: "Home page",
     notFoundTitle: "Page not found",
-    notFoundText: "This page does not exist. Check the address, or go back home.",
+    notFoundText: "This page doesn't exist. Check the address, or head back to the home page.",
   },
 };
 
@@ -87,17 +88,17 @@ const pt: SiteMessages = {
   cartCount: (count) => `${String(count)} no carrinho`,
   contact: {
     heading: "Estúdio",
-    byAppointment: "Apenas por marcação",
+    byAppointment: "Só por marcação",
     admin: "Admin do estúdio",
     privacy: "Privacidade",
   },
   language: "Idioma",
   loading: "A carregar",
   description:
-    "Tatuagens personalizadas de manga, anime, fantasia e videojogos, em linhas pretas com forte contraste e um toque de vermelho. Cada desenho é feito à mão, para quem o vai usar.",
+    "Tatuagens personalizadas de manga, anime, fantasia e videojogos, em traço preto de forte contraste com um toque de vermelho. Cada desenho é feito à mão, a pensar em quem o vai levar na pele.",
   pageTitle: (page) => `${page} — Daniel Castro`,
   tattooAlt: "Tatuagem de Daniel Castro",
-  studioAlt: "Estúdio Daniel Castro Tattoo em Braga",
+  studioAlt: "O estúdio Daniel Castro Tattoo, em Braga",
   viewer: {
     close: "Fechar",
     previous: "Foto anterior",
@@ -107,17 +108,17 @@ const pt: SiteMessages = {
   errors: {
     eyebrow: "Erro",
     signInTitle: "Inicie sessão",
-    signInText: "A sua sessão terminou. Inicie sessão de novo para continuar.",
+    signInText: "A sua sessão terminou. Inicie sessão novamente para continuar.",
     forbiddenTitle: "Sem acesso",
-    forbiddenText: "A sua conta não pode abrir esta página.",
+    forbiddenText: "A sua conta não tem acesso a esta página.",
     genericTitle: "Algo correu mal",
     genericText:
-      "Não foi possível carregar a página, e o erro ficou registado. Tente de novo daqui a pouco.",
+      "Não foi possível carregar a página. O erro ficou registado; tente novamente daqui a pouco.",
     signIn: "Iniciar sessão",
-    tryAgain: "Tentar de novo",
+    tryAgain: "Tentar novamente",
     home: "Página inicial",
     notFoundTitle: "Página não encontrada",
-    notFoundText: "Esta página não existe. Confirme o endereço, ou volte à página inicial.",
+    notFoundText: "Esta página não existe. Confirme o endereço ou volte à página inicial.",
   },
 };
 
@@ -127,7 +128,7 @@ const fr: SiteMessages = {
     news: "Actualités",
     guestSpots: "Guest spots",
     travel: "Voyage",
-    howToBook: "Réserver",
+    howToBook: "Réservation",
     aftercare: "Soins",
     about: "À propos",
     shop: "Boutique",
@@ -142,7 +143,7 @@ const fr: SiteMessages = {
   nextGuestSpot: "Prochain guest spot",
   bookSession: "Réserver une séance",
   bookShort: "Réserver",
-  cartCount: (count) => `${String(count)} dans le panier`,
+  cartCount: (count) => `${String(count)} dans votre panier`,
   contact: {
     heading: "Studio",
     byAppointment: "Uniquement sur rendez-vous",
@@ -152,10 +153,10 @@ const fr: SiteMessages = {
   language: "Langue",
   loading: "Chargement",
   description:
-    "Tatouages sur mesure manga, anime, fantasy et jeux vidéo, en linework noir au contraste marqué, avec une touche de rouge. Chaque dessin est fait à la main, pour la personne qui le porte.",
+    "Tatouages sur mesure inspirés du manga, de l’anime, de la fantasy et du jeu vidéo : un trait noir très contrasté, relevé d’une touche de rouge. Chaque dessin est fait à la main, pour la personne qui le portera.",
   pageTitle: (page) => `${page} — Daniel Castro`,
   tattooAlt: "Tatouage de Daniel Castro",
-  studioAlt: "Le studio Daniel Castro Tattoo à Braga",
+  studioAlt: "Le studio Daniel Castro Tattoo, à Braga",
   viewer: {
     close: "Fermer",
     previous: "Photo précédente",
@@ -165,17 +166,17 @@ const fr: SiteMessages = {
   errors: {
     eyebrow: "Erreur",
     signInTitle: "Veuillez vous connecter",
-    signInText: "Votre session a expiré. Connectez-vous à nouveau pour continuer.",
+    signInText: "Votre session a expiré. Reconnectez-vous pour continuer.",
     forbiddenTitle: "Accès refusé",
-    forbiddenText: "Votre compte ne peut pas ouvrir cette page.",
+    forbiddenText: "Votre compte n’a pas accès à cette page.",
     genericTitle: "Un problème est survenu",
     genericText:
-      "La page n’a pas pu être chargée, et l’erreur a été enregistrée. Réessayez dans un instant.",
+      "La page n’a pas pu se charger. L’erreur a été enregistrée ; réessayez dans un instant.",
     signIn: "Se connecter",
     tryAgain: "Réessayer",
     home: "Page d’accueil",
     notFoundTitle: "Page introuvable",
-    notFoundText: "Cette page n’existe pas. Vérifiez l’adresse, ou revenez à l’accueil.",
+    notFoundText: "Cette page n’existe pas. Vérifiez l’adresse ou revenez à l’accueil.",
   },
 };
 
@@ -185,7 +186,7 @@ const de: SiteMessages = {
     news: "Neuigkeiten",
     guestSpots: "Guest Spots",
     travel: "Anreise",
-    howToBook: "Buchung",
+    howToBook: "Termine",
     aftercare: "Pflege",
     about: "Über Daniel",
     shop: "Shop",
@@ -195,7 +196,7 @@ const de: SiteMessages = {
     mainLabel: "Hauptmenü",
     tabsLabel: "Seiten",
   },
-  tagline: { first: "Zuerst Fan.", second: "Künstler durch und durch." },
+  tagline: { first: "Vor allem Fan.", second: "Künstler durch und durch." },
   logoLabel: "Daniel Castro, Arbeiten",
   nextGuestSpot: "Nächster Guest Spot",
   bookSession: "Termin anfragen",
@@ -203,14 +204,14 @@ const de: SiteMessages = {
   cartCount: (count) => `${String(count)} im Warenkorb`,
   contact: {
     heading: "Studio",
-    byAppointment: "Nur mit Termin",
+    byAppointment: "Nur nach Terminvereinbarung",
     admin: "Studio-Admin",
     privacy: "Datenschutz",
   },
   language: "Sprache",
   loading: "Wird geladen",
   description:
-    "Individuelle Manga-, Anime-, Fantasy- und Gaming-Tattoos in schwarzem Linework mit starkem Kontrast und einem Hauch Rot. Jedes Motiv von Hand gezeichnet, für die Person, die es trägt.",
+    "Individuelle Manga-, Anime-, Fantasy- und Gaming-Tattoos: schwarze Linien mit starkem Kontrast und einem Hauch Rot. Jedes Motiv wird von Hand gezeichnet – für die Person, die es tragen wird.",
   pageTitle: (page) => `${page} — Daniel Castro`,
   tattooAlt: "Tattoo von Daniel Castro",
   studioAlt: "Das Studio Daniel Castro Tattoo in Braga",
@@ -223,17 +224,17 @@ const de: SiteMessages = {
   errors: {
     eyebrow: "Fehler",
     signInTitle: "Bitte melde dich an",
-    signInText: "Deine Sitzung ist abgelaufen. Melde dich erneut an, um weiterzumachen.",
+    signInText: "Deine Sitzung ist abgelaufen. Melde dich neu an, um weiterzumachen.",
     forbiddenTitle: "Kein Zugriff",
-    forbiddenText: "Dein Konto darf diese Seite nicht öffnen.",
+    forbiddenText: "Dein Konto hat keinen Zugriff auf diese Seite.",
     genericTitle: "Etwas ist schiefgelaufen",
     genericText:
-      "Die Seite konnte nicht geladen werden, und der Fehler wurde gespeichert. Versuch es gleich noch einmal.",
+      "Die Seite konnte nicht geladen werden. Der Fehler wurde protokolliert – versuch es gleich noch einmal.",
     signIn: "Anmelden",
-    tryAgain: "Erneut versuchen",
+    tryAgain: "Noch einmal versuchen",
     home: "Startseite",
     notFoundTitle: "Seite nicht gefunden",
-    notFoundText: "Diese Seite gibt es nicht. Prüf die Adresse, oder geh zurück zur Startseite.",
+    notFoundText: "Diese Seite gibt es nicht. Prüf die Adresse oder geh zurück zur Startseite.",
   },
 };
 
@@ -258,7 +259,7 @@ const es: SiteMessages = {
   nextGuestSpot: "Próximo guest spot",
   bookSession: "Reservar sesión",
   bookShort: "Reservar",
-  cartCount: (count) => `${String(count)} en el carrito`,
+  cartCount: (count) => `${String(count)} en tu carrito`,
   contact: {
     heading: "Estudio",
     byAppointment: "Solo con cita previa",
@@ -268,10 +269,10 @@ const es: SiteMessages = {
   language: "Idioma",
   loading: "Cargando",
   description:
-    "Tatuajes personalizados de manga, anime, fantasía y videojuegos, en linework negro con fuerte contraste y un toque de rojo. Cada diseño dibujado a mano, para quien lo lleva.",
+    "Tatuajes personalizados de manga, anime, fantasía y videojuegos: línea negra de alto contraste con un toque de rojo. Cada diseño se dibuja a mano, pensado para quien lo va a llevar.",
   pageTitle: (page) => `${page} — Daniel Castro`,
   tattooAlt: "Tatuaje de Daniel Castro",
-  studioAlt: "Estudio Daniel Castro Tattoo en Braga",
+  studioAlt: "El estudio Daniel Castro Tattoo, en Braga",
   viewer: {
     close: "Cerrar",
     previous: "Foto anterior",
@@ -281,17 +282,17 @@ const es: SiteMessages = {
   errors: {
     eyebrow: "Error",
     signInTitle: "Inicia sesión",
-    signInText: "Tu sesión ha terminado. Vuelve a iniciar sesión para continuar.",
+    signInText: "Tu sesión ha caducado. Vuelve a iniciar sesión para continuar.",
     forbiddenTitle: "Sin acceso",
-    forbiddenText: "Tu cuenta no puede abrir esta página.",
+    forbiddenText: "Tu cuenta no tiene acceso a esta página.",
     genericTitle: "Algo ha salido mal",
     genericText:
-      "No se ha podido cargar la página, y el error ha quedado registrado. Inténtalo de nuevo en un momento.",
+      "No se ha podido cargar la página. Hemos registrado el error; inténtalo de nuevo en un momento.",
     signIn: "Iniciar sesión",
-    tryAgain: "Reintentar",
+    tryAgain: "Volver a intentarlo",
     home: "Página de inicio",
     notFoundTitle: "Página no encontrada",
-    notFoundText: "Esta página no existe. Revisa la dirección, o vuelve a la página de inicio.",
+    notFoundText: "Esta página no existe. Revisa la dirección o vuelve a la página de inicio.",
   },
 };
 

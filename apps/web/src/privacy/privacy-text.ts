@@ -30,7 +30,7 @@ const en: PrivacyText = {
     {
       title: "Who sees it",
       paragraphs: [
-        "Daniel and Joana, the studio manager. To do this, the website uses a few service providers, who process the data only on our behalf:",
+        "Daniel and Joana, the studio manager. To make this work, the website relies on a few service providers, who process the data only on our behalf:",
       ],
       items: [
         "the company that hosts the website and its database, where enquiries are stored;",
@@ -127,7 +127,7 @@ export const PRIVACY_TEXT: Record<Locale, PrivacyText> = {
   fr: {
     ...en,
     translationNote:
-      "Cette politique existe en anglais et en portugais, les langues dans lesquelles le studio répond.",
+      "Cette politique est disponible en anglais et en portugais, les langues dans lesquelles le studio répond.",
   },
   de: {
     ...en,
@@ -137,7 +137,7 @@ export const PRIVACY_TEXT: Record<Locale, PrivacyText> = {
   es: {
     ...en,
     translationNote:
-      "Esta política está en inglés y en portugués, los idiomas en los que responde el estudio.",
+      "Esta política solo está disponible en inglés y en portugués, los idiomas en los que responde el estudio.",
   },
 };
 

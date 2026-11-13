@@ -25,7 +25,7 @@ export const WORK_PAGE_TEXT: Record<Locale, typeof en> = {
   pt: {
     eyebrow: "Trabalhos",
     eyebrowDetail: "Braga · Tatuagens personalizadas",
-    headingFirst: "As personagens favoritas,",
+    headingFirst: "As suas personagens favoritas,",
     headingSecond: "desenhadas para a pele.",
     themes: [
       "Anime",
@@ -59,7 +59,7 @@ export const WORK_PAGE_TEXT: Record<Locale, typeof en> = {
   de: {
     eyebrow: "Arbeiten",
     eyebrowDetail: "Braga · Individuelle Tattoos",
-    headingFirst: "Charaktere, die du liebst,",
+    headingFirst: "Figuren, die du liebst,",
     headingSecond: "gezeichnet für die Haut.",
     themes: [
       "Anime",
@@ -69,14 +69,14 @@ export const WORK_PAGE_TEXT: Record<Locale, typeof en> = {
       "Mythologien",
       "Dark Fantasy",
       "Gothic",
-      "Gruselig",
+      "Grusel",
     ],
     empty: "Die Galerie wird gerade vorbereitet. Schau bald wieder vorbei.",
   },
   es: {
     eyebrow: "Trabajos",
     eyebrowDetail: "Braga · Tatuajes personalizados",
-    headingFirst: "Los personajes que amas,",
+    headingFirst: "Tus personajes favoritos,",
     headingSecond: "dibujados para la piel.",
     themes: [
       "Anime",

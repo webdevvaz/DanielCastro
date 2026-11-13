@@ -9,36 +9,37 @@ const en = {
   eyebrowDetail: "Coming to Braga",
   headingFirst: "Plan the trip",
   headingSecond: "to your tattoo.",
-  lead: "Enter your city to see what the trip can cost: a flight to Porto, getting to Braga, and a hotel. Add your dates for closer prices.",
+  lead: "Enter your city to see what the trip could cost: a flight to Porto, getting to Braga and a hotel. Add your dates for more accurate prices.",
   form: {
-    from: "Where do you travel from?",
+    from: "Where are you travelling from?",
     fromPlaceholder: "London",
-    arrive: "Arrive",
-    leave: "Leave",
+    arrive: "Arriving",
+    leave: "Leaving",
     optional: "Optional",
-    submit: "Estimate",
+    submit: "Get estimate",
     fromError: "Enter your city (up to 80 characters).",
     arriveError: "Enter a valid arrival date.",
-    leaveError: "Enter a leave date after the arrival date.",
+    leaveError: "Enter a departure date after your arrival.",
   },
   heading: (from: string) => `From ${from}`,
-  failed: "Prices are not available right now. The links below still work.",
+  failed: "Prices aren't available right now, but the links below still work.",
   unknownCity: (typed: string) =>
-    `We do not know “${typed}” yet. The links below still search for it, or try the nearest large city.`,
+    `We don't recognise “${typed}” yet. The links below will still search for it, or try the nearest big city.`,
   flights: {
     title: "Flights to Porto",
     loading: "Looking up flight prices…",
-    none: "Not enough recent fares from this city for an average. Google Flights shows every flight and its price.",
+    none: "There aren't enough recent fares from this city to show an average. Google Flights shows every flight and its price.",
     unavailable:
-      "Flight prices are not available right now. Google Flights shows every flight and its price.",
-    unknownCity: "Flight prices need a city we know. Google Flights shows every flight.",
+      "Flight prices aren't available right now. Google Flights shows every flight and its price.",
+    unknownCity:
+      "We need a city we recognise to show flight prices. Google Flights shows every flight.",
     direct: "Direct",
     stops: (stops: number) => (stops === 1 ? "1 stop" : `${stops} stops`),
     averageBothWays: "Average price, both ways",
     bothWays: "Both ways",
     allAirlines: "All airlines",
     about: "about",
-    recentFares: "From fares that travellers found in the last few days.",
+    recentFares: "Based on fares travellers found in the last few days.",
     live: (range: string) => `Live prices from Google Flights for ${range}.`,
     liveExample: (range: string) =>
       `Live prices from Google Flights for an example trip, ${range}.`,
@@ -51,7 +52,7 @@ const en = {
     uber: "Uber",
     busDefault: "Direct to Braga bus station",
     carDefault: "Pick it up at the airport",
-    uberDefault: "From the arrivals floor",
+    uberDefault: "From the arrivals level",
     eachWay: (duration: string) => `${duration} each way`,
     busDetails: (price: string, duration: string) => `${price} both ways · ${duration} each way`,
     carDetails: (range: string, days: string, drive: string) =>
@@ -66,21 +67,22 @@ const en = {
     title: "Stay in Braga",
     loading: "Looking up live hotel prices…",
     none: "No rooms found for these dates.",
-    unavailable: "Live hotel prices are not available right now.",
+    unavailable: "Live hotel prices aren't available right now.",
     past: "These dates have passed.",
     perNight: (price: string) => `${price} a night`,
     stars: (stars: number) => `${stars} stars`,
     rated: (rating: string) => `rated ${rating}`,
     forDates: (range: string) => `For ${range}`,
-    exampleStay: (range: string) => `Example stay, ${range}. Add your dates for your own prices.`,
-    cheapest: "The cheapest with 3 stars or more and good reviews.",
+    exampleStay: (range: string) =>
+      `Example stay, ${range}. Add your dates to see prices for your trip.`,
+    cheapest: "The cheapest with 3+ stars and good reviews.",
     average: "Average {average} a night, {total} for {nights}.",
     typical: "Hotels from {from} a night; most cost {range}.",
     search: "Search Booking.com",
   },
   drive: {
     title: "By car",
-    text: (from: string) => `From ${from}, driving can be the simplest way to the studio.`,
+    text: (from: string) => `From ${from}, driving may be the easiest way to get to the studio.`,
     open: "Open Google Maps",
   },
   total: {
@@ -93,21 +95,21 @@ const en = {
     example: "For the example trip.",
   },
   nights: (nights: number) => (nights === 1 ? "1 night" : `${nights} nights`),
-  note: "Flight prices are average prices for both ways, from fares that travellers found recently on Aviasales; for less common routes, they are live from Google Flights. Hotel prices are live from Google. Transport prices are typical prices. All prices are for one adult and change often, so check them before you book. Book your travel only after your date is confirmed and your deposit is paid.",
+  note: "Flight prices are average prices for both ways, based on fares travellers recently found on Aviasales; for less common routes, they're live prices from Google Flights. Hotel prices are live from Google, and transport prices are typical prices. All prices are for one adult and change often, so check them before you book. And only book your travel once your date is confirmed and your deposit is paid.",
   tips: {
     title: "In Braga",
     stayTitle: "Where to stay",
-    stay: "There is no accommodation near the studio. Stay in Braga's historic centre: the old town, restaurants, shops, and bars are there, and the studio is a short ride away.",
+    stay: "There's no accommodation near the studio, so stay in Braga's historic centre: that's where the old town, restaurants, shops and bars are, and the studio is a short ride away.",
     studioTitle: "To the studio",
     studio:
       "Buses 2 and 9 stop right in front of the studio, at the Ramoa stop. An Uber from the centre takes about 10 minutes and costs about €5.",
     parkingTitle: "Parking",
     parking:
-      "Free parking on Rua da Ramoa, and behind the studio, from Av. Doutor António da Rocha.",
+      "Free parking on Rua da Ramoa and behind the studio, reached from Av. Doutor António da Rocha.",
     map: "Studio on Google Maps",
     sessionsTitle: "Several sessions",
     sessions:
-      "Daniel finishes each area of skin in one session, so the next session does not wait for healing. For clients who travel: up to 4 sessions a week, every other day. A full arm sleeve usually takes 4 sessions, about a week in Braga.",
+      "Daniel finishes each area of skin in a single session, so the next session doesn't have to wait for healing. If you're travelling in, you can do up to 4 sessions a week, every other day: a full arm sleeve usually takes 4 sessions, so about a week in Braga.",
   },
 };
 
@@ -118,7 +120,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
     eyebrowDetail: "Vir a Braga",
     headingFirst: "Planeie a viagem",
     headingSecond: "até à sua tatuagem.",
-    lead: "Indique a sua cidade para ver quanto pode custar a viagem: um voo para o Porto, a ida até Braga e um hotel. Junte as datas para preços mais exatos.",
+    lead: "Indique a sua cidade para ver quanto pode custar a viagem: um voo para o Porto, a ida até Braga e um hotel. Indique também as datas para ver preços mais exatos.",
     form: {
       from: "De onde vem?",
       fromPlaceholder: "Londres",
@@ -128,21 +130,21 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       submit: "Calcular",
       fromError: "Indique a sua cidade (até 80 caracteres).",
       arriveError: "Indique uma data de chegada válida.",
-      leaveError: "Indique uma data de partida depois da chegada.",
+      leaveError: "Indique uma data de partida posterior à chegada.",
     },
     heading: (from) => `De ${from}`,
     failed:
-      "Os preços não estão disponíveis neste momento. As ligações abaixo continuam a funcionar.",
+      "De momento, não é possível mostrar os preços, mas as ligações abaixo continuam a funcionar.",
     unknownCity: (typed) =>
-      `Ainda não conhecemos “${typed}”. As ligações abaixo pesquisam-na na mesma, ou experimente a cidade grande mais próxima.`,
+      `Ainda não reconhecemos “${typed}”. As ligações abaixo pesquisam-na na mesma; também pode experimentar a cidade grande mais próxima.`,
     flights: {
       title: "Voos para o Porto",
       loading: "A procurar preços de voos…",
-      none: "Não há tarifas recentes suficientes desta cidade para uma média. O Google Flights mostra todos os voos e os seus preços.",
+      none: "Não há tarifas recentes suficientes a partir desta cidade para calcular uma média. O Google Flights mostra todos os voos e os respetivos preços.",
       unavailable:
-        "Os preços dos voos não estão disponíveis neste momento. O Google Flights mostra todos os voos e os seus preços.",
+        "De momento, os preços dos voos não estão disponíveis. O Google Flights mostra todos os voos e os respetivos preços.",
       unknownCity:
-        "Os preços dos voos precisam de uma cidade que conheçamos. O Google Flights mostra todos os voos.",
+        "Para mostrar preços de voos, precisamos de uma cidade que reconheçamos. O Google Flights mostra todos os voos.",
       direct: "Direto",
       stops: (stops) => (stops === 1 ? "1 escala" : `${stops} escalas`),
       averageBothWays: "Preço médio, ida e volta",
@@ -183,7 +185,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       rated: (rating) => `avaliação ${rating}`,
       forDates: (range) => `Para ${range}`,
       exampleStay: (range) =>
-        `Estadia de exemplo, ${range}. Junte as suas datas para ver os seus preços.`,
+        `Estadia de exemplo, ${range}. Indique as suas datas para ver os preços da sua viagem.`,
       cheapest: "Os mais baratos com 3 estrelas ou mais e boas avaliações.",
       average: "Média de {average} por noite, {total} por {nights}.",
       typical: "Hotéis desde {from} por noite; a maioria custa {range}.",
@@ -204,11 +206,11 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       example: "Para a viagem de exemplo.",
     },
     nights: (nights) => (nights === 1 ? "1 noite" : `${nights} noites`),
-    note: "Os preços dos voos são preços médios de ida e volta, com base em tarifas encontradas recentemente por viajantes no Aviasales; para rotas menos comuns, são preços em tempo real do Google Flights. Os preços dos hotéis são em tempo real, do Google. Os preços de transporte são preços habituais. Todos os preços são para um adulto e mudam com frequência, por isso confirme-os antes de reservar. Reserve a viagem só depois de a data estar confirmada e o sinal pago.",
+    note: "Os preços dos voos são preços médios de ida e volta, com base em tarifas encontradas recentemente por viajantes no Aviasales; para rotas menos comuns, são preços em tempo real do Google Flights. Os preços dos hotéis vêm do Google, em tempo real, e os de transporte são preços habituais. Todos os preços são para um adulto e mudam com frequência, por isso confirme-os antes de reservar. E só reserve a viagem depois de a data estar confirmada e o sinal pago.",
     tips: {
       title: "Em Braga",
       stayTitle: "Onde ficar",
-      stay: "Perto do estúdio não há alojamento. Fique no centro histórico de Braga: tem a parte histórica, restaurantes, lojas e bares, e o estúdio fica a poucos minutos.",
+      stay: "Perto do estúdio não há alojamento, por isso o melhor é ficar no centro histórico de Braga: é lá que estão os restaurantes, as lojas e os bares, e o estúdio fica a poucos minutos.",
       studioTitle: "Até ao estúdio",
       studio:
         "Os autocarros 2 e 9 param mesmo em frente ao estúdio, na paragem Ramoa. Um Uber a partir do centro demora cerca de 10 minutos e custa cerca de 5 €.",
@@ -218,7 +220,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       map: "Estúdio no Google Maps",
       sessionsTitle: "Várias sessões",
       sessions:
-        "O Daniel conclui cada zona de pele numa sessão, por isso a sessão seguinte não precisa de esperar pela cicatrização. Para quem vem de longe: até 4 sessões por semana, dia sim, dia não. Uma sleeve de braço completa costuma levar 4 sessões, cerca de uma semana em Braga.",
+        "O Daniel termina cada zona de pele numa só sessão, por isso a sessão seguinte não tem de esperar pela cicatrização. Para quem vem de fora, são possíveis até 4 sessões por semana, dia sim, dia não: uma sleeve completa costuma levar 4 sessões, ou seja, cerca de uma semana em Braga.",
     },
   },
   fr: {
@@ -239,17 +241,17 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
     },
     heading: (from) => `Depuis ${from}`,
     failed:
-      "Les prix ne sont pas disponibles pour le moment. Les liens ci-dessous fonctionnent toujours.",
+      "Les prix ne sont pas disponibles pour le moment, mais les liens ci-dessous fonctionnent toujours.",
     unknownCity: (typed) =>
-      `Nous ne connaissons pas encore « ${typed} ». Les liens ci-dessous la recherchent quand même, ou essayez la grande ville la plus proche.`,
+      `Nous ne reconnaissons pas encore « ${typed} ». Les liens ci-dessous lanceront quand même la recherche ; vous pouvez aussi essayer la grande ville la plus proche.`,
     flights: {
       title: "Vols pour Porto",
       loading: "Recherche des prix des vols…",
-      none: "Pas assez de tarifs récents depuis cette ville pour une moyenne. Google Flights affiche tous les vols et leurs prix.",
+      none: "Il n’y a pas assez de tarifs récents depuis cette ville pour calculer une moyenne. Google Flights affiche tous les vols et leurs prix.",
       unavailable:
         "Les prix des vols ne sont pas disponibles pour le moment. Google Flights affiche tous les vols et leurs prix.",
       unknownCity:
-        "Les prix des vols demandent une ville que nous connaissons. Google Flights affiche tous les vols.",
+        "Pour afficher le prix des vols, il nous faut une ville que nous reconnaissons. Google Flights affiche tous les vols.",
       direct: "Direct",
       stops: (stops) => (stops === 1 ? "1 escale" : `${stops} escales`),
       averageBothWays: "Prix moyen, aller-retour",
@@ -259,7 +261,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       recentFares: "D’après les tarifs trouvés par des voyageurs ces derniers jours.",
       live: (range) => `Prix en direct de Google Flights pour ${range}.`,
       liveExample: (range) =>
-        `Prix en direct de Google Flights pour un voyage d’exemple, ${range}.`,
+        `Prix en direct de Google Flights pour un exemple de voyage, ${range}.`,
       search: "Rechercher sur Google Flights",
     },
     airport: {
@@ -269,7 +271,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       uber: "Uber",
       busDefault: "Direct jusqu’à la gare routière de Braga",
       carDefault: "À récupérer à l’aéroport",
-      uberDefault: "Depuis le niveau des arrivées",
+      uberDefault: "Depuis le hall des arrivées",
       eachWay: (duration) => `${duration} par trajet`,
       busDetails: (price, duration) => `${price} aller-retour · ${duration} par trajet`,
       carDetails: (range, days, drive) => `${range} pour ${days}, plus les péages · ${drive}`,
@@ -290,7 +292,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       rated: (rating) => `note ${rating}`,
       forDates: (range) => `Pour ${range}`,
       exampleStay: (range) =>
-        `Séjour d’exemple, ${range}. Ajoutez vos dates pour vos propres prix.`,
+        `Exemple de séjour, ${range}. Ajoutez vos dates pour voir vos propres prix.`,
       cheapest: "Les moins chers avec 3 étoiles ou plus et de bons avis.",
       average: "En moyenne {average} la nuit, {total} pour {nights}.",
       typical: "Hôtels à partir de {from} la nuit ; la plupart coûtent {range}.",
@@ -309,10 +311,10 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       hotelAverage: (nights) => `${nights} au prix moyen d’hôtel`,
       hotelTypical: (nights) => `${nights} à l’hôtel aux prix habituels`,
       parts: (flight, hotel) => `${flight}, le bus aller-retour et ${hotel}.`,
-      example: "Pour le voyage d’exemple.",
+      example: "Pour l’exemple de voyage.",
     },
     nights: (nights) => (nights === 1 ? "1 nuit" : `${nights} nuits`),
-    note: "Les prix des vols sont des prix moyens aller-retour, d’après les tarifs trouvés récemment par des voyageurs sur Aviasales ; pour les itinéraires moins courants, ce sont des prix en direct de Google Flights. Les prix des hôtels sont en direct, de Google. Les prix des transports sont des prix habituels. Tous les prix sont pour un adulte et changent souvent : vérifiez-les avant de réserver. Ne réservez votre voyage qu’une fois votre date confirmée et votre acompte payé.",
+    note: "Les prix des vols sont des prix moyens aller-retour, d’après les tarifs trouvés récemment par des voyageurs sur Aviasales ; pour les itinéraires moins courants, ce sont des prix en direct de Google Flights. Les prix des hôtels sont en direct, de Google. Les prix des transports sont des prix habituels. Tous les prix s’entendent pour un adulte et changent souvent : vérifiez-les avant de réserver. Ne réservez votre voyage qu’une fois votre date confirmée et votre acompte payé.",
     tips: {
       title: "À Braga",
       stayTitle: "Où loger",
@@ -322,18 +324,18 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
         "Les bus 2 et 9 s’arrêtent juste devant le studio, à l’arrêt Ramoa. Un Uber depuis le centre met environ 10 minutes et coûte environ 5 €.",
       parkingTitle: "Stationnement",
       parking:
-        "Stationnement gratuit dans la Rua da Ramoa, et derrière le studio, par l’Av. Doutor António da Rocha.",
+        "Stationnement gratuit dans la Rua da Ramoa et derrière le studio, avec accès par l’Av. Doutor António da Rocha.",
       map: "Le studio sur Google Maps",
       sessionsTitle: "Plusieurs séances",
       sessions:
-        "Daniel termine chaque zone de peau en une séance, donc la séance suivante n’attend pas la cicatrisation. Pour les clients qui voyagent : jusqu’à 4 séances par semaine, un jour sur deux. Une manchette complète demande en général 4 séances, soit environ une semaine à Braga.",
+        "Daniel termine chaque zone de peau en une seule séance, donc la séance suivante n’a pas besoin d’attendre la cicatrisation. Si vous venez de loin : jusqu’à 4 séances par semaine, un jour sur deux. Un bras complet demande en général 4 séances, soit environ une semaine à Braga.",
     },
   },
   de: {
     eyebrowDetail: "Anreise nach Braga",
     headingFirst: "Plan die Reise",
     headingSecond: "zu deinem Tattoo.",
-    lead: "Gib deine Stadt ein und sieh, was die Reise kosten kann: ein Flug nach Porto, die Fahrt nach Braga und ein Hotel. Mit deinen Daten werden die Preise genauer.",
+    lead: "Gib deine Stadt ein und sieh, was die Reise ungefähr kostet: Flug nach Porto, Weg nach Braga und Hotel. Mit deinen Reisedaten werden die Preise genauer.",
     form: {
       from: "Von wo reist du an?",
       fromPlaceholder: "London",
@@ -348,11 +350,11 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
     heading: (from) => `Ab ${from}`,
     failed: "Die Preise sind gerade nicht verfügbar. Die Links unten funktionieren trotzdem.",
     unknownCity: (typed) =>
-      `„${typed}“ kennen wir noch nicht. Die Links unten suchen trotzdem danach, oder probier die nächste große Stadt.`,
+      `„${typed}“ kennen wir noch nicht. Die Links unten suchen trotzdem danach – oder probier es mit der nächsten großen Stadt.`,
     flights: {
       title: "Flüge nach Porto",
       loading: "Flugpreise werden gesucht…",
-      none: "Für einen Durchschnitt gibt es von dieser Stadt nicht genug aktuelle Preise. Google Flights zeigt alle Flüge und ihre Preise.",
+      none: "Von dieser Stadt gibt es nicht genug aktuelle Preise für einen Durchschnitt. Google Flights zeigt alle Flüge und ihre Preise.",
       unavailable:
         "Flugpreise sind gerade nicht verfügbar. Google Flights zeigt alle Flüge und ihre Preise.",
       unknownCity:
@@ -363,7 +365,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       bothWays: "Hin und zurück",
       allAirlines: "Alle Airlines",
       about: "etwa",
-      recentFares: "Aus Preisen, die Reisende in den letzten Tagen gefunden haben.",
+      recentFares: "Basierend auf Preisen, die Reisende in den letzten Tagen gefunden haben.",
       live: (range) => `Live-Preise von Google Flights für ${range}.`,
       liveExample: (range) => `Live-Preise von Google Flights für eine Beispielreise, ${range}.`,
       search: "Bei Google Flights suchen",
@@ -388,7 +390,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
     hotels: {
       title: "Übernachten in Braga",
       loading: "Live-Hotelpreise werden gesucht…",
-      none: "Für diese Daten gibt es keine Zimmer.",
+      none: "Für diese Daten sind keine Zimmer frei.",
       unavailable: "Live-Hotelpreise sind gerade nicht verfügbar.",
       past: "Diese Daten liegen in der Vergangenheit.",
       perNight: (price) => `${price} pro Nacht`,
@@ -396,7 +398,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       rated: (rating) => `Bewertung ${rating}`,
       forDates: (range) => `Für ${range}`,
       exampleStay: (range) =>
-        `Beispielaufenthalt, ${range}. Gib deine Daten ein, um deine Preise zu sehen.`,
+        `Beispielaufenthalt, ${range}. Gib deine Reisedaten ein, um deine Preise zu sehen.`,
       cheapest: "Die günstigsten mit 3 Sternen oder mehr und guten Bewertungen.",
       average: "Durchschnittlich {average} pro Nacht, {total} für {nights}.",
       typical: "Hotels ab {from} pro Nacht; die meisten kosten {range}.",
@@ -408,7 +410,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       open: "Google Maps öffnen",
     },
     total: {
-      label: "Geschätzte Summe für eine Person",
+      label: "Geschätzte Gesamtkosten pro Person",
       flightLive: "Ein Flug hin und zurück",
       flightAverage: "Ein durchschnittlicher Flug hin und zurück",
       hotelAverage: (nights) => `${nights} zum durchschnittlichen Hotelpreis`,
@@ -421,7 +423,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
     tips: {
       title: "In Braga",
       stayTitle: "Wo übernachten",
-      stay: "In der Nähe des Studios gibt es keine Unterkünfte. Übernachte im historischen Zentrum von Braga: Dort sind die Altstadt, Restaurants, Läden und Bars, und das Studio ist nur eine kurze Fahrt entfernt.",
+      stay: "In der Nähe des Studios gibt es keine Unterkünfte – übernachte am besten im historischen Zentrum von Braga: Dort findest du die Altstadt, Restaurants, Läden und Bars, und zum Studio ist es nur eine kurze Fahrt.",
       studioTitle: "Zum Studio",
       studio:
         "Die Busse 2 und 9 halten direkt vor dem Studio, an der Haltestelle Ramoa. Ein Uber aus dem Zentrum braucht etwa 10 Minuten und kostet etwa 5 €.",
@@ -431,7 +433,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       map: "Studio in Google Maps",
       sessionsTitle: "Mehrere Sessions",
       sessions:
-        "Daniel macht jede Hautstelle in einer Session fertig, deshalb muss die nächste Session nicht auf die Heilung warten. Für Kunden, die anreisen: bis zu 4 Sessions pro Woche, jeden zweiten Tag. Ein kompletter Arm-Sleeve braucht meist 4 Sessions, also etwa eine Woche in Braga.",
+        "Daniel macht jede Hautpartie in einer einzigen Session fertig, deshalb muss die nächste Session nicht auf die Heilung warten. Wer anreist, kann bis zu 4 Sessions pro Woche machen, jeden zweiten Tag: Ein kompletter Arm-Sleeve braucht meist 4 Sessions, also etwa eine Woche in Braga.",
     },
   },
   es: {
@@ -452,17 +454,17 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
     },
     heading: (from) => `Desde ${from}`,
     failed:
-      "Los precios no están disponibles ahora mismo. Los enlaces de abajo siguen funcionando.",
+      "Ahora mismo no podemos mostrar los precios, pero los enlaces de abajo siguen funcionando.",
     unknownCity: (typed) =>
-      `Todavía no conocemos «${typed}». Los enlaces de abajo la buscan igualmente, o prueba con la ciudad grande más cercana.`,
+      `Todavía no reconocemos «${typed}». Los enlaces de abajo la buscarán igualmente; también puedes probar con la ciudad grande más cercana.`,
     flights: {
       title: "Vuelos a Oporto",
       loading: "Buscando precios de vuelos…",
-      none: "No hay suficientes tarifas recientes desde esta ciudad para una media. Google Flights muestra todos los vuelos y sus precios.",
+      none: "No hay suficientes tarifas recientes desde esta ciudad para calcular una media. Google Flights muestra todos los vuelos y sus precios.",
       unavailable:
         "Los precios de los vuelos no están disponibles ahora mismo. Google Flights muestra todos los vuelos y sus precios.",
       unknownCity:
-        "Los precios de los vuelos necesitan una ciudad que conozcamos. Google Flights muestra todos los vuelos.",
+        "Para mostrar precios de vuelos necesitamos una ciudad que reconozcamos. Google Flights muestra todos los vuelos.",
       direct: "Directo",
       stops: (stops) => (stops === 1 ? "1 escala" : `${stops} escalas`),
       averageBothWays: "Precio medio, ida y vuelta",
@@ -539,7 +541,7 @@ export const TRAVEL_TEXT: Record<Locale, typeof en> = {
       map: "El estudio en Google Maps",
       sessionsTitle: "Varias sesiones",
       sessions:
-        "Daniel termina cada zona de piel en una sesión, así que la siguiente sesión no tiene que esperar a la cicatrización. Para quien viaja: hasta 4 sesiones por semana, en días alternos. Una manga completa de brazo suele llevar 4 sesiones, más o menos una semana en Braga.",
+        "Daniel termina cada zona de piel en una sola sesión, así que la siguiente no tiene que esperar a que cicatrice. Si vienes de fuera, puedes hacer hasta 4 sesiones por semana, en días alternos: una manga completa suele llevar 4 sesiones, más o menos una semana en Braga.",
     },
   },
 };

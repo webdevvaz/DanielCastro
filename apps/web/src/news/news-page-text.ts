@@ -9,7 +9,7 @@ const en = {
   empty: {
     ready: "No posts yet.",
     not_connected: "The latest posts are on Instagram.",
-    unavailable: "The posts cannot load at this time. See them on Instagram.",
+    unavailable: "The posts can't load right now. See them on Instagram.",
   },
   cta: "Follow Daniel for new work and flash days.",
   follow: "Follow on Instagram",

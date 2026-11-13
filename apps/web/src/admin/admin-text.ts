@@ -339,7 +339,7 @@ const pt: AdminText = {
   },
   overview: {
     title: "Resumo",
-    welcome: "Bem-vindo de volta",
+    welcome: "Olá de novo",
     galleryStat: (featured, hidden, studio) =>
       `fotos de trabalhos · ${featured} em destaque · ${hidden} ocultas · ${studio} do estúdio`,
     manageGallery: "Gerir galeria →",
@@ -357,7 +357,7 @@ const pt: AdminText = {
   },
   gallery: {
     title: "Galeria",
-    lead: "Arraste as fotos para mudar a ordem, ou use as setas. As fotos ocultas só aparecem aqui. Um clique numa foto do site mostra-a em grande, com o título e os detalhes.",
+    lead: "Arraste as fotos para mudar a ordem ou use as setas. As fotos ocultas só aparecem aqui. Um clique numa foto do site mostra-a em grande, com o título e os detalhes.",
     sections: {
       work: {
         title: "Trabalhos",
@@ -377,7 +377,7 @@ const pt: AdminText = {
       add: "Adicionar fotos",
       uploading: "A enviar…",
       drop: (megabytes) =>
-        `Arraste as fotos para aqui, ou clique para as escolher. JPG, PNG ou WebP até ${megabytes} MB cada. As fotos novas ficam em primeiro lugar.`,
+        `Arraste as fotos para aqui ou clique para as escolher. JPG, PNG ou WebP até ${megabytes} MB cada. As fotos novas ficam em primeiro lugar.`,
       wrongFile: (megabytes) => `Use uma imagem JPG, PNG ou WebP até ${megabytes} MB`,
       failed: "O envio falhou",
       status: { waiting: "À espera", uploading: "A enviar…", failed: "Falhou" },
@@ -392,8 +392,8 @@ const pt: AdminText = {
       unfeature: "Tirar destaque",
       show: "Mostrar",
       hide: "Ocultar",
-      moveEarlier: "Mover para trás",
-      moveLater: "Mover para a frente",
+      moveEarlier: "Mover para antes",
+      moveLater: "Mover para depois",
       confirmDelete: "Apagar esta foto da galeria? Não é possível desfazer.",
       changeFailed: "Não foi possível alterar a foto",
       deleteFailed: "Não foi possível apagar a foto",
@@ -477,7 +477,7 @@ const pt: AdminText = {
     hidden:
       "Página Novidades: oculta. O separador Novidades aparece no menu quando o Instagram estiver ligado.",
     connectFailed:
-      "O Instagram não ficou ligado. Tente de novo. Se o problema continuar, peça ao seu programador que verifique a configuração do Instagram.",
+      "Não foi possível ligar o Instagram. Tente novamente; se o problema continuar, peça ao seu programador que verifique a configuração do Instagram.",
     account: "Conta",
     posts: "Publicações recentes",
     noPosts: {
@@ -513,7 +513,7 @@ const pt: AdminText = {
   },
   enquiries: {
     title: "Pedidos",
-    lead: "Todos os pedidos enviados pelo formulário do site, os mais recentes primeiro. Responder ao email responde ao cliente; aqui acompanha a fase de cada pedido.",
+    lead: "Todos os pedidos enviados pelo formulário do site, os mais recentes primeiro. Ao responder ao email, responde diretamente ao cliente; aqui acompanha a fase de cada pedido.",
     empty: "Ainda não há pedidos.",
     received: "Recebido",
     client: "Cliente",
