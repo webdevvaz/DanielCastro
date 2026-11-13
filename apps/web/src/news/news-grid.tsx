@@ -2,11 +2,19 @@ import { format, parseISO } from "date-fns";
 
 import type { getNewsFeed } from "@/server/instagram/instagram.functions";
 
-/** What the corner badge says for posts that are more than one photo. */
-const KIND_LABEL = { image: null, video: "Video", carousel: "Album" } as const;
+import { DATE_LOCALES } from "@/i18n/locales";
+import { useLocale } from "@/i18n/use-locale";
 
-/** Instagram posts in a grid of square tiles, newest first. Each tile opens the post. */
+import { NEWS_PAGE_TEXT } from "./news-page-text";
+
+/**
+ * Instagram posts in a grid of square tiles, newest first. Each tile opens the post. Posts of more
+ * than one photo, and videos, carry a corner badge.
+ */
 export function NewsGrid({ posts }: { posts: ReadonlyArray<NewsPost> }) {
+  const locale = useLocale();
+  const t = NEWS_PAGE_TEXT[locale];
+
   return (
     <ul className="news-grid">
       {posts.map((post) => (
@@ -16,17 +24,19 @@ export function NewsGrid({ posts }: { posts: ReadonlyArray<NewsPost> }) {
               {/* Instagram's addresses expire, so the image is never stored or resized here. */}
               <img
                 src={post.imageUrl}
-                alt={post.caption ?? "Instagram post by Daniel Castro"}
+                alt={post.caption ?? t.postAlt}
                 loading="lazy"
                 decoding="async"
                 referrerPolicy="no-referrer"
               />
-              {KIND_LABEL[post.kind] === null ? null : (
-                <span className="news-post-kind">{KIND_LABEL[post.kind]}</span>
+              {t.kinds[post.kind] === null ? null : (
+                <span className="news-post-kind">{t.kinds[post.kind]}</span>
               )}
             </span>
             <span className="news-post-body">
-              <time dateTime={post.postedAt}>{format(parseISO(post.postedAt), "d MMM yyyy")}</time>
+              <time dateTime={post.postedAt}>
+                {format(parseISO(post.postedAt), "d MMM yyyy", { locale: DATE_LOCALES[locale] })}
+              </time>
               {post.caption === null ? null : (
                 <span className="news-post-caption">{post.caption}</span>
               )}

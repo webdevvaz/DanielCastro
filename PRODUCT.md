@@ -10,7 +10,7 @@ This file describes Daniel. Coding agents read it before they work on features.
 - **Fans** who buy prints and t-shirts from the Necrotic Wear shop.
 - **The studio team** (Daniel and Joana, the shop manager), who manage the gallery, guest spots, and enquiries from an admin area.
 
-The site is in Portuguese and English.
+The public site is in English (the main address), Portuguese, French, German, and Spanish (under `/pt`, `/fr`, `/de`, `/es`). On the first visit it opens in the browser's language when it is one of these; a switcher in the menu changes it and is remembered. The studio itself answers in Portuguese and English only, which the French, German, and Spanish pages say. The admin area switches between Portuguese and English. The French, German, and Spanish texts are translations that a native speaker has not reviewed yet.
 
 ## Product purpose
 
@@ -135,7 +135,7 @@ The studio answered the question list on 2026-11-12 (`support_documents/Resposta
 - **Photos online:** the consent form asks whether the client's face may be shown; if not, only content without the face is used.
 - **Guest spots:** the same process, adapted to the host studio's rules (companions, payment); the client gets guidelines for that studio.
 - **Gift vouchers:** printed only, collected at the studio or sent by post. The studio would like to sell them online through the site; the voucher terms (such as validity) must be set first.
-- **Languages:** Portuguese and English.
+- **Languages:** the studio speaks Portuguese and English fluently (some Spanish, no French). The site is in five languages (see "Users"), but replies stay in Portuguese or English.
 
 ## Accounts and hosting
 

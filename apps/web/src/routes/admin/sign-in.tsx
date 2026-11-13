@@ -9,7 +9,7 @@ function SignInPage() {
   return (
     <main className="sign-in">
       <div className="sign-in-card">
-        <Link to="/" aria-label="Home page">
+        <Link to="/{-$locale}" params={{ locale: undefined }} aria-label="Home page">
           <img src="/assets/brand/badge-white.webp" alt="" width={900} height={736} />
         </Link>
         <p className="eyebrow">

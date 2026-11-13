@@ -2,19 +2,18 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 
 import { appConfig } from "@/app-config";
+import { useSiteMessages } from "@/i18n/site-messages";
+import { useLocale } from "@/i18n/use-locale";
 
 import { NewsGrid } from "./news-grid";
-
-/** Why the page shows no posts, keyed by the feed status. */
-const EMPTY_TEXT = {
-  ready: "No posts yet.",
-  not_connected: "The latest posts are on Instagram.",
-  unavailable: "The posts cannot load at this time. See them on Instagram.",
-} as const;
+import { NEWS_PAGE_TEXT } from "./news-page-text";
 
 /** The News page: Daniel's latest Instagram posts, each linking to the post. */
 export function NewsPage() {
-  const context = useRouteContext({ from: "/_site/news" });
+  const context = useRouteContext({ from: "/{-$locale}/_site/news" });
+  const locale = useLocale();
+  const site = useSiteMessages();
+  const t = NEWS_PAGE_TEXT[locale];
 
   const { data: feed } = useSuspenseQuery(context.newsFeedQueryOptions);
 
@@ -24,32 +23,30 @@ export function NewsPage() {
         <div className="page-head">
           <div>
             <p className="eyebrow">
-              <b>News</b> From Instagram
+              <b>{site.nav.news}</b> {t.eyebrowDetail}
             </p>
             <h1>
-              Fresh from <em>the studio.</em>
+              {t.headingFirst} <em>{t.headingSecond}</em>
             </h1>
           </div>
-          <p className="lead">
-            New work, flash, and guest spot dates, as Daniel posts them on Instagram.
-          </p>
+          <p className="lead">{t.lead}</p>
         </div>
 
         {feed.posts.length > 0 ? (
           <NewsGrid posts={feed.posts} />
         ) : (
-          <p className="empty-state">{EMPTY_TEXT[feed.status]}</p>
+          <p className="empty-state">{t.empty[feed.status]}</p>
         )}
 
         <div className="page-cta">
-          <p>Follow Daniel for new work and flash days.</p>
+          <p>{t.cta}</p>
           <a
             className="btn btn-red"
             href={appConfig.links.instagram}
             target="_blank"
             rel="noreferrer"
           >
-            Follow on Instagram
+            {t.follow}
           </a>
         </div>
       </div>

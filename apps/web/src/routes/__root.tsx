@@ -7,15 +7,19 @@ import { Toaster } from "sonner";
 import { appConfig } from "@/app-config";
 import { RootErrorComponent } from "@/defaults/error";
 import { NotFoundComponent } from "@/defaults/not-found";
+import { useLocale } from "@/i18n/use-locale";
 
 import appCss from "../styles.css?url";
 
 const FONTS_URL =
   "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap";
 
+/** The HTML document, in the language of the page's address (English outside the public site). */
 function RootDocument({ children }: { children: ReactNode }) {
+  const locale = useLocale();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <head>
         <HeadContent />
       </head>

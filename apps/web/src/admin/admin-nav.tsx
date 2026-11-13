@@ -22,7 +22,9 @@ export function AdminNav() {
       <Link to="/admin/instagram">Instagram</Link>
       <div className="admin-nav-end">
         <p className="admin-nav-user">{context.user.email}</p>
-        <Link to="/">View site</Link>
+        <Link to="/{-$locale}" params={{ locale: undefined }}>
+          View site
+        </Link>
         <button type="button" disabled={signOut.isPending} onClick={() => signOut.mutate()}>
           {signOut.isPending ? "Signing out…" : "Sign out"}
         </button>

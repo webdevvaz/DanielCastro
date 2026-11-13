@@ -2,15 +2,19 @@ import type { getUpcomingGuestSpots } from "@/server/guest-spots/guest-spots.fun
 
 import { appConfig } from "@/app-config";
 import { formatDateRange } from "@/components/format-date-range";
+import { useLocale } from "@/i18n/use-locale";
 
-const STATUS_LABELS = { open: "Books open", full: "Fully booked" } as const;
+import { GUEST_SPOTS_PAGE_TEXT } from "./guest-spots-page-text";
 
 /** Upcoming guest spots, the soonest first, or a note to follow Instagram when there are none. */
 export function GuestSpotList({ spots }: { spots: UpcomingGuestSpots }) {
+  const locale = useLocale();
+  const t = GUEST_SPOTS_PAGE_TEXT[locale];
+
   if (spots.length === 0) {
     return (
       <p className="empty-state">
-        No guest spots are announced right now. New dates appear here and on{" "}
+        {t.emptyBefore}{" "}
         <a href={appConfig.links.instagram} target="_blank" rel="noreferrer">
           Instagram
         </a>
@@ -23,7 +27,7 @@ export function GuestSpotList({ spots }: { spots: UpcomingGuestSpots }) {
     <ul className="spots">
       {spots.map((spot) => (
         <li className="spot" key={spot.id}>
-          <span className="spot-dates">{formatDateRange(spot.startsOn, spot.endsOn)}</span>
+          <span className="spot-dates">{formatDateRange(spot.startsOn, spot.endsOn, locale)}</span>
           <div className="spot-place">
             <h3>
               {spot.city}, {spot.country}
@@ -35,7 +39,7 @@ export function GuestSpotList({ spots }: { spots: UpcomingGuestSpots }) {
             {spot.note ? <p>{spot.note}</p> : null}
           </div>
           <span className="status-pill" data-status={spot.status}>
-            {STATUS_LABELS[spot.status]}
+            {t.status[spot.status]}
           </span>
         </li>
       ))}

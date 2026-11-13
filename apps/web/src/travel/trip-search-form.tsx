@@ -5,17 +5,25 @@ import { useNavigate, useRouteContext } from "@tanstack/react-router";
 import { Schema } from "effect";
 
 import { useAppForm } from "@/forms/form";
+import { localeParam } from "@/i18n/locales";
+import { useLocale } from "@/i18n/use-locale";
 
+import { TRAVEL_TEXT } from "./travel-text";
 import { useDebouncedValue } from "./use-debounced-value";
 
 const SUGGESTION_DELAY_MS = 250;
 
 const NO_SUGGESTIONS: ReadonlyArray<string> = [];
 
-/** The search for a trip estimate. Submitting puts the search in the page's address. */
+/**
+ * The search for a trip estimate. Submitting puts the search in the page's address, in the page's
+ * language. Errors show in that language too.
+ */
 export function TripSearchForm({ search }: { search: TravelSearch }) {
-  const context = useRouteContext({ from: "/_site/travel" });
+  const context = useRouteContext({ from: "/{-$locale}/_site/travel" });
   const navigate = useNavigate();
+  const locale = useLocale();
+  const t = TRAVEL_TEXT[locale].form;
 
   const defaultValues: TravelSearchForm = {
     from: search.from ?? "",
@@ -29,7 +37,8 @@ export function TripSearchForm({ search }: { search: TravelSearch }) {
     validators: { onDynamic: Schema.toStandardSchemaV1(TravelSearchForm) },
     onSubmit: async ({ value }) => {
       await navigate({
-        to: "/travel",
+        to: "/{-$locale}/travel",
+        params: { locale: localeParam(locale) },
         search: {
           from: value.from.trim(),
           arrive: value.arrive === "" ? undefined : value.arrive,
@@ -58,21 +67,31 @@ export function TripSearchForm({ search }: { search: TravelSearch }) {
       <form.AppField name="from">
         {(field) => (
           <field.TextField
-            label="Where do you travel from?"
-            placeholder="London"
+            label={t.from}
+            placeholder={t.fromPlaceholder}
             autoComplete="address-level2"
             suggestions={suggestions}
+            errorText={t.fromError}
           />
         )}
       </form.AppField>
       <form.AppField name="arrive">
-        {(field) => <field.TextField label="Arrive" type="date" hint="Optional" />}
+        {(field) => (
+          <field.TextField
+            label={t.arrive}
+            type="date"
+            hint={t.optional}
+            errorText={t.arriveError}
+          />
+        )}
       </form.AppField>
       <form.AppField name="leave">
-        {(field) => <field.TextField label="Leave" type="date" hint="Optional" />}
+        {(field) => (
+          <field.TextField label={t.leave} type="date" hint={t.optional} errorText={t.leaveError} />
+        )}
       </form.AppField>
       <button className="btn btn-red" type="submit">
-        Estimate
+        {t.submit}
       </button>
     </form>
   );

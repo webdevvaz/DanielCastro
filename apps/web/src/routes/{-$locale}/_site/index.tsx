@@ -6,7 +6,7 @@ import { GalleryPage } from "@/gallery/gallery-page";
 import { galleryQueryOptions } from "@/integrations/tanstack-query/gallery-query-options";
 
 /** The home page: Daniel's work, the full gallery. */
-export const Route = createFileRoute("/_site/")({
+export const Route = createFileRoute("/{-$locale}/_site/")({
   context: () => ({ galleryQueryOptions }),
   loader: ({ context }) => {
     void context.queryClient.query(context.galleryQueryOptions).catch(noop);

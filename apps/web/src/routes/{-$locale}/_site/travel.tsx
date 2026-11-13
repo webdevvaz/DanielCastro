@@ -3,6 +3,7 @@ import { noop } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Schema } from "effect";
 
+import { pageTitleFor } from "@/i18n/site-messages";
 import {
   citySuggestionsQueryOptions,
   tripEstimateQueryOptions,
@@ -10,7 +11,7 @@ import {
 import { TravelPage } from "@/travel/travel-page";
 
 /** The travel estimator. The search lives in the address, so an estimate can be shared. */
-export const Route = createFileRoute("/_site/travel")({
+export const Route = createFileRoute("/{-$locale}/_site/travel")({
   validateSearch: Schema.toStandardSchemaV1(TravelSearch),
   loaderDeps: ({ search }) => search,
   context: () => ({ tripEstimateQueryOptions, citySuggestionsQueryOptions }),
@@ -27,6 +28,6 @@ export const Route = createFileRoute("/_site/travel")({
       )
       .catch(noop);
   },
-  head: () => ({ meta: [{ title: "Plan your trip — Daniel Castro" }] }),
+  head: ({ params }) => ({ meta: [{ title: pageTitleFor(params.locale, "travel") }] }),
   component: TravelPage,
 });

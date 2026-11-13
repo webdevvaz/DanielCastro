@@ -27,9 +27,13 @@ export function AdminInstagramPage() {
       </p>
       <h1>Instagram</h1>
       <p className="lead">
-        The <Link to="/news">News page</Link> shows the latest posts from Daniel&apos;s Instagram
-        account. Connect the account once; the site renews its access by itself. To show a post in
-        the gallery too, use &ldquo;Add to gallery&rdquo;.
+        The{" "}
+        <Link to="/{-$locale}/news" params={{ locale: undefined }}>
+          News page
+        </Link>{" "}
+        shows the latest posts from Daniel&apos;s Instagram account. Connect the account once; the
+        site renews its access by itself. To show a post in the gallery too, use &ldquo;Add to
+        gallery&rdquo;.
       </p>
 
       <p className="news-status" data-live={newsLive}>

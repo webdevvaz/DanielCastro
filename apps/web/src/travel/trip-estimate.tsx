@@ -6,6 +6,7 @@ import { useRouteContext } from "@tanstack/react-router";
 import type { getTripEstimate } from "@/server/travel/travel.functions";
 
 import { formatDateRange } from "@/components/format-date-range";
+import { useLocale } from "@/i18n/use-locale";
 
 import { cityLabel } from "./city-label";
 import { HotelCard } from "./hotel-card";
@@ -16,7 +17,8 @@ import {
   googleFlightsUrl,
   UBER_TO_STUDIO_URL,
 } from "./travel-links";
-import { euros, formatMinutes, formatNights } from "./trip-format";
+import { TRAVEL_TEXT } from "./travel-text";
+import { euroRange, eurosIn, formatMinutes } from "./trip-format";
 
 /**
  * What the cards show. While the estimate loads, or when it failed, there is no city match and
@@ -56,38 +58,28 @@ const shownEstimateOf = (estimate: Estimate | undefined, loading: boolean) => {
   };
 };
 
-/** What the flight card says when it has no prices to list. */
-const FLIGHT_MESSAGES = {
-  loading: "Looking up flight prices…",
-  none: "Not enough recent fares from this city for an average. Google Flights shows every flight and its price.",
-  unavailable:
-    "Flight prices are not available right now. Google Flights shows every flight and its price.",
-  unknownCity: "Flight prices need a city we know. Google Flights shows every flight.",
-} as const;
-
-const formatStops = (stops: number) => {
-  if (stops === 0) return "Direct";
-
-  return stops === 1 ? "1 stop" : `${stops} stops`;
-};
-
 /** An average from recent fares, or a live fare with its stops and journey time. */
 function FlightOption({ flight }: { flight: Flight }) {
-  const details = [flight.source === "average" ? "Average price, both ways" : "Both ways"];
+  const locale = useLocale();
+  const t = TRAVEL_TEXT[locale].flights;
 
-  if (flight.stops !== null) details.push(formatStops(flight.stops));
+  const details = [flight.source === "average" ? t.averageBothWays : t.bothWays];
 
-  if (flight.durationMinutes !== null) details.push(formatMinutes(flight.durationMinutes));
+  if (flight.stops !== null) details.push(flight.stops === 0 ? t.direct : t.stops(flight.stops));
+
+  if (flight.durationMinutes !== null) {
+    details.push(formatMinutes(flight.durationMinutes, locale));
+  }
 
   return (
     <li className="trip-flight">
       <div>
-        <b>{flight.airline ?? "All airlines"}</b>
+        <b>{flight.airline ?? t.allAirlines}</b>
         <span>{details.join(" · ")}</span>
       </div>
       <p className="trip-price">
-        {flight.source === "average" ? "about " : null}
-        <b>{euros.format(flight.priceEuros)}</b>
+        {flight.source === "average" ? `${t.about} ` : null}
+        <b>{eurosIn(locale).format(flight.priceEuros)}</b>
       </p>
     </li>
   );
@@ -95,21 +87,16 @@ function FlightOption({ flight }: { flight: Flight }) {
 
 /** Where the listed prices come from. */
 function FlightSourceLine({ status, tripDates }: FlightSourceLineProps) {
-  if (status !== "live") {
-    return <p className="field-hint">From fares that travellers found in the last few days.</p>;
-  }
+  const locale = useLocale();
+  const t = TRAVEL_TEXT[locale].flights;
+
+  if (status !== "live") return <p className="field-hint">{t.recentFares}</p>;
 
   if (tripDates === null) return null;
 
-  const range = formatDateRange(tripDates.outbound, tripDates.return);
+  const range = formatDateRange(tripDates.outbound, tripDates.return, locale);
 
-  return (
-    <p className="field-hint">
-      {tripDates.example
-        ? `Live prices from Google Flights for an example trip, ${range}.`
-        : `Live prices from Google Flights for ${range}.`}
-    </p>
-  );
+  return <p className="field-hint">{tripDates.example ? t.liveExample(range) : t.live(range)}</p>;
 }
 
 /**
@@ -118,6 +105,8 @@ function FlightSourceLine({ status, tripDates }: FlightSourceLineProps) {
  * Google Flights prices.
  */
 function FlightsCard({ flights, tripDates, searchUrl, status }: FlightsCardProps) {
+  const t = TRAVEL_TEXT[useLocale()].flights;
+
   const body =
     status === "averages" || status === "live" ? (
       <>
@@ -129,15 +118,15 @@ function FlightsCard({ flights, tripDates, searchUrl, status }: FlightsCardProps
         </ul>
       </>
     ) : (
-      <p>{FLIGHT_MESSAGES[status]}</p>
+      <p>{t[status]}</p>
     );
 
   return (
     <article className="trip-card">
-      <h3>Flights to Porto</h3>
+      <h3>{t.title}</h3>
       {body}
       <a className="btn btn-ghost btn-small" href={searchUrl} target="_blank" rel="noreferrer">
-        Search Google Flights
+        {t.search}
       </a>
     </article>
   );
@@ -163,35 +152,46 @@ function TransportOption({ name, details, link, linkLabel }: TransportOptionProp
  * the options and their links show.
  */
 function AirportCard({ settings, days }: AirportCardProps) {
-  let bus = "Direct to Braga bus station";
-  let car = "Pick it up at the airport";
-  let uber = "From the arrivals floor";
+  const locale = useLocale();
+  const t = TRAVEL_TEXT[locale].airport;
+
+  let bus = t.busDefault;
+  let car = t.carDefault;
+  let uber = t.uberDefault;
 
   if (settings !== null) {
-    const drive = `${formatMinutes(settings.driveMinutes)} each way`;
-    const carDays = days === 1 ? "1 day" : `${days} days`;
+    const drive = t.eachWay(formatMinutes(settings.driveMinutes, locale));
+    const carRange = euroRange(
+      locale,
+      days * settings.carDayMinEuros,
+      days * settings.carDayMaxEuros,
+    );
+    const uberRange = euroRange(locale, 2 * settings.rideMinEuros, 2 * settings.rideMaxEuros);
 
-    bus = `${euros.format(2 * settings.coachFareEuros)} both ways · ${formatMinutes(settings.coachMinutes)} each way`;
-    car = `${euros.format(days * settings.carDayMinEuros)}–${euros.format(days * settings.carDayMaxEuros)} for ${carDays}, plus tolls · ${drive}`;
-    uber = `About ${euros.format(2 * settings.rideMinEuros)}–${euros.format(2 * settings.rideMaxEuros)} both ways · ${drive}`;
+    bus = t.busDetails(
+      eurosIn(locale).format(2 * settings.coachFareEuros),
+      formatMinutes(settings.coachMinutes, locale),
+    );
+    car = t.carDetails(carRange, t.days(days), drive);
+    uber = t.uberDetails(uberRange, drive);
   }
 
   return (
     <article className="trip-card">
-      <h3>Porto airport to Braga</h3>
+      <h3>{t.title}</h3>
       <ul className="trip-options">
-        <TransportOption name="Bus" details={bus} link={AIRPORT_BUS_URL} linkLabel="Get Bus" />
+        <TransportOption name={t.bus} details={bus} link={AIRPORT_BUS_URL} linkLabel={t.getBus} />
         <TransportOption
-          name="Rental car"
+          name={t.car}
           details={car}
           link={AIRPORT_CAR_RENTAL_URL}
-          linkLabel="Compare"
+          linkLabel={t.compare}
         />
         <TransportOption
-          name="Uber"
+          name={t.uber}
           details={uber}
           link={UBER_TO_STUDIO_URL}
-          linkLabel="Open Uber"
+          linkLabel={t.openUber}
         />
       </ul>
     </article>
@@ -199,42 +199,47 @@ function AirportCard({ settings, days }: AirportCardProps) {
 }
 
 function DriveCard({ from }: { from: string }) {
+  const t = TRAVEL_TEXT[useLocale()].drive;
+
   return (
     <article className="trip-card">
-      <h3>By car</h3>
-      <p>From {from}, driving can be the simplest way to the studio.</p>
+      <h3>{t.title}</h3>
+      <p>{t.text(from)}</p>
       <a
         className="btn btn-ghost btn-small"
         href={drivingDirectionsUrl(from)}
         target="_blank"
         rel="noreferrer"
       >
-        Open Google Maps
+        {t.open}
       </a>
     </article>
   );
 }
 
 function TotalLine({ estimate }: { estimate: Estimate }) {
+  const locale = useLocale();
+  const text = TRAVEL_TEXT[locale];
+
   if (estimate.total === null) return null;
 
-  const nights = formatNights(estimate.nights);
+  const nights = text.nights(estimate.nights);
   const hotel =
     estimate.hotelAverage === null
-      ? `${nights} in a hotel at typical prices`
-      : `${nights} at the average hotel price`;
+      ? text.total.hotelTypical(nights)
+      : text.total.hotelAverage(nights);
   const flight =
-    estimate.flightStatus === "live" ? "A flight both ways" : "An average flight both ways";
-  const parts = `${flight}, the bus both ways, and ${hotel}.`;
+    estimate.flightStatus === "live" ? text.total.flightLive : text.total.flightAverage;
+  const parts = text.total.parts(flight, hotel);
 
   return (
     <div className="trip-total">
-      <p>Estimated total for one person</p>
+      <p>{text.total.label}</p>
       <p className="trip-total-range">
-        {euros.format(estimate.total.minEuros)} – {euros.format(estimate.total.maxEuros)}
+        {euroRange(locale, estimate.total.minEuros, estimate.total.maxEuros)}
       </p>
       <p className="field-hint">
-        {estimate.tripDates.example ? `${parts} For the example trip.` : parts}
+        {estimate.tripDates.example ? `${parts} ${text.total.example}` : parts}
       </p>
     </div>
   );
@@ -242,22 +247,19 @@ function TotalLine({ estimate }: { estimate: Estimate }) {
 
 /** Why the estimate has no prices, when that is not plain from the cards. */
 function TripStatus({ failed, unknownCity, typed }: TripStatusProps) {
+  const t = TRAVEL_TEXT[useLocale()];
+
   if (failed) {
     return (
       <p className="trip-status" role="alert">
-        Prices are not available right now. The links below still work.
+        {t.failed}
       </p>
     );
   }
 
   if (!unknownCity) return null;
 
-  return (
-    <p className="trip-status">
-      We do not know “{typed}” yet. The links below still search for it, or try the nearest large
-      city.
-    </p>
-  );
+  return <p className="trip-status">{t.unknownCity(typed)}</p>;
 }
 
 /**
@@ -265,7 +267,9 @@ function TripStatus({ failed, unknownCity, typed }: TripStatusProps) {
  * the prices load and when no prices exist.
  */
 export function TripEstimate({ input }: { input: TravelEstimateInput }) {
-  const context = useRouteContext({ from: "/_site/travel" });
+  const context = useRouteContext({ from: "/{-$locale}/_site/travel" });
+  const locale = useLocale();
+  const t = TRAVEL_TEXT[locale];
 
   const { data: estimate, isPending, isError } = useQuery(context.tripEstimateQueryOptions(input));
 
@@ -279,10 +283,10 @@ export function TripEstimate({ input }: { input: TravelEstimateInput }) {
       ? { from, arrive: input.arrive, leave: input.leave }
       : { from, arrive: shown.tripDates.outbound, leave: shown.tripDates.return };
 
-  let heading = `From ${from}`;
+  let heading = t.heading(from);
 
   if (input.arrive !== undefined && input.leave !== undefined) {
-    heading = `${heading}, ${formatDateRange(input.arrive, input.leave)}`;
+    heading = `${heading}, ${formatDateRange(input.arrive, input.leave, locale)}`;
   }
 
   return (
@@ -295,7 +299,7 @@ export function TripEstimate({ input }: { input: TravelEstimateInput }) {
         <FlightsCard
           flights={shown.flights}
           tripDates={shown.tripDates}
-          searchUrl={googleFlightsUrl(priced)}
+          searchUrl={googleFlightsUrl(priced, locale)}
           status={shown.flightStatus}
         />
         <AirportCard settings={shown.settings} days={shown.nights} />
@@ -313,13 +317,7 @@ export function TripEstimate({ input }: { input: TravelEstimateInput }) {
 
       {estimate === undefined ? null : <TotalLine estimate={estimate} />}
 
-      <p className="trip-note">
-        Flight prices are average prices for both ways, from fares that travellers found recently on
-        Aviasales; for less common routes, they are live from Google Flights. Hotel prices are live
-        from Google. Transport prices are typical prices. All prices are for one adult and change
-        often, so check them before you book. Book your travel only after your date is confirmed and
-        your deposit is paid.
-      </p>
+      <p className="trip-note">{t.note}</p>
     </section>
   );
 }

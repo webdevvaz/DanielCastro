@@ -1,12 +1,15 @@
 import { Link } from "@tanstack/react-router";
 
 import { appConfig } from "@/app-config";
+import { useSiteMessages } from "@/i18n/site-messages";
 
 /** The studio address, email, and social links. The side menu and the phone footer show them. */
 export function SiteContact() {
+  const t = useSiteMessages();
+
   return (
     <div className="site-contact">
-      <h4>Studio</h4>
+      <h4>{t.contact.heading}</h4>
       <a href={appConfig.links.map} target="_blank" rel="noreferrer">
         {appConfig.studio.addressLines.map((line) => (
           <span key={line}>
@@ -18,7 +21,7 @@ export function SiteContact() {
       <p>
         <a href={`mailto:${appConfig.studio.email}`}>{appConfig.studio.email}</a>
         <br />
-        By appointment only
+        {t.contact.byAppointment}
       </p>
       <p>
         <a href={appConfig.links.instagram} target="_blank" rel="noreferrer">
@@ -33,7 +36,7 @@ export function SiteContact() {
           YouTube
         </a>
         {" · "}
-        <Link to="/admin">Studio admin</Link>
+        <Link to="/admin">{t.contact.admin}</Link>
       </p>
     </div>
   );

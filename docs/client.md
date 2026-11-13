@@ -139,3 +139,18 @@ Unexpected server failures reach the browser as a generic message. The details a
 ## Tables
 
 Build tables with TanStack Table v9 (`useTable`). The rules for stable columns and state reads are in the React section of `.agents/skills/daniel-impl/SKILL.md`.
+
+## Languages
+
+The public site is in English, Portuguese, French, German, and Spanish (`apps/web/src/i18n/locales.ts`). English has no address prefix; the others do: `/about`, `/pt/about`, `/fr/about`. All public routes live under `routes/{-$locale}/`, whose `route.tsx` accepts only `pt`, `fr`, `de`, and `es` as the prefix and answers 404 for anything else, `/en` included.
+
+- **The language of a page** comes from its address: `useLocale()` (`i18n/use-locale.ts`). Never keep it in state.
+- **Shared text** (menu, buttons, contact, photo viewer, error pages) is in `i18n/site-messages.ts`; read it with `useSiteMessages()`.
+- **Page text** lives next to its page, one module per page with every language (for example `about/about-page-text.ts`), so a page loads only its own text. Each module types the other languages as `typeof en`: a missing or extra entry in any language fails the type check. Use functions for text with numbers (`nights: (n) => ...`), and `RichText` (`i18n/rich-text.tsx`) with `{name}` placeholders when a formatted value, such as a bold price, sits inside a sentence.
+- **Links** between public pages keep the language: `<Link to="/{-$locale}/about" params={{ locale: localeParam(locale) }}>`.
+- **Page titles** come from `pageTitleFor(params.locale, "about")` in each route's `head`.
+- **Dates, prices, and durations** use the page's language: `formatDateRange(start, end, locale)`, `eurosIn(locale)`, `formatMinutes(minutes, locale)`.
+- **Form errors** on public forms: pass `errorText` to the field, so the error shows in the page's language instead of the schema's English message.
+- **The first visit** (`i18n/locale-redirect.ts`, used in `start.ts`): a browser that opens a page without a prefix goes to its language when the visitor chose one in the switcher (the `locale` cookie) or, without a choice, when its `Accept-Language` prefers one. Admin pages, API routes, server functions, files, and prefixed addresses are never redirected. `tests/unit/locale-redirect.test.ts` protects these rules.
+
+Text that admins type (photo titles, guest spot notes, Instagram captions) is shown as written, in one language. The studio answers enquiries in Portuguese and English only.

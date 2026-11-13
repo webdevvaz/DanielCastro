@@ -4,6 +4,24 @@ import { createCsrfMiddleware, createMiddleware, createStart } from "@tanstack/r
 import { setResponseHeader, setResponseStatus } from "@tanstack/react-start/server";
 import { Schema } from "effect";
 
+import { localeRedirectTarget } from "./i18n/locale-redirect";
+
+/**
+ * Opens a public page in the visitor's language: a browser that asks for `/about` and prefers
+ * Portuguese, or chose it in the switcher, goes to `/pt/about`. The answer depends on those
+ * headers, so caches must keep them apart.
+ */
+const localeRedirectMiddleware = createMiddleware().server(({ next, request }) => {
+  const target = localeRedirectTarget(request);
+
+  if (target === null) return next();
+
+  return new Response(null, {
+    status: 302,
+    headers: { Location: target, Vary: "Accept-Language, Cookie" },
+  });
+});
+
 /**
  * Start sends only `message` for thrown errors. This adapter encodes expected `AppError`s with
  * their schema so the client receives real error instances with `_tag` and `status`.
@@ -59,9 +77,12 @@ const appErrorStatusMiddleware = createMiddleware({ type: "function" }).server(a
   }
 });
 
-/** The TanStack Start instance: error serialization, CSRF protection, and security headers. */
+/**
+ * The TanStack Start instance: error serialization, the language redirect, CSRF protection, and
+ * security headers.
+ */
 export const startInstance = createStart(() => ({
   serializationAdapters: [appErrorAdapter],
-  requestMiddleware: [csrfMiddleware, securityHeadersMiddleware],
+  requestMiddleware: [localeRedirectMiddleware, csrfMiddleware, securityHeadersMiddleware],
   functionMiddleware: [appErrorStatusMiddleware],
 }));

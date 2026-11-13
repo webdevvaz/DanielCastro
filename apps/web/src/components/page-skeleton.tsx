@@ -1,7 +1,11 @@
+import { useSiteMessages } from "@/i18n/site-messages";
+
 /** A heading and content placeholder in the shape of a page section, while its data loads. */
 export function SectionSkeleton({ blocks = 3 }: { blocks?: number }) {
+  const t = useSiteMessages();
+
   return (
-    <div aria-busy="true" aria-label="Loading">
+    <div aria-busy="true" aria-label={t.loading}>
       <div className="skeleton" style={{ width: 120, height: 12 }} />
       <div className="skeleton" style={{ width: "min(520px, 80%)", height: 52, marginTop: 20 }} />
       <div

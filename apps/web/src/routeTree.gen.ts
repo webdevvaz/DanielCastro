@@ -9,18 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SiteRouteImport } from './routes/_site'
-import { Route as SiteIndexRouteImport } from './routes/_site/index'
-import { Route as SiteAboutRouteImport } from './routes/_site/about'
-import { Route as SiteAftercareRouteImport } from './routes/_site/aftercare'
-import { Route as SiteGuestSpotsRouteImport } from './routes/_site/guest-spots'
-import { Route as SiteHowToBookRouteImport } from './routes/_site/how-to-book'
-import { Route as SiteNewsRouteImport } from './routes/_site/news'
-import { Route as SiteTravelRouteImport } from './routes/_site/travel'
+import { Route as Char123LocaleChar125RouteRouteImport } from './routes/{-$locale}/route'
 import { Route as AdminDashboardRouteImport } from './routes/admin/_dashboard'
 import { Route as AdminSignInRouteImport } from './routes/admin/sign-in'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiReadyRouteImport } from './routes/api/ready'
+import { Route as Char123LocaleChar125SiteRouteImport } from './routes/{-$locale}/_site'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/_dashboard/index'
 import { Route as AdminDashboardGalleryRouteImport } from './routes/admin/_dashboard/gallery'
 import { Route as AdminDashboardGuestSpotsRouteImport } from './routes/admin/_dashboard/guest-spots'
@@ -30,46 +24,20 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiInstagramCallbackRouteImport } from './routes/api/instagram/callback'
 import { Route as ApiInstagramConnectRouteImport } from './routes/api/instagram/connect'
 import { Route as ApiPhotosSplatRouteImport } from './routes/api/photos/$'
+import { Route as Char123LocaleChar125SiteIndexRouteImport } from './routes/{-$locale}/_site/index'
+import { Route as Char123LocaleChar125SiteAboutRouteImport } from './routes/{-$locale}/_site/about'
+import { Route as Char123LocaleChar125SiteAftercareRouteImport } from './routes/{-$locale}/_site/aftercare'
+import { Route as Char123LocaleChar125SiteGuestSpotsRouteImport } from './routes/{-$locale}/_site/guest-spots'
+import { Route as Char123LocaleChar125SiteHowToBookRouteImport } from './routes/{-$locale}/_site/how-to-book'
+import { Route as Char123LocaleChar125SiteNewsRouteImport } from './routes/{-$locale}/_site/news'
+import { Route as Char123LocaleChar125SiteTravelRouteImport } from './routes/{-$locale}/_site/travel'
 
-const SiteRoute = SiteRouteImport.update({
-  id: '/_site',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SiteIndexRoute = SiteIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SiteRoute,
-} as any)
-const SiteAboutRoute = SiteAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => SiteRoute,
-} as any)
-const SiteAftercareRoute = SiteAftercareRouteImport.update({
-  id: '/aftercare',
-  path: '/aftercare',
-  getParentRoute: () => SiteRoute,
-} as any)
-const SiteGuestSpotsRoute = SiteGuestSpotsRouteImport.update({
-  id: '/guest-spots',
-  path: '/guest-spots',
-  getParentRoute: () => SiteRoute,
-} as any)
-const SiteHowToBookRoute = SiteHowToBookRouteImport.update({
-  id: '/how-to-book',
-  path: '/how-to-book',
-  getParentRoute: () => SiteRoute,
-} as any)
-const SiteNewsRoute = SiteNewsRouteImport.update({
-  id: '/news',
-  path: '/news',
-  getParentRoute: () => SiteRoute,
-} as any)
-const SiteTravelRoute = SiteTravelRouteImport.update({
-  id: '/travel',
-  path: '/travel',
-  getParentRoute: () => SiteRoute,
-} as any)
+const Char123LocaleChar125RouteRoute =
+  Char123LocaleChar125RouteRouteImport.update({
+    id: '/{-$locale}',
+    path: '/{-$locale}',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/admin/_dashboard',
   path: '/admin',
@@ -90,6 +58,11 @@ const ApiReadyRoute = ApiReadyRouteImport.update({
   path: '/api/ready',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char123LocaleChar125SiteRoute =
+  Char123LocaleChar125SiteRouteImport.update({
+    id: '/_site',
+    getParentRoute: () => Char123LocaleChar125RouteRoute,
+  } as any)
 const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -136,15 +109,51 @@ const ApiPhotosSplatRoute = ApiPhotosSplatRouteImport.update({
   path: '/api/photos/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char123LocaleChar125SiteIndexRoute =
+  Char123LocaleChar125SiteIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
+const Char123LocaleChar125SiteAboutRoute =
+  Char123LocaleChar125SiteAboutRouteImport.update({
+    id: '/about',
+    path: '/about',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
+const Char123LocaleChar125SiteAftercareRoute =
+  Char123LocaleChar125SiteAftercareRouteImport.update({
+    id: '/aftercare',
+    path: '/aftercare',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
+const Char123LocaleChar125SiteGuestSpotsRoute =
+  Char123LocaleChar125SiteGuestSpotsRouteImport.update({
+    id: '/guest-spots',
+    path: '/guest-spots',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
+const Char123LocaleChar125SiteHowToBookRoute =
+  Char123LocaleChar125SiteHowToBookRouteImport.update({
+    id: '/how-to-book',
+    path: '/how-to-book',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
+const Char123LocaleChar125SiteNewsRoute =
+  Char123LocaleChar125SiteNewsRouteImport.update({
+    id: '/news',
+    path: '/news',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
+const Char123LocaleChar125SiteTravelRoute =
+  Char123LocaleChar125SiteTravelRouteImport.update({
+    id: '/travel',
+    path: '/travel',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof SiteIndexRoute
-  '/about': typeof SiteAboutRoute
-  '/aftercare': typeof SiteAftercareRoute
-  '/guest-spots': typeof SiteGuestSpotsRoute
-  '/how-to-book': typeof SiteHowToBookRoute
-  '/news': typeof SiteNewsRoute
-  '/travel': typeof SiteTravelRoute
+  '/{-$locale}': typeof Char123LocaleChar125RouteRouteWithChildren
   '/admin': typeof AdminDashboardRouteWithChildren
   '/admin/sign-in': typeof AdminSignInRoute
   '/api/health': typeof ApiHealthRoute
@@ -157,19 +166,20 @@ export interface FileRoutesByFullPath {
   '/api/instagram/callback': typeof ApiInstagramCallbackRoute
   '/api/instagram/connect': typeof ApiInstagramConnectRoute
   '/api/photos/$': typeof ApiPhotosSplatRoute
+  '/{-$locale}/about': typeof Char123LocaleChar125SiteAboutRoute
+  '/{-$locale}/aftercare': typeof Char123LocaleChar125SiteAftercareRoute
+  '/{-$locale}/guest-spots': typeof Char123LocaleChar125SiteGuestSpotsRoute
+  '/{-$locale}/how-to-book': typeof Char123LocaleChar125SiteHowToBookRoute
+  '/{-$locale}/news': typeof Char123LocaleChar125SiteNewsRoute
+  '/{-$locale}/travel': typeof Char123LocaleChar125SiteTravelRoute
   '/admin/': typeof AdminDashboardIndexRoute
+  '/{-$locale}/': typeof Char123LocaleChar125SiteIndexRoute
 }
 export interface FileRoutesByTo {
-  '/about': typeof SiteAboutRoute
-  '/aftercare': typeof SiteAftercareRoute
-  '/guest-spots': typeof SiteGuestSpotsRoute
-  '/how-to-book': typeof SiteHowToBookRoute
-  '/news': typeof SiteNewsRoute
-  '/travel': typeof SiteTravelRoute
+  '/{-$locale}': typeof Char123LocaleChar125SiteIndexRoute
   '/admin/sign-in': typeof AdminSignInRoute
   '/api/health': typeof ApiHealthRoute
   '/api/ready': typeof ApiReadyRoute
-  '/': typeof SiteIndexRoute
   '/admin/gallery': typeof AdminDashboardGalleryRoute
   '/admin/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/instagram': typeof AdminDashboardInstagramRoute
@@ -178,22 +188,22 @@ export interface FileRoutesByTo {
   '/api/instagram/callback': typeof ApiInstagramCallbackRoute
   '/api/instagram/connect': typeof ApiInstagramConnectRoute
   '/api/photos/$': typeof ApiPhotosSplatRoute
+  '/{-$locale}/about': typeof Char123LocaleChar125SiteAboutRoute
+  '/{-$locale}/aftercare': typeof Char123LocaleChar125SiteAftercareRoute
+  '/{-$locale}/guest-spots': typeof Char123LocaleChar125SiteGuestSpotsRoute
+  '/{-$locale}/how-to-book': typeof Char123LocaleChar125SiteHowToBookRoute
+  '/{-$locale}/news': typeof Char123LocaleChar125SiteNewsRoute
+  '/{-$locale}/travel': typeof Char123LocaleChar125SiteTravelRoute
   '/admin': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_site': typeof SiteRouteWithChildren
-  '/_site/about': typeof SiteAboutRoute
-  '/_site/aftercare': typeof SiteAftercareRoute
-  '/_site/guest-spots': typeof SiteGuestSpotsRoute
-  '/_site/how-to-book': typeof SiteHowToBookRoute
-  '/_site/news': typeof SiteNewsRoute
-  '/_site/travel': typeof SiteTravelRoute
+  '/{-$locale}': typeof Char123LocaleChar125RouteRouteWithChildren
   '/admin/_dashboard': typeof AdminDashboardRouteWithChildren
   '/admin/sign-in': typeof AdminSignInRoute
   '/api/health': typeof ApiHealthRoute
   '/api/ready': typeof ApiReadyRoute
-  '/_site/': typeof SiteIndexRoute
+  '/{-$locale}/_site': typeof Char123LocaleChar125SiteRouteWithChildren
   '/admin/_dashboard/gallery': typeof AdminDashboardGalleryRoute
   '/admin/_dashboard/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/_dashboard/instagram': typeof AdminDashboardInstagramRoute
@@ -202,18 +212,19 @@ export interface FileRoutesById {
   '/api/instagram/callback': typeof ApiInstagramCallbackRoute
   '/api/instagram/connect': typeof ApiInstagramConnectRoute
   '/api/photos/$': typeof ApiPhotosSplatRoute
+  '/{-$locale}/_site/about': typeof Char123LocaleChar125SiteAboutRoute
+  '/{-$locale}/_site/aftercare': typeof Char123LocaleChar125SiteAftercareRoute
+  '/{-$locale}/_site/guest-spots': typeof Char123LocaleChar125SiteGuestSpotsRoute
+  '/{-$locale}/_site/how-to-book': typeof Char123LocaleChar125SiteHowToBookRoute
+  '/{-$locale}/_site/news': typeof Char123LocaleChar125SiteNewsRoute
+  '/{-$locale}/_site/travel': typeof Char123LocaleChar125SiteTravelRoute
   '/admin/_dashboard/': typeof AdminDashboardIndexRoute
+  '/{-$locale}/_site/': typeof Char123LocaleChar125SiteIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/about'
-    | '/aftercare'
-    | '/guest-spots'
-    | '/how-to-book'
-    | '/news'
-    | '/travel'
+    | '/{-$locale}'
     | '/admin'
     | '/admin/sign-in'
     | '/api/health'
@@ -226,19 +237,20 @@ export interface FileRouteTypes {
     | '/api/instagram/callback'
     | '/api/instagram/connect'
     | '/api/photos/$'
+    | '/{-$locale}/about'
+    | '/{-$locale}/aftercare'
+    | '/{-$locale}/guest-spots'
+    | '/{-$locale}/how-to-book'
+    | '/{-$locale}/news'
+    | '/{-$locale}/travel'
     | '/admin/'
+    | '/{-$locale}/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/about'
-    | '/aftercare'
-    | '/guest-spots'
-    | '/how-to-book'
-    | '/news'
-    | '/travel'
+    | '/{-$locale}'
     | '/admin/sign-in'
     | '/api/health'
     | '/api/ready'
-    | '/'
     | '/admin/gallery'
     | '/admin/guest-spots'
     | '/admin/instagram'
@@ -247,21 +259,21 @@ export interface FileRouteTypes {
     | '/api/instagram/callback'
     | '/api/instagram/connect'
     | '/api/photos/$'
+    | '/{-$locale}/about'
+    | '/{-$locale}/aftercare'
+    | '/{-$locale}/guest-spots'
+    | '/{-$locale}/how-to-book'
+    | '/{-$locale}/news'
+    | '/{-$locale}/travel'
     | '/admin'
   id:
     | '__root__'
-    | '/_site'
-    | '/_site/about'
-    | '/_site/aftercare'
-    | '/_site/guest-spots'
-    | '/_site/how-to-book'
-    | '/_site/news'
-    | '/_site/travel'
+    | '/{-$locale}'
     | '/admin/_dashboard'
     | '/admin/sign-in'
     | '/api/health'
     | '/api/ready'
-    | '/_site/'
+    | '/{-$locale}/_site'
     | '/admin/_dashboard/gallery'
     | '/admin/_dashboard/guest-spots'
     | '/admin/_dashboard/instagram'
@@ -270,11 +282,18 @@ export interface FileRouteTypes {
     | '/api/instagram/callback'
     | '/api/instagram/connect'
     | '/api/photos/$'
+    | '/{-$locale}/_site/about'
+    | '/{-$locale}/_site/aftercare'
+    | '/{-$locale}/_site/guest-spots'
+    | '/{-$locale}/_site/how-to-book'
+    | '/{-$locale}/_site/news'
+    | '/{-$locale}/_site/travel'
     | '/admin/_dashboard/'
+    | '/{-$locale}/_site/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  SiteRoute: typeof SiteRouteWithChildren
+  Char123LocaleChar125RouteRoute: typeof Char123LocaleChar125RouteRouteWithChildren
   AdminDashboardRoute: typeof AdminDashboardRouteWithChildren
   AdminSignInRoute: typeof AdminSignInRoute
   ApiHealthRoute: typeof ApiHealthRoute
@@ -287,61 +306,12 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_site': {
-      id: '/_site'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof SiteRouteImport
+    '/{-$locale}': {
+      id: '/{-$locale}'
+      path: '/{-$locale}'
+      fullPath: '/{-$locale}'
+      preLoaderRoute: typeof Char123LocaleChar125RouteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_site/': {
-      id: '/_site/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof SiteIndexRouteImport
-      parentRoute: typeof SiteRoute
-    }
-    '/_site/about': {
-      id: '/_site/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof SiteAboutRouteImport
-      parentRoute: typeof SiteRoute
-    }
-    '/_site/aftercare': {
-      id: '/_site/aftercare'
-      path: '/aftercare'
-      fullPath: '/aftercare'
-      preLoaderRoute: typeof SiteAftercareRouteImport
-      parentRoute: typeof SiteRoute
-    }
-    '/_site/guest-spots': {
-      id: '/_site/guest-spots'
-      path: '/guest-spots'
-      fullPath: '/guest-spots'
-      preLoaderRoute: typeof SiteGuestSpotsRouteImport
-      parentRoute: typeof SiteRoute
-    }
-    '/_site/how-to-book': {
-      id: '/_site/how-to-book'
-      path: '/how-to-book'
-      fullPath: '/how-to-book'
-      preLoaderRoute: typeof SiteHowToBookRouteImport
-      parentRoute: typeof SiteRoute
-    }
-    '/_site/news': {
-      id: '/_site/news'
-      path: '/news'
-      fullPath: '/news'
-      preLoaderRoute: typeof SiteNewsRouteImport
-      parentRoute: typeof SiteRoute
-    }
-    '/_site/travel': {
-      id: '/_site/travel'
-      path: '/travel'
-      fullPath: '/travel'
-      preLoaderRoute: typeof SiteTravelRouteImport
-      parentRoute: typeof SiteRoute
     }
     '/admin/_dashboard': {
       id: '/admin/_dashboard'
@@ -370,6 +340,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/ready'
       preLoaderRoute: typeof ApiReadyRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/{-$locale}/_site': {
+      id: '/{-$locale}/_site'
+      path: ''
+      fullPath: '/{-$locale}'
+      preLoaderRoute: typeof Char123LocaleChar125SiteRouteImport
+      parentRoute: typeof Char123LocaleChar125RouteRoute
     }
     '/admin/_dashboard/': {
       id: '/admin/_dashboard/'
@@ -434,30 +411,100 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPhotosSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/{-$locale}/_site/': {
+      id: '/{-$locale}/_site/'
+      path: '/'
+      fullPath: '/{-$locale}/'
+      preLoaderRoute: typeof Char123LocaleChar125SiteIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
+    '/{-$locale}/_site/about': {
+      id: '/{-$locale}/_site/about'
+      path: '/about'
+      fullPath: '/{-$locale}/about'
+      preLoaderRoute: typeof Char123LocaleChar125SiteAboutRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
+    '/{-$locale}/_site/aftercare': {
+      id: '/{-$locale}/_site/aftercare'
+      path: '/aftercare'
+      fullPath: '/{-$locale}/aftercare'
+      preLoaderRoute: typeof Char123LocaleChar125SiteAftercareRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
+    '/{-$locale}/_site/guest-spots': {
+      id: '/{-$locale}/_site/guest-spots'
+      path: '/guest-spots'
+      fullPath: '/{-$locale}/guest-spots'
+      preLoaderRoute: typeof Char123LocaleChar125SiteGuestSpotsRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
+    '/{-$locale}/_site/how-to-book': {
+      id: '/{-$locale}/_site/how-to-book'
+      path: '/how-to-book'
+      fullPath: '/{-$locale}/how-to-book'
+      preLoaderRoute: typeof Char123LocaleChar125SiteHowToBookRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
+    '/{-$locale}/_site/news': {
+      id: '/{-$locale}/_site/news'
+      path: '/news'
+      fullPath: '/{-$locale}/news'
+      preLoaderRoute: typeof Char123LocaleChar125SiteNewsRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
+    '/{-$locale}/_site/travel': {
+      id: '/{-$locale}/_site/travel'
+      path: '/travel'
+      fullPath: '/{-$locale}/travel'
+      preLoaderRoute: typeof Char123LocaleChar125SiteTravelRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
   }
 }
 
-interface SiteRouteChildren {
-  SiteAboutRoute: typeof SiteAboutRoute
-  SiteAftercareRoute: typeof SiteAftercareRoute
-  SiteGuestSpotsRoute: typeof SiteGuestSpotsRoute
-  SiteHowToBookRoute: typeof SiteHowToBookRoute
-  SiteNewsRoute: typeof SiteNewsRoute
-  SiteTravelRoute: typeof SiteTravelRoute
-  SiteIndexRoute: typeof SiteIndexRoute
+interface Char123LocaleChar125SiteRouteChildren {
+  Char123LocaleChar125SiteAboutRoute: typeof Char123LocaleChar125SiteAboutRoute
+  Char123LocaleChar125SiteAftercareRoute: typeof Char123LocaleChar125SiteAftercareRoute
+  Char123LocaleChar125SiteGuestSpotsRoute: typeof Char123LocaleChar125SiteGuestSpotsRoute
+  Char123LocaleChar125SiteHowToBookRoute: typeof Char123LocaleChar125SiteHowToBookRoute
+  Char123LocaleChar125SiteNewsRoute: typeof Char123LocaleChar125SiteNewsRoute
+  Char123LocaleChar125SiteTravelRoute: typeof Char123LocaleChar125SiteTravelRoute
+  Char123LocaleChar125SiteIndexRoute: typeof Char123LocaleChar125SiteIndexRoute
 }
 
-const SiteRouteChildren: SiteRouteChildren = {
-  SiteAboutRoute: SiteAboutRoute,
-  SiteAftercareRoute: SiteAftercareRoute,
-  SiteGuestSpotsRoute: SiteGuestSpotsRoute,
-  SiteHowToBookRoute: SiteHowToBookRoute,
-  SiteNewsRoute: SiteNewsRoute,
-  SiteTravelRoute: SiteTravelRoute,
-  SiteIndexRoute: SiteIndexRoute,
+const Char123LocaleChar125SiteRouteChildren: Char123LocaleChar125SiteRouteChildren =
+  {
+    Char123LocaleChar125SiteAboutRoute: Char123LocaleChar125SiteAboutRoute,
+    Char123LocaleChar125SiteAftercareRoute:
+      Char123LocaleChar125SiteAftercareRoute,
+    Char123LocaleChar125SiteGuestSpotsRoute:
+      Char123LocaleChar125SiteGuestSpotsRoute,
+    Char123LocaleChar125SiteHowToBookRoute:
+      Char123LocaleChar125SiteHowToBookRoute,
+    Char123LocaleChar125SiteNewsRoute: Char123LocaleChar125SiteNewsRoute,
+    Char123LocaleChar125SiteTravelRoute: Char123LocaleChar125SiteTravelRoute,
+    Char123LocaleChar125SiteIndexRoute: Char123LocaleChar125SiteIndexRoute,
+  }
+
+const Char123LocaleChar125SiteRouteWithChildren =
+  Char123LocaleChar125SiteRoute._addFileChildren(
+    Char123LocaleChar125SiteRouteChildren,
+  )
+
+interface Char123LocaleChar125RouteRouteChildren {
+  Char123LocaleChar125SiteRoute: typeof Char123LocaleChar125SiteRouteWithChildren
 }
 
-const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)
+const Char123LocaleChar125RouteRouteChildren: Char123LocaleChar125RouteRouteChildren =
+  {
+    Char123LocaleChar125SiteRoute: Char123LocaleChar125SiteRouteWithChildren,
+  }
+
+const Char123LocaleChar125RouteRouteWithChildren =
+  Char123LocaleChar125RouteRoute._addFileChildren(
+    Char123LocaleChar125RouteRouteChildren,
+  )
 
 interface AdminDashboardRouteChildren {
   AdminDashboardGalleryRoute: typeof AdminDashboardGalleryRoute
@@ -480,7 +527,7 @@ const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  SiteRoute: SiteRouteWithChildren,
+  Char123LocaleChar125RouteRoute: Char123LocaleChar125RouteRouteWithChildren,
   AdminDashboardRoute: AdminDashboardRouteWithChildren,
   AdminSignInRoute: AdminSignInRoute,
   ApiHealthRoute: ApiHealthRoute,

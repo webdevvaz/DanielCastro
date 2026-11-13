@@ -28,7 +28,7 @@ function SiteLayout() {
  * waits for it so the server renders the final menu: without it, News would appear after the page
  * loads and move the other links. When the check fails, the menu leaves News out.
  */
-export const Route = createFileRoute("/_site")({
+export const Route = createFileRoute("/{-$locale}/_site")({
   context: () => ({ upcomingGuestSpotsQueryOptions, newsStatusQueryOptions }),
   loader: async ({ context }) => {
     void context.queryClient.query(context.upcomingGuestSpotsQueryOptions).catch(noop);

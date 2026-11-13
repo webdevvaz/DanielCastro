@@ -16,11 +16,14 @@ export function AdminTravelPage() {
       </p>
       <h1>Travel estimator</h1>
       <p className="lead">
-        The <Link to="/travel">travel page</Link> shows these typical prices for the bus, a rental
-        car, and Uber from the airport. Enter one-way and per-day prices; the page works out the
-        price for both ways and for the days of each trip. For hotels it shows live prices, and uses
-        the hotel prices here only when live prices are not available. Until you save them, it shows
-        links only.
+        The{" "}
+        <Link to="/{-$locale}/travel" params={{ locale: undefined }}>
+          travel page
+        </Link>{" "}
+        shows these typical prices for the bus, a rental car, and Uber from the airport. Enter
+        one-way and per-day prices; the page works out the price for both ways and for the days of
+        each trip. For hotels it shows live prices, and uses the hotel prices here only when live
+        prices are not available. Until you save them, it shows links only.
       </p>
 
       <section className="admin-section">

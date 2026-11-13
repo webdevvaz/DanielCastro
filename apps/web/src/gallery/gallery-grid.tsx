@@ -1,9 +1,9 @@
 import { useState } from "react";
 
+import { useSiteMessages } from "@/i18n/site-messages";
+
 import { photoUrl } from "./photo-files";
 import { PhotoViewer, type ViewerPhoto } from "./photo-viewer";
-
-const FALLBACK_ALT = "Tattoo by Daniel Castro";
 
 /** A photo's caption: its title, or the series when there is no title. */
 function Caption({ photo }: { photo: ViewerPhoto }) {
@@ -22,6 +22,8 @@ function Caption({ photo }: { photo: ViewerPhoto }) {
  * tall. A click on a photo shows it at full size on the same page, with its details.
  */
 export function GalleryGrid({ photos }: { photos: ReadonlyArray<ViewerPhoto> }) {
+  const t = useSiteMessages();
+
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
@@ -32,7 +34,7 @@ export function GalleryGrid({ photos }: { photos: ReadonlyArray<ViewerPhoto> }) 
             <button
               className="photo-open"
               type="button"
-              aria-label={`View ${photo.title ?? "photo"} at full size`}
+              aria-label={t.viewer.open(photo.title)}
               onClick={() => setOpenIndex(index)}
             >
               <img
@@ -41,7 +43,7 @@ export function GalleryGrid({ photos }: { photos: ReadonlyArray<ViewerPhoto> }) 
                 sizes="(max-width: 900px) 50vw, 30vw"
                 width={photo.width}
                 height={photo.height}
-                alt={photo.title ?? FALLBACK_ALT}
+                alt={photo.title ?? t.tattooAlt}
                 loading="lazy"
                 decoding="async"
               />
@@ -54,7 +56,7 @@ export function GalleryGrid({ photos }: { photos: ReadonlyArray<ViewerPhoto> }) 
         <PhotoViewer
           photos={photos}
           index={openIndex}
-          fallbackAlt={FALLBACK_ALT}
+          fallbackAlt={t.tattooAlt}
           onIndexChange={setOpenIndex}
           onClose={() => setOpenIndex(null)}
         />

@@ -1,25 +1,17 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 
-import { appConfig } from "@/app-config";
+import { useSiteMessages } from "@/i18n/site-messages";
+import { useLocale } from "@/i18n/use-locale";
 
 import { GalleryGrid } from "./gallery-grid";
+import { WORK_PAGE_TEXT } from "./work-page-text";
 
-/** Themes Daniel enjoys most, from the enquiry form. */
-const THEMES = [
-  "Anime",
-  "Films",
-  "Comic books",
-  "Video games",
-  "Mythologies",
-  "Dark fantasy",
-  "Gothic",
-  "Spooky",
-] as const;
-
-/** The Work page, the site's home page: the full gallery. */
+/** The Work page, the site's home page: the full gallery and the themes Daniel enjoys most. */
 export function GalleryPage() {
-  const context = useRouteContext({ from: "/_site/" });
+  const context = useRouteContext({ from: "/{-$locale}/_site/" });
+  const site = useSiteMessages();
+  const t = WORK_PAGE_TEXT[useLocale()];
 
   const { data: photos } = useSuspenseQuery(context.galleryQueryOptions);
 
@@ -29,21 +21,21 @@ export function GalleryPage() {
         <div className="page-head">
           <div>
             <p className="eyebrow">
-              <b>Work</b> Braga · Custom tattoos
+              <b>{t.eyebrow}</b> {t.eyebrowDetail}
             </p>
             <h1>
-              Characters you love, <em>drawn for skin.</em>
+              {t.headingFirst} <em>{t.headingSecond}</em>
             </h1>
           </div>
           <div>
-            <p className="lead">{appConfig.description}</p>
-            <p className="theme-list">{THEMES.join(" · ")}</p>
+            <p className="lead">{site.description}</p>
+            <p className="theme-list">{t.themes.join(" · ")}</p>
           </div>
         </div>
         {photos.length > 0 ? (
           <GalleryGrid photos={photos} />
         ) : (
-          <p className="empty-state">The gallery is being prepared. Come back soon.</p>
+          <p className="empty-state">{t.empty}</p>
         )}
       </div>
     </main>

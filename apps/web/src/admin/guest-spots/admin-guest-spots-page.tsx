@@ -68,7 +68,7 @@ export function AdminGuestSpotsPage() {
               {spots.map((spot) => (
                 <Fragment key={spot.id}>
                   <tr data-past={spot.endsOn < today}>
-                    <td>{formatDateRange(spot.startsOn, spot.endsOn)}</td>
+                    <td>{formatDateRange(spot.startsOn, spot.endsOn, "en")}</td>
                     <td>
                       {spot.city}, {spot.country}
                       <br />

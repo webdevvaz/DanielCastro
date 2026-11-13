@@ -47,7 +47,8 @@ function FieldFrame({ id, label, hint, errors, children }: FieldFrameProps) {
 
 /**
  * A one-line text input: text, email, password, or date. `suggestions` are offered while the
- * user types; any other text stays allowed.
+ * user types; any other text stays allowed. `errorText` replaces the schema's messages when the
+ * field has an error, for forms that show their errors in the page's language.
  */
 export function TextField({
   label,
@@ -56,11 +57,14 @@ export function TextField({
   autoComplete,
   placeholder,
   suggestions,
+  errorText,
 }: TextFieldProps) {
   const field = useFieldContext<string>();
   const id = useId();
 
-  const errors = useFieldErrors();
+  const fieldErrors = useFieldErrors();
+
+  const errors = errorText !== undefined && fieldErrors.length > 0 ? [errorText] : fieldErrors;
 
   const suggestionsId = suggestions === undefined ? undefined : `${id}-suggestions`;
 
@@ -189,6 +193,8 @@ type TextFieldProps = {
   readonly autoComplete?: string;
   readonly placeholder?: string;
   readonly suggestions?: ReadonlyArray<string>;
+  /** Shown instead of the schema's messages when the field has an error. */
+  readonly errorText?: string;
 };
 
 type NumberFieldProps = {

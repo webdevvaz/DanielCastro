@@ -2,12 +2,17 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 
 import { appConfig } from "@/app-config";
+import { useSiteMessages } from "@/i18n/site-messages";
+import { useLocale } from "@/i18n/use-locale";
 
 import { GuestSpotList } from "./guest-spot-list";
+import { GUEST_SPOTS_PAGE_TEXT } from "./guest-spots-page-text";
 
 /** The Guest spots page: the home studio in Braga and the upcoming guest spots. */
 export function GuestSpotsPage() {
-  const context = useRouteContext({ from: "/_site/guest-spots" });
+  const context = useRouteContext({ from: "/{-$locale}/_site/guest-spots" });
+  const site = useSiteMessages();
+  const t = GUEST_SPOTS_PAGE_TEXT[useLocale()];
 
   const { data: spots } = useSuspenseQuery(context.upcomingGuestSpotsQueryOptions);
 
@@ -17,43 +22,41 @@ export function GuestSpotsPage() {
         <div className="page-head">
           <div>
             <p className="eyebrow">
-              <b>Guest spots</b> On the road
+              <b>{site.nav.guestSpots}</b> {t.eyebrowDetail}
             </p>
             <h1>
-              Daniel <em>on the road.</em>
+              {t.headingFirst} <em>{t.headingSecond}</em>
             </h1>
           </div>
-          <p className="lead">
-            Sessions in Braga and in other studios across Europe. Choose the city in your enquiry.
-          </p>
+          <p className="lead">{t.lead}</p>
         </div>
 
         <div className="studio-card">
           <div>
-            <p className="eyebrow">Home studio</p>
-            <h2>Braga, Portugal</h2>
+            <p className="eyebrow">{t.homeStudio}</p>
+            <h2>{t.homeCity}</h2>
             <p className="muted">
-              {appConfig.studio.name} · {appConfig.studio.addressLines.join(", ")} · By appointment
-              only
+              {appConfig.studio.name} · {appConfig.studio.addressLines.join(", ")} ·{" "}
+              {site.contact.byAppointment}
             </p>
           </div>
           <a className="btn btn-ghost" href={appConfig.links.map} target="_blank" rel="noreferrer">
-            Open in Google Maps
+            {t.openMap}
           </a>
         </div>
 
-        <h2 className="page-subtitle">Upcoming guest spots</h2>
+        <h2 className="page-subtitle">{t.upcoming}</h2>
         <GuestSpotList spots={spots} />
 
         <div className="page-cta">
-          <p>Choose Braga or a guest spot city in your enquiry.</p>
+          <p>{t.cta}</p>
           <a
             className="btn btn-red"
             href={appConfig.links.enquiry}
             target="_blank"
             rel="noreferrer"
           >
-            Book a session
+            {site.bookSession}
           </a>
         </div>
       </div>

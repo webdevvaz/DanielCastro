@@ -295,6 +295,38 @@ h2 em {
   color: var(--bone);
 }
 
+.language-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.language-switcher a {
+  padding: 4px 0;
+}
+
+.language-switcher a:hover {
+  color: var(--bone);
+}
+
+.language-switcher a[aria-current="true"] {
+  color: var(--bone);
+  box-shadow: inset 0 -2px var(--red);
+}
+
+.language-switcher-compact {
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin: 0 12px 0 auto;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
 .site-main {
   display: flex;
   flex-direction: column;
@@ -388,6 +420,10 @@ h2 em {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px;
   list-style: none;
+}
+
+.book-note {
+  margin-top: 20px;
 }
 
 .book-steps li {

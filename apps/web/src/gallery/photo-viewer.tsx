@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 
 import type { getGallery } from "@/server/gallery/gallery.functions";
 
+import { useSiteMessages } from "@/i18n/site-messages";
+
 import { photoUrl } from "./photo-files";
 
 /** The photo's title, then its series and placement. Empty for a photo without details. */
@@ -22,6 +24,8 @@ function PhotoDetails({ photo }: { photo: ViewerPhoto }) {
  * closes it. The thumbnail, already loaded by the grid, shows until the large file arrives.
  */
 export function PhotoViewer({ photos, index, fallbackAlt, onIndexChange, onClose }: Props) {
+  const t = useSiteMessages();
+
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -74,7 +78,12 @@ export function PhotoViewer({ photos, index, fallbackAlt, onIndexChange, onClose
           </small>
         </figcaption>
       </figure>
-      <button className="photo-viewer-close" type="button" aria-label="Close" onClick={close}>
+      <button
+        className="photo-viewer-close"
+        type="button"
+        aria-label={t.viewer.close}
+        onClick={close}
+      >
         ×
       </button>
       {photos.length > 1 ? (
@@ -83,7 +92,7 @@ export function PhotoViewer({ photos, index, fallbackAlt, onIndexChange, onClose
             className="photo-viewer-step"
             data-direction="previous"
             type="button"
-            aria-label="Previous photo"
+            aria-label={t.viewer.previous}
             disabled={!hasPrevious}
             onClick={() => show(index - 1)}
           >
@@ -93,7 +102,7 @@ export function PhotoViewer({ photos, index, fallbackAlt, onIndexChange, onClose
             className="photo-viewer-step"
             data-direction="next"
             type="button"
-            aria-label="Next photo"
+            aria-label={t.viewer.next}
             disabled={!hasNext}
             onClick={() => show(index + 1)}
           >

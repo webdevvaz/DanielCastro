@@ -1,24 +1,22 @@
 import type { getTripEstimate } from "@/server/travel/travel.functions";
 
 import { formatDateRange } from "@/components/format-date-range";
+import { RichText } from "@/i18n/rich-text";
+import { useLocale } from "@/i18n/use-locale";
 
 import { bookingHotelUrl, bookingUrl } from "./travel-links";
-import { euros, formatNights } from "./trip-format";
-
-/** What the hotel card says when it has no live prices to list. */
-const HOTEL_MESSAGES = {
-  loading: "Looking up live hotel prices…",
-  none: "No rooms found for these dates.",
-  unavailable: "Live hotel prices are not available right now.",
-  past: "These dates have passed.",
-} as const;
+import { TRAVEL_TEXT } from "./travel-text";
+import { euroRange, eurosIn } from "./trip-format";
 
 function HotelOption({ hotel, stay }: HotelOptionProps) {
-  const details = [`${euros.format(hotel.pricePerNightEuros)} a night`];
+  const locale = useLocale();
+  const t = TRAVEL_TEXT[locale].hotels;
 
-  if (hotel.stars !== null) details.push(`${hotel.stars} stars`);
+  const details = [t.perNight(eurosIn(locale).format(hotel.pricePerNightEuros))];
 
-  if (hotel.rating !== null) details.push(`rated ${hotel.rating.toFixed(1)}`);
+  if (hotel.stars !== null) details.push(t.stars(hotel.stars));
+
+  if (hotel.rating !== null) details.push(t.rated(hotel.rating.toFixed(1)));
 
   return (
     <li className="trip-option">
@@ -26,7 +24,7 @@ function HotelOption({ hotel, stay }: HotelOptionProps) {
         <b>{hotel.name}</b>
         <span>{details.join(" · ")}</span>
       </div>
-      <a href={bookingHotelUrl(hotel.name, stay)} target="_blank" rel="noreferrer">
+      <a href={bookingHotelUrl(hotel.name, stay, locale)} target="_blank" rel="noreferrer">
         Booking.com
       </a>
     </li>
@@ -35,27 +33,39 @@ function HotelOption({ hotel, stay }: HotelOptionProps) {
 
 /** The nights the hotel prices are for: the visitor's dates, or the example trip. */
 function StayDatesLine({ tripDates }: { tripDates: TripDates }) {
-  const range = formatDateRange(tripDates.outbound, tripDates.return);
+  const locale = useLocale();
+  const t = TRAVEL_TEXT[locale].hotels;
 
-  if (!tripDates.example) return <p className="field-hint">For {range}</p>;
+  const range = formatDateRange(tripDates.outbound, tripDates.return, locale);
 
-  return <p className="field-hint">Example stay, {range}. Add your dates for your own prices.</p>;
+  return (
+    <p className="field-hint">{tripDates.example ? t.exampleStay(range) : t.forDates(range)}</p>
+  );
 }
 
 /** The live hotels and their average, for the nights of the stay. */
 function LiveHotels({ hotels, average, nights, stay }: LiveHotelsProps) {
+  const locale = useLocale();
+  const text = TRAVEL_TEXT[locale];
+  const euros = eurosIn(locale);
+
   return (
     <>
-      <p className="field-hint">The cheapest with 3 stars or more and good reviews.</p>
+      <p className="field-hint">{text.hotels.cheapest}</p>
       <ul className="trip-options">
         {hotels.map((hotel) => (
           <HotelOption key={hotel.name} hotel={hotel} stay={stay} />
         ))}
       </ul>
       <p>
-        Average <b>{euros.format(average)}</b> a night,{" "}
-        <span className="trip-range">{euros.format(average * nights)}</span> for{" "}
-        {formatNights(nights)}.
+        <RichText
+          template={text.hotels.average}
+          values={{
+            average: <b>{euros.format(average)}</b>,
+            total: <span className="trip-range">{euros.format(average * nights)}</span>,
+            nights: text.nights(nights),
+          }}
+        />
       </p>
     </>
   );
@@ -74,36 +84,44 @@ export function HotelCard({
   tripDates,
   stay,
 }: HotelCardProps) {
+  const locale = useLocale();
+  const t = TRAVEL_TEXT[locale].hotels;
+
   // There is an average exactly when live hotels were found.
   const live = average === null ? null : { hotels, average };
   const typical = live === null && status !== "loading" ? settings : null;
 
   return (
     <article className="trip-card">
-      <h3>Stay in Braga</h3>
+      <h3>{t.title}</h3>
       {tripDates === null ? null : <StayDatesLine tripDates={tripDates} />}
       {live === null ? (
-        <p>{HOTEL_MESSAGES[status === "found" ? "none" : status]}</p>
+        <p>{t[status === "found" ? "none" : status]}</p>
       ) : (
         <LiveHotels hotels={live.hotels} average={live.average} nights={nights} stay={stay} />
       )}
       {typical === null ? null : (
         <p>
-          Hotels from <b>{euros.format(typical.hotelFromEuros)}</b> a night; most cost{" "}
-          <span className="trip-range">
-            {euros.format(typical.hotelTypicalMinEuros)}–
-            {euros.format(typical.hotelTypicalMaxEuros)}
-          </span>
-          .
+          <RichText
+            template={t.typical}
+            values={{
+              from: <b>{eurosIn(locale).format(typical.hotelFromEuros)}</b>,
+              range: (
+                <span className="trip-range">
+                  {euroRange(locale, typical.hotelTypicalMinEuros, typical.hotelTypicalMaxEuros)}
+                </span>
+              ),
+            }}
+          />
         </p>
       )}
       <a
         className="btn btn-ghost btn-small"
-        href={bookingUrl(stay)}
+        href={bookingUrl(stay, locale)}
         target="_blank"
         rel="noreferrer"
       >
-        Search Booking.com
+        {t.search}
       </a>
     </article>
   );

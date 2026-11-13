@@ -1,7 +1,27 @@
+import type { Locale } from "@/i18n/locales";
+
 import { appConfig } from "@/app-config";
 
 /** Porto airport: Google Flights reads the code in its search text. */
 const DESTINATION_AIRPORT = "OPO";
+
+/** The language of Google's pages (`hl`), per site language. */
+const GOOGLE_LANGUAGES: Record<Locale, string> = {
+  en: "en",
+  pt: "pt-PT",
+  fr: "fr",
+  de: "de",
+  es: "es",
+};
+
+/** The language of Booking.com's pages (`lang`), per site language. */
+const BOOKING_LANGUAGES: Record<Locale, string> = {
+  en: "en-gb",
+  pt: "pt-pt",
+  fr: "fr",
+  de: "de",
+  es: "es",
+};
 
 const [studioLatitude = "", studioLongitude = ""] = appConfig.studio.coordinates.split(",");
 
@@ -25,10 +45,11 @@ export const UBER_TO_STUDIO_URL = `https://m.uber.com/ul/?${new URLSearchParams(
 }).toString()}`;
 
 /**
- * Google Flights with the route, and the dates when the visitor gave them, already in the search.
- * Google reads `from` as free text, so a city it knows works even when the city search does not.
+ * Google Flights with the route, and the dates when the visitor gave them, already in the search,
+ * in the site's language. Google reads `from` as free text, so a city it knows works even when the
+ * city search does not. The search text stays in English, which Google reads in every language.
  */
-export const googleFlightsUrl = (trip: TripText) => {
+export const googleFlightsUrl = (trip: TripText, locale: Locale) => {
   const url = new URL("https://www.google.com/travel/flights");
 
   let search = `Flights to ${DESTINATION_AIRPORT} from ${trip.from}`;
@@ -39,19 +60,20 @@ export const googleFlightsUrl = (trip: TripText) => {
 
   url.searchParams.set("q", search);
   url.searchParams.set("curr", "EUR");
-  url.searchParams.set("hl", "en");
+  url.searchParams.set("hl", GOOGLE_LANGUAGES[locale]);
 
   return url.toString();
 };
 
 /** Booking.com hotels in Braga, for the visitor's nights when they gave dates. */
-export const bookingUrl = (trip: TripText) => {
+export const bookingUrl = (trip: TripText, locale: Locale) => {
   const url = new URL("https://www.booking.com/searchresults.html");
 
   url.searchParams.set("ss", "Braga, Portugal");
   url.searchParams.set("group_adults", "1");
   url.searchParams.set("no_rooms", "1");
   url.searchParams.set("selected_currency", "EUR");
+  url.searchParams.set("lang", BOOKING_LANGUAGES[locale]);
 
   if (trip.arrive !== undefined && trip.leave !== undefined) {
     url.searchParams.set("checkin", trip.arrive);
@@ -62,8 +84,8 @@ export const bookingUrl = (trip: TripText) => {
 };
 
 /** One hotel on Booking.com, for the nights of the stay when they are known. */
-export const bookingHotelUrl = (hotelName: string, trip: TripText) => {
-  const url = new URL(bookingUrl(trip));
+export const bookingHotelUrl = (hotelName: string, trip: TripText, locale: Locale) => {
+  const url = new URL(bookingUrl(trip, locale));
 
   url.searchParams.set("ss", `${hotelName}, Braga`);
 
