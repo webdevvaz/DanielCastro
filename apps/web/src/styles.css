@@ -1322,6 +1322,20 @@ html:has(.photo-viewer[open]) {
   margin: -10px 0 16px;
 }
 
+.news-status {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--muted);
+  background: var(--ink-2);
+  font-size: 14px;
+}
+
+.news-status[data-live="true"] {
+  border-left-color: var(--ok);
+}
+
 .panel {
   padding: 24px;
   background: var(--ink-2);

@@ -81,6 +81,19 @@ const recentPosts = Effect.gen(function* () {
 });
 
 /**
+ * Whether the News page is live: an account is connected and its token has not expired. It reads
+ * only the stored connection, without calling Instagram, because every public page asks it to
+ * decide whether the menu shows News.
+ */
+export const getNewsStatus = Effect.gen(function* () {
+  const connection = yield* getInstagramConnection();
+
+  const live = connection !== null && isAfter(connection.tokenExpiresAt, new Date());
+
+  return { live };
+}).pipe(Effect.withSpan("getNewsStatus"));
+
+/**
  * Daniel's latest Instagram posts for the News page. Instagram being down, or no account being
  * connected, is a status and not a failure, so the page can link to Instagram instead.
  */

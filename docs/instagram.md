@@ -2,6 +2,8 @@
 
 The News page (`/news`) shows Daniel's latest Instagram posts. An admin connects Daniel's account once at `/admin/instagram`; after that the site works by itself:
 
+- The menu shows **News only while it is live**: while an account is connected and its token has not expired. Connecting puts the tab in the menu; disconnecting, or an expired token, takes it out. The admin page shows the status ("News page: live" or "hidden"). The check reads the stored connection only, so it costs every public page one small database read and no Instagram request.
+
 - It keeps the access token in the database, and renews it when fewer than 30 days of its 60 are left and it is at least a day old. A renewal happens when someone opens the News page or the admin page, so the token expires only when nobody opens either page for about 60 days. The admin page then says so, and "Connect again" fixes it.
 - It reads the posts again every 15 minutes, because Instagram's image addresses expire. When Instagram fails, the News page links to Instagram and does not break.
 - "Add to gallery" on the admin page copies a post's photo into the gallery (for an album, its first photo). Videos cannot be added. A post can be in the gallery only once.

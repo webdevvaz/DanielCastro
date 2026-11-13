@@ -8,8 +8,14 @@ import {
   disconnectInstagram as disconnectInstagramEffect,
   getInstagramAdminView,
   getNewsFeed as getNewsFeedEffect,
+  getNewsStatus as getNewsStatusEffect,
   importInstagramPost as importInstagramPostEffect,
 } from "./instagram.server";
+
+/** Whether the News page is live, so the menu shows it only then. Public. */
+export const getNewsStatus = createServerFn({ method: "GET" }).handler(() =>
+  runServerEffect(getNewsStatusEffect),
+);
 
 /** Daniel's latest Instagram posts for the News page. Public. */
 export const getNewsFeed = createServerFn({ method: "GET" }).handler(() =>

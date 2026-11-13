@@ -42,10 +42,10 @@ export function InstagramAccount({ view }: { view: InstagramAdminView }) {
   if (!view.configured) {
     return (
       <div className="panel">
-        <p>Instagram is not set up on the server yet.</p>
+        <p>Instagram is not switched on for this site yet.</p>
         <p className="field-hint">
-          Set <code>INSTAGRAM_APP_ID</code> and <code>INSTAGRAM_APP_SECRET</code> from the Meta app.
-          The setup guide is in <code>docs/instagram.md</code>.
+          Your web developer finishes a one-time setup with Meta. After that, a &ldquo;Connect
+          Instagram&rdquo; button appears here.
         </p>
       </div>
     );
@@ -57,7 +57,8 @@ export function InstagramAccount({ view }: { view: InstagramAdminView }) {
         <div>
           <p>No account is connected.</p>
           <p className="field-hint">
-            Instagram asks you to log in. Log in with Daniel&apos;s account.
+            Instagram asks you to log in: use Daniel&apos;s account. When you come back here, the
+            News page is live.
           </p>
         </div>
         <ConnectButton label="Connect Instagram" />

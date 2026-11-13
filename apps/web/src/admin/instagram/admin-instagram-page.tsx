@@ -18,6 +18,8 @@ export function AdminInstagramPage() {
 
   const { data: view } = useSuspenseQuery(context.adminInstagramQueryOptions);
 
+  const newsLive = view.connection !== null && !view.connection.expired;
+
   return (
     <>
       <p className="eyebrow">
@@ -30,10 +32,16 @@ export function AdminInstagramPage() {
         the gallery too, use &ldquo;Add to gallery&rdquo;.
       </p>
 
+      <p className="news-status" data-live={newsLive}>
+        {newsLive
+          ? "News page: live. Visitors see the News tab in the menu."
+          : "News page: hidden. The News tab appears in the menu once Instagram is connected."}
+      </p>
+
       {search.connect === "failed" ? (
         <p className="form-error" role="alert">
-          Instagram did not connect. Try again. If the problem continues, make sure that the account
-          is a professional account and that it is added to the Meta app.
+          Instagram did not connect. Try again. If the problem continues, ask your web developer to
+          check the Instagram setup.
         </p>
       ) : null}
 
