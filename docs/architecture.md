@@ -57,9 +57,12 @@ A server route (`apps/web/src/routes/api/`) runs its program with `runServerRout
 | `Auth`           | `@daniel/auth` | `layer` (needs `Database`)         | Better Auth instance plus `call` and `getSession`                     |
 | Observability    | `apps/web`     | `ObservabilityLive`                | Log format and level, optional OTLP export                            |
 | `RequestHeaders` | `apps/web`     | provided by `runServerEffect`      | The current request's headers                                         |
-| `PhotoStorage`   | `apps/web`     | `PhotoStorageLive`                 | Gallery files in `PHOTO_STORAGE_DIR`                                  |
+| `PhotoStorage`   | `apps/web`     | `PhotoStorageLive`                 | Gallery and enquiry photos in `PHOTO_STORAGE_DIR`                     |
 | `TravelData`     | `apps/web`     | `TravelDataLive` (HTTP client)     | City search and average fares (Travelpayouts), hotel prices (SerpApi) |
 | `InstagramApi`   | `apps/web`     | `InstagramApiLive` (HTTP client)   | Instagram Login, tokens, posts (`docs/instagram.md`)                  |
+| `Shopify`        | `apps/web`     | `ShopifyLive` (HTTP client)        | Necrotic Wear products and checkouts (Storefront API)                 |
+| `Resend`         | `apps/web`     | `ResendLive` (HTTP client)         | Sends enquiry emails with the key an admin saved                      |
+| `SecretBox`      | `apps/web`     | `SecretBoxLive`                    | Encrypts secrets that admins enter (`BETTER_AUTH_SECRET` derives key) |
 
 To add a service, write a `Context.Service` class with a `layer`, and add it to `AppLive`. Its type flows into `AppServices`, so every server program can use it. Do not call `Effect.provide` inside services.
 

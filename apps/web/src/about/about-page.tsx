@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 
-import { appConfig } from "@/app-config";
 import { localeParam } from "@/i18n/locales";
 import { useSiteMessages } from "@/i18n/site-messages";
 import { useLocale } from "@/i18n/use-locale";
@@ -79,14 +78,13 @@ export function AboutPage() {
 
         <div className="page-cta">
           <p>{t.cta}</p>
-          <a
+          <Link
             className="btn btn-red"
-            href={appConfig.links.enquiry}
-            target="_blank"
-            rel="noreferrer"
+            to="/{-$locale}/enquiry"
+            params={{ locale: localeParam(locale) }}
           >
             {site.bookSession}
-          </a>
+          </Link>
         </div>
       </div>
     </main>

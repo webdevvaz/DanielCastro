@@ -17,21 +17,27 @@ import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiReadyRouteImport } from './routes/api/ready'
 import { Route as Char123LocaleChar125SiteRouteImport } from './routes/{-$locale}/_site'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/_dashboard/index'
+import { Route as AdminDashboardEmailRouteImport } from './routes/admin/_dashboard/email'
 import { Route as AdminDashboardGalleryRouteImport } from './routes/admin/_dashboard/gallery'
 import { Route as AdminDashboardGuestSpotsRouteImport } from './routes/admin/_dashboard/guest-spots'
 import { Route as AdminDashboardInstagramRouteImport } from './routes/admin/_dashboard/instagram'
 import { Route as AdminDashboardTravelRouteImport } from './routes/admin/_dashboard/travel'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiEnquiryPhotosSplatRouteImport } from './routes/api/enquiry-photos/$'
 import { Route as ApiInstagramCallbackRouteImport } from './routes/api/instagram/callback'
 import { Route as ApiInstagramConnectRouteImport } from './routes/api/instagram/connect'
 import { Route as ApiPhotosSplatRouteImport } from './routes/api/photos/$'
 import { Route as Char123LocaleChar125SiteIndexRouteImport } from './routes/{-$locale}/_site/index'
 import { Route as Char123LocaleChar125SiteAboutRouteImport } from './routes/{-$locale}/_site/about'
 import { Route as Char123LocaleChar125SiteAftercareRouteImport } from './routes/{-$locale}/_site/aftercare'
+import { Route as Char123LocaleChar125SiteEnquiryRouteImport } from './routes/{-$locale}/_site/enquiry'
 import { Route as Char123LocaleChar125SiteGuestSpotsRouteImport } from './routes/{-$locale}/_site/guest-spots'
 import { Route as Char123LocaleChar125SiteHowToBookRouteImport } from './routes/{-$locale}/_site/how-to-book'
 import { Route as Char123LocaleChar125SiteNewsRouteImport } from './routes/{-$locale}/_site/news'
+import { Route as Char123LocaleChar125SitePrivacyRouteImport } from './routes/{-$locale}/_site/privacy'
 import { Route as Char123LocaleChar125SiteTravelRouteImport } from './routes/{-$locale}/_site/travel'
+import { Route as AdminDashboardEnquiriesIndexRouteImport } from './routes/admin/_dashboard/enquiries/index'
+import { Route as AdminDashboardEnquiriesIdRouteImport } from './routes/admin/_dashboard/enquiries/$id'
 import { Route as Char123LocaleChar125SiteShopIndexRouteImport } from './routes/{-$locale}/_site/shop/index'
 import { Route as Char123LocaleChar125SiteShopHandleRouteImport } from './routes/{-$locale}/_site/shop/$handle'
 
@@ -75,6 +81,11 @@ const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminDashboardRoute,
 } as any)
+const AdminDashboardEmailRoute = AdminDashboardEmailRouteImport.update({
+  id: '/email',
+  path: '/email',
+  getParentRoute: () => AdminDashboardRoute,
+} as any)
 const AdminDashboardGalleryRoute = AdminDashboardGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -99,6 +110,11 @@ const AdminDashboardTravelRoute = AdminDashboardTravelRouteImport.update({
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEnquiryPhotosSplatRoute = ApiEnquiryPhotosSplatRouteImport.update({
+  id: '/api/enquiry-photos/$',
+  path: '/api/enquiry-photos/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiInstagramCallbackRoute = ApiInstagramCallbackRouteImport.update({
@@ -134,6 +150,12 @@ const Char123LocaleChar125SiteAftercareRoute =
     path: '/aftercare',
     getParentRoute: () => Char123LocaleChar125SiteRoute,
   } as any)
+const Char123LocaleChar125SiteEnquiryRoute =
+  Char123LocaleChar125SiteEnquiryRouteImport.update({
+    id: '/enquiry',
+    path: '/enquiry',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
 const Char123LocaleChar125SiteGuestSpotsRoute =
   Char123LocaleChar125SiteGuestSpotsRouteImport.update({
     id: '/guest-spots',
@@ -152,11 +174,29 @@ const Char123LocaleChar125SiteNewsRoute =
     path: '/news',
     getParentRoute: () => Char123LocaleChar125SiteRoute,
   } as any)
+const Char123LocaleChar125SitePrivacyRoute =
+  Char123LocaleChar125SitePrivacyRouteImport.update({
+    id: '/privacy',
+    path: '/privacy',
+    getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
 const Char123LocaleChar125SiteTravelRoute =
   Char123LocaleChar125SiteTravelRouteImport.update({
     id: '/travel',
     path: '/travel',
     getParentRoute: () => Char123LocaleChar125SiteRoute,
+  } as any)
+const AdminDashboardEnquiriesIndexRoute =
+  AdminDashboardEnquiriesIndexRouteImport.update({
+    id: '/enquiries/',
+    path: '/enquiries/',
+    getParentRoute: () => AdminDashboardRoute,
+  } as any)
+const AdminDashboardEnquiriesIdRoute =
+  AdminDashboardEnquiriesIdRouteImport.update({
+    id: '/enquiries/$id',
+    path: '/enquiries/$id',
+    getParentRoute: () => AdminDashboardRoute,
   } as any)
 const Char123LocaleChar125SiteShopIndexRoute =
   Char123LocaleChar125SiteShopIndexRouteImport.update({
@@ -177,23 +217,29 @@ export interface FileRoutesByFullPath {
   '/admin/sign-in': typeof AdminSignInRoute
   '/api/health': typeof ApiHealthRoute
   '/api/ready': typeof ApiReadyRoute
+  '/admin/email': typeof AdminDashboardEmailRoute
   '/admin/gallery': typeof AdminDashboardGalleryRoute
   '/admin/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/instagram': typeof AdminDashboardInstagramRoute
   '/admin/travel': typeof AdminDashboardTravelRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/enquiry-photos/$': typeof ApiEnquiryPhotosSplatRoute
   '/api/instagram/callback': typeof ApiInstagramCallbackRoute
   '/api/instagram/connect': typeof ApiInstagramConnectRoute
   '/api/photos/$': typeof ApiPhotosSplatRoute
   '/{-$locale}/about': typeof Char123LocaleChar125SiteAboutRoute
   '/{-$locale}/aftercare': typeof Char123LocaleChar125SiteAftercareRoute
+  '/{-$locale}/enquiry': typeof Char123LocaleChar125SiteEnquiryRoute
   '/{-$locale}/guest-spots': typeof Char123LocaleChar125SiteGuestSpotsRoute
   '/{-$locale}/how-to-book': typeof Char123LocaleChar125SiteHowToBookRoute
   '/{-$locale}/news': typeof Char123LocaleChar125SiteNewsRoute
+  '/{-$locale}/privacy': typeof Char123LocaleChar125SitePrivacyRoute
   '/{-$locale}/travel': typeof Char123LocaleChar125SiteTravelRoute
   '/admin/': typeof AdminDashboardIndexRoute
   '/{-$locale}/': typeof Char123LocaleChar125SiteIndexRoute
+  '/admin/enquiries/$id': typeof AdminDashboardEnquiriesIdRoute
   '/{-$locale}/shop/$handle': typeof Char123LocaleChar125SiteShopHandleRoute
+  '/admin/enquiries/': typeof AdminDashboardEnquiriesIndexRoute
   '/{-$locale}/shop/': typeof Char123LocaleChar125SiteShopIndexRoute
 }
 export interface FileRoutesByTo {
@@ -202,21 +248,27 @@ export interface FileRoutesByTo {
   '/admin/sign-in': typeof AdminSignInRoute
   '/api/health': typeof ApiHealthRoute
   '/api/ready': typeof ApiReadyRoute
+  '/admin/email': typeof AdminDashboardEmailRoute
   '/admin/gallery': typeof AdminDashboardGalleryRoute
   '/admin/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/instagram': typeof AdminDashboardInstagramRoute
   '/admin/travel': typeof AdminDashboardTravelRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/enquiry-photos/$': typeof ApiEnquiryPhotosSplatRoute
   '/api/instagram/callback': typeof ApiInstagramCallbackRoute
   '/api/instagram/connect': typeof ApiInstagramConnectRoute
   '/api/photos/$': typeof ApiPhotosSplatRoute
   '/{-$locale}/about': typeof Char123LocaleChar125SiteAboutRoute
   '/{-$locale}/aftercare': typeof Char123LocaleChar125SiteAftercareRoute
+  '/{-$locale}/enquiry': typeof Char123LocaleChar125SiteEnquiryRoute
   '/{-$locale}/guest-spots': typeof Char123LocaleChar125SiteGuestSpotsRoute
   '/{-$locale}/how-to-book': typeof Char123LocaleChar125SiteHowToBookRoute
   '/{-$locale}/news': typeof Char123LocaleChar125SiteNewsRoute
+  '/{-$locale}/privacy': typeof Char123LocaleChar125SitePrivacyRoute
   '/{-$locale}/travel': typeof Char123LocaleChar125SiteTravelRoute
+  '/admin/enquiries/$id': typeof AdminDashboardEnquiriesIdRoute
   '/{-$locale}/shop/$handle': typeof Char123LocaleChar125SiteShopHandleRoute
+  '/admin/enquiries': typeof AdminDashboardEnquiriesIndexRoute
   '/{-$locale}/shop': typeof Char123LocaleChar125SiteShopIndexRoute
 }
 export interface FileRoutesById {
@@ -228,23 +280,29 @@ export interface FileRoutesById {
   '/api/health': typeof ApiHealthRoute
   '/api/ready': typeof ApiReadyRoute
   '/{-$locale}/_site': typeof Char123LocaleChar125SiteRouteWithChildren
+  '/admin/_dashboard/email': typeof AdminDashboardEmailRoute
   '/admin/_dashboard/gallery': typeof AdminDashboardGalleryRoute
   '/admin/_dashboard/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/_dashboard/instagram': typeof AdminDashboardInstagramRoute
   '/admin/_dashboard/travel': typeof AdminDashboardTravelRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/enquiry-photos/$': typeof ApiEnquiryPhotosSplatRoute
   '/api/instagram/callback': typeof ApiInstagramCallbackRoute
   '/api/instagram/connect': typeof ApiInstagramConnectRoute
   '/api/photos/$': typeof ApiPhotosSplatRoute
   '/{-$locale}/_site/about': typeof Char123LocaleChar125SiteAboutRoute
   '/{-$locale}/_site/aftercare': typeof Char123LocaleChar125SiteAftercareRoute
+  '/{-$locale}/_site/enquiry': typeof Char123LocaleChar125SiteEnquiryRoute
   '/{-$locale}/_site/guest-spots': typeof Char123LocaleChar125SiteGuestSpotsRoute
   '/{-$locale}/_site/how-to-book': typeof Char123LocaleChar125SiteHowToBookRoute
   '/{-$locale}/_site/news': typeof Char123LocaleChar125SiteNewsRoute
+  '/{-$locale}/_site/privacy': typeof Char123LocaleChar125SitePrivacyRoute
   '/{-$locale}/_site/travel': typeof Char123LocaleChar125SiteTravelRoute
   '/admin/_dashboard/': typeof AdminDashboardIndexRoute
   '/{-$locale}/_site/': typeof Char123LocaleChar125SiteIndexRoute
+  '/admin/_dashboard/enquiries/$id': typeof AdminDashboardEnquiriesIdRoute
   '/{-$locale}/_site/shop/$handle': typeof Char123LocaleChar125SiteShopHandleRoute
+  '/admin/_dashboard/enquiries/': typeof AdminDashboardEnquiriesIndexRoute
   '/{-$locale}/_site/shop/': typeof Char123LocaleChar125SiteShopIndexRoute
 }
 export interface FileRouteTypes {
@@ -255,23 +313,29 @@ export interface FileRouteTypes {
     | '/admin/sign-in'
     | '/api/health'
     | '/api/ready'
+    | '/admin/email'
     | '/admin/gallery'
     | '/admin/guest-spots'
     | '/admin/instagram'
     | '/admin/travel'
     | '/api/auth/$'
+    | '/api/enquiry-photos/$'
     | '/api/instagram/callback'
     | '/api/instagram/connect'
     | '/api/photos/$'
     | '/{-$locale}/about'
     | '/{-$locale}/aftercare'
+    | '/{-$locale}/enquiry'
     | '/{-$locale}/guest-spots'
     | '/{-$locale}/how-to-book'
     | '/{-$locale}/news'
+    | '/{-$locale}/privacy'
     | '/{-$locale}/travel'
     | '/admin/'
     | '/{-$locale}/'
+    | '/admin/enquiries/$id'
     | '/{-$locale}/shop/$handle'
+    | '/admin/enquiries/'
     | '/{-$locale}/shop/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -280,21 +344,27 @@ export interface FileRouteTypes {
     | '/admin/sign-in'
     | '/api/health'
     | '/api/ready'
+    | '/admin/email'
     | '/admin/gallery'
     | '/admin/guest-spots'
     | '/admin/instagram'
     | '/admin/travel'
     | '/api/auth/$'
+    | '/api/enquiry-photos/$'
     | '/api/instagram/callback'
     | '/api/instagram/connect'
     | '/api/photos/$'
     | '/{-$locale}/about'
     | '/{-$locale}/aftercare'
+    | '/{-$locale}/enquiry'
     | '/{-$locale}/guest-spots'
     | '/{-$locale}/how-to-book'
     | '/{-$locale}/news'
+    | '/{-$locale}/privacy'
     | '/{-$locale}/travel'
+    | '/admin/enquiries/$id'
     | '/{-$locale}/shop/$handle'
+    | '/admin/enquiries'
     | '/{-$locale}/shop'
   id:
     | '__root__'
@@ -305,23 +375,29 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/ready'
     | '/{-$locale}/_site'
+    | '/admin/_dashboard/email'
     | '/admin/_dashboard/gallery'
     | '/admin/_dashboard/guest-spots'
     | '/admin/_dashboard/instagram'
     | '/admin/_dashboard/travel'
     | '/api/auth/$'
+    | '/api/enquiry-photos/$'
     | '/api/instagram/callback'
     | '/api/instagram/connect'
     | '/api/photos/$'
     | '/{-$locale}/_site/about'
     | '/{-$locale}/_site/aftercare'
+    | '/{-$locale}/_site/enquiry'
     | '/{-$locale}/_site/guest-spots'
     | '/{-$locale}/_site/how-to-book'
     | '/{-$locale}/_site/news'
+    | '/{-$locale}/_site/privacy'
     | '/{-$locale}/_site/travel'
     | '/admin/_dashboard/'
     | '/{-$locale}/_site/'
+    | '/admin/_dashboard/enquiries/$id'
     | '/{-$locale}/_site/shop/$handle'
+    | '/admin/_dashboard/enquiries/'
     | '/{-$locale}/_site/shop/'
   fileRoutesById: FileRoutesById
 }
@@ -331,6 +407,7 @@ export interface RootRouteChildren {
   ApiHealthRoute: typeof ApiHealthRoute
   ApiReadyRoute: typeof ApiReadyRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiEnquiryPhotosSplatRoute: typeof ApiEnquiryPhotosSplatRoute
   ApiInstagramCallbackRoute: typeof ApiInstagramCallbackRoute
   ApiInstagramConnectRoute: typeof ApiInstagramConnectRoute
   ApiPhotosSplatRoute: typeof ApiPhotosSplatRoute
@@ -394,6 +471,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardIndexRouteImport
       parentRoute: typeof AdminDashboardRoute
     }
+    '/admin/_dashboard/email': {
+      id: '/admin/_dashboard/email'
+      path: '/email'
+      fullPath: '/admin/email'
+      preLoaderRoute: typeof AdminDashboardEmailRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
     '/admin/_dashboard/gallery': {
       id: '/admin/_dashboard/gallery'
       path: '/gallery'
@@ -427,6 +511,13 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/enquiry-photos/$': {
+      id: '/api/enquiry-photos/$'
+      path: '/api/enquiry-photos/$'
+      fullPath: '/api/enquiry-photos/$'
+      preLoaderRoute: typeof ApiEnquiryPhotosSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/instagram/callback': {
@@ -471,6 +562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125SiteAftercareRouteImport
       parentRoute: typeof Char123LocaleChar125SiteRoute
     }
+    '/{-$locale}/_site/enquiry': {
+      id: '/{-$locale}/_site/enquiry'
+      path: '/enquiry'
+      fullPath: '/{-$locale}/enquiry'
+      preLoaderRoute: typeof Char123LocaleChar125SiteEnquiryRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
     '/{-$locale}/_site/guest-spots': {
       id: '/{-$locale}/_site/guest-spots'
       path: '/guest-spots'
@@ -492,12 +590,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125SiteNewsRouteImport
       parentRoute: typeof Char123LocaleChar125SiteRoute
     }
+    '/{-$locale}/_site/privacy': {
+      id: '/{-$locale}/_site/privacy'
+      path: '/privacy'
+      fullPath: '/{-$locale}/privacy'
+      preLoaderRoute: typeof Char123LocaleChar125SitePrivacyRouteImport
+      parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
     '/{-$locale}/_site/travel': {
       id: '/{-$locale}/_site/travel'
       path: '/travel'
       fullPath: '/{-$locale}/travel'
       preLoaderRoute: typeof Char123LocaleChar125SiteTravelRouteImport
       parentRoute: typeof Char123LocaleChar125SiteRoute
+    }
+    '/admin/_dashboard/enquiries/': {
+      id: '/admin/_dashboard/enquiries/'
+      path: '/enquiries'
+      fullPath: '/admin/enquiries/'
+      preLoaderRoute: typeof AdminDashboardEnquiriesIndexRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
+    '/admin/_dashboard/enquiries/$id': {
+      id: '/admin/_dashboard/enquiries/$id'
+      path: '/enquiries/$id'
+      fullPath: '/admin/enquiries/$id'
+      preLoaderRoute: typeof AdminDashboardEnquiriesIdRouteImport
+      parentRoute: typeof AdminDashboardRoute
     }
     '/{-$locale}/_site/shop/': {
       id: '/{-$locale}/_site/shop/'
@@ -517,19 +636,25 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminDashboardRouteChildren {
+  AdminDashboardEmailRoute: typeof AdminDashboardEmailRoute
   AdminDashboardGalleryRoute: typeof AdminDashboardGalleryRoute
   AdminDashboardGuestSpotsRoute: typeof AdminDashboardGuestSpotsRoute
   AdminDashboardInstagramRoute: typeof AdminDashboardInstagramRoute
   AdminDashboardTravelRoute: typeof AdminDashboardTravelRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
+  AdminDashboardEnquiriesIdRoute: typeof AdminDashboardEnquiriesIdRoute
+  AdminDashboardEnquiriesIndexRoute: typeof AdminDashboardEnquiriesIndexRoute
 }
 
 const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
+  AdminDashboardEmailRoute: AdminDashboardEmailRoute,
   AdminDashboardGalleryRoute: AdminDashboardGalleryRoute,
   AdminDashboardGuestSpotsRoute: AdminDashboardGuestSpotsRoute,
   AdminDashboardInstagramRoute: AdminDashboardInstagramRoute,
   AdminDashboardTravelRoute: AdminDashboardTravelRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
+  AdminDashboardEnquiriesIdRoute: AdminDashboardEnquiriesIdRoute,
+  AdminDashboardEnquiriesIndexRoute: AdminDashboardEnquiriesIndexRoute,
 }
 
 const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(
@@ -553,9 +678,11 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 interface Char123LocaleChar125SiteRouteChildren {
   Char123LocaleChar125SiteAboutRoute: typeof Char123LocaleChar125SiteAboutRoute
   Char123LocaleChar125SiteAftercareRoute: typeof Char123LocaleChar125SiteAftercareRoute
+  Char123LocaleChar125SiteEnquiryRoute: typeof Char123LocaleChar125SiteEnquiryRoute
   Char123LocaleChar125SiteGuestSpotsRoute: typeof Char123LocaleChar125SiteGuestSpotsRoute
   Char123LocaleChar125SiteHowToBookRoute: typeof Char123LocaleChar125SiteHowToBookRoute
   Char123LocaleChar125SiteNewsRoute: typeof Char123LocaleChar125SiteNewsRoute
+  Char123LocaleChar125SitePrivacyRoute: typeof Char123LocaleChar125SitePrivacyRoute
   Char123LocaleChar125SiteTravelRoute: typeof Char123LocaleChar125SiteTravelRoute
   Char123LocaleChar125SiteIndexRoute: typeof Char123LocaleChar125SiteIndexRoute
   Char123LocaleChar125SiteShopHandleRoute: typeof Char123LocaleChar125SiteShopHandleRoute
@@ -567,11 +694,13 @@ const Char123LocaleChar125SiteRouteChildren: Char123LocaleChar125SiteRouteChildr
     Char123LocaleChar125SiteAboutRoute: Char123LocaleChar125SiteAboutRoute,
     Char123LocaleChar125SiteAftercareRoute:
       Char123LocaleChar125SiteAftercareRoute,
+    Char123LocaleChar125SiteEnquiryRoute: Char123LocaleChar125SiteEnquiryRoute,
     Char123LocaleChar125SiteGuestSpotsRoute:
       Char123LocaleChar125SiteGuestSpotsRoute,
     Char123LocaleChar125SiteHowToBookRoute:
       Char123LocaleChar125SiteHowToBookRoute,
     Char123LocaleChar125SiteNewsRoute: Char123LocaleChar125SiteNewsRoute,
+    Char123LocaleChar125SitePrivacyRoute: Char123LocaleChar125SitePrivacyRoute,
     Char123LocaleChar125SiteTravelRoute: Char123LocaleChar125SiteTravelRoute,
     Char123LocaleChar125SiteIndexRoute: Char123LocaleChar125SiteIndexRoute,
     Char123LocaleChar125SiteShopHandleRoute:
@@ -605,6 +734,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHealthRoute: ApiHealthRoute,
   ApiReadyRoute: ApiReadyRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiEnquiryPhotosSplatRoute: ApiEnquiryPhotosSplatRoute,
   ApiInstagramCallbackRoute: ApiInstagramCallbackRoute,
   ApiInstagramConnectRoute: ApiInstagramConnectRoute,
   ApiPhotosSplatRoute: ApiPhotosSplatRoute,

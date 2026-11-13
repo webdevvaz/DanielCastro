@@ -7,3 +7,5 @@ export * from "./guest-spots";
 export * from "./travel";
 
 export * from "./instagram";
+
+export * from "./enquiries";

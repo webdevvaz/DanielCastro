@@ -1,10 +1,13 @@
 import { Link } from "@tanstack/react-router";
 
 import { appConfig } from "@/app-config";
+import { localeParam } from "@/i18n/locales";
 import { useSiteMessages } from "@/i18n/site-messages";
+import { useLocale } from "@/i18n/use-locale";
 
 /** The studio address, email, and social links. The side menu and the phone footer show them. */
 export function SiteContact() {
+  const locale = useLocale();
   const t = useSiteMessages();
 
   return (
@@ -37,6 +40,11 @@ export function SiteContact() {
         </a>
         {" · "}
         <Link to="/admin">{t.contact.admin}</Link>
+      </p>
+      <p>
+        <Link to="/{-$locale}/privacy" params={{ locale: localeParam(locale) }}>
+          {t.contact.privacy}
+        </Link>
       </p>
     </div>
   );

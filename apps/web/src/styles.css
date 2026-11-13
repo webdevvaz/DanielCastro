@@ -1607,6 +1607,237 @@ html:has(.photo-viewer[open]) {
   gap: 6px;
 }
 
+/* Enquiry form */
+
+.enquiry-form {
+  max-width: 880px;
+  gap: 24px;
+}
+
+.enquiry-section {
+  display: grid;
+  gap: 20px;
+}
+
+.enquiry-section .checklist {
+  margin-bottom: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.field-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.field-check input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--red);
+}
+
+.field-check a {
+  text-decoration: underline;
+}
+
+.photo-picker-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  list-style: none;
+}
+
+.photo-picker-list li {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.photo-picker-list img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-picker-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--bone);
+  background: rgba(11, 10, 9, 0.8);
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+
+.photo-picker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.photo-picker label.btn {
+  cursor: pointer;
+}
+
+.photo-picker:has(input:focus-visible) label.btn {
+  outline: 2px solid var(--bone);
+  outline-offset: 2px;
+}
+
+/* Visitors never see the field; bots fill it in. */
+.enquiry-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.enquiry-submit {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+
+.enquiry-done {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+  max-width: 880px;
+}
+
+.enquiry-done h2 {
+  font-size: 34px;
+}
+
+/* Privacy notice */
+
+.privacy-section {
+  max-width: 760px;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+}
+
+.privacy-section h2 {
+  margin-bottom: 12px;
+  font-size: 28px;
+}
+
+.privacy-section p + p,
+.privacy-section ul + p {
+  margin-top: 12px;
+}
+
+.privacy-section ul {
+  margin: 12px 0 0 20px;
+}
+
+.privacy-section li + li {
+  margin-top: 6px;
+}
+
+/* Admin enquiries and email */
+
+.admin-notice {
+  margin-bottom: 24px;
+}
+
+.admin-notice[data-ready="true"] {
+  border-color: var(--ok);
+}
+
+.admin-table tr[data-status="declined"] td {
+  color: var(--muted);
+}
+
+.status-pill[data-status="new"] {
+  border-color: var(--red);
+  color: var(--bone);
+}
+
+.status-pill[data-status="booked"] {
+  border-color: var(--ok);
+  color: var(--bone);
+}
+
+.admin-enquiry-actions {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 32px;
+}
+
+.admin-enquiry-actions .actions {
+  margin-top: 12px;
+}
+
+.admin-answers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+  margin-bottom: 24px;
+}
+
+.admin-answers dt {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.admin-answers dd {
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.admin-long-text {
+  margin: 8px 0 24px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.admin-enquiry-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  list-style: none;
+}
+
+.admin-enquiry-photos img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.admin-steps {
+  max-width: 760px;
+  margin-left: 20px;
+}
+
+.admin-steps li + li {
+  margin-top: 8px;
+}
+
 /* Shop */
 
 .shop-filters {
@@ -2018,8 +2249,14 @@ html:has(.photo-viewer[open]) {
 
   .form-grid,
   .stats,
-  .trip-search {
+  .trip-search,
+  .admin-enquiry-actions,
+  .admin-answers {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-grid > [aria-hidden="true"] {
+    display: none;
   }
 
   .trip-search .btn {

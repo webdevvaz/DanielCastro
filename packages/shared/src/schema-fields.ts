@@ -25,3 +25,9 @@ export const CalendarDate = Schema.String.check(
       "Enter a date such as 2026-11-19",
   ),
 );
+
+/** An email address: something@domain.tld, trimmed, up to 254 characters. */
+export const EmailAddress = Schema.Trim.check(
+  Schema.isMaxLength(254, { message: "Enter a valid email address" }),
+  Schema.isPattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: "Enter a valid email address" }),
+);

@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useRouteContext } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 
 import { appConfig } from "@/app-config";
+import { localeParam } from "@/i18n/locales";
 import { useSiteMessages } from "@/i18n/site-messages";
 import { useLocale } from "@/i18n/use-locale";
 
@@ -12,7 +13,8 @@ import { GUEST_SPOTS_PAGE_TEXT } from "./guest-spots-page-text";
 export function GuestSpotsPage() {
   const context = useRouteContext({ from: "/{-$locale}/_site/guest-spots" });
   const site = useSiteMessages();
-  const t = GUEST_SPOTS_PAGE_TEXT[useLocale()];
+  const locale = useLocale();
+  const t = GUEST_SPOTS_PAGE_TEXT[locale];
 
   const { data: spots } = useSuspenseQuery(context.upcomingGuestSpotsQueryOptions);
 
@@ -50,14 +52,13 @@ export function GuestSpotsPage() {
 
         <div className="page-cta">
           <p>{t.cta}</p>
-          <a
+          <Link
             className="btn btn-red"
-            href={appConfig.links.enquiry}
-            target="_blank"
-            rel="noreferrer"
+            to="/{-$locale}/enquiry"
+            params={{ locale: localeParam(locale) }}
           >
             {site.bookSession}
-          </a>
+          </Link>
         </div>
       </div>
     </main>

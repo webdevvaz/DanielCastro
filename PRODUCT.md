@@ -37,7 +37,7 @@ The website of Daniel Castro, Tattoo Artist®: show the portfolio, turn visitors
 
 1. **Browse the gallery.** A curated portfolio that the studio team fills by hand (see journey 7). Known pieces: Skull Knight, Asta, Madara Uchiha, a God of War backpiece. A click on a photo shows it at full size on the same page, with its title, series, and placement underneath; the arrows move to the next photo.
 2. **Read Daniel News.** A main page that shows Daniel's latest Instagram posts automatically, through Meta's official Instagram API. Daniel's Instagram account is already a professional account; Daniel connects it once from the admin area. The site refreshes the access token itself and caches the posts, so a slow or failed Instagram call never breaks the page.
-3. **Send a project enquiry.** The site has its own bilingual enquiry form, which replaces the Google Form ("Marcações / bookings - Daniel Castro"). It asks the same questions (see [Enquiry form](#enquiry-form)) without a Google sign-in. Each enquiry is emailed to danielcastrotattooshop@gmail.com with its photos and is listed in the admin area. Body and reference photos are personal data: store them privately, show them only to the studio team, and publish a privacy policy.
+3. **Send a project enquiry.** The site has its own enquiry form (`/enquiry`, in the five site languages), which replaces the Google Form ("Marcações / bookings - Daniel Castro"). It asks the same questions (see [Enquiry form](#enquiry-form)) on one page, without a Google sign-in. Each enquiry is listed in the admin area and emailed through Resend, in Portuguese, to the recipients an admin sets (for example danielcastrotattooshop@gmail.com), with its photos and the client as Reply-To. Emails start once the site's domain is verified in Resend; until then the admin area is the only place enquiries appear. Body and reference photos are personal data: they are stored privately and only admins can open them, and the form links to the privacy notice (see [Privacy](#privacy)).
 4. **Booking process.** Enquiry → private quote, session plan, and dates → non-refundable deposit confirms the date → Daniel draws the design close to the appointment and sends it the night before. An enquiry does not reserve a date. Prices are never published.
 5. **Estimate the trip** (travelling clients). Keep it simple, like a search results card: "from" prices and links out, not a booking engine. The client enters their city and, optionally, dates:
    - **Flights** from the client's city to Porto (OPO): the average price for both ways of up to three airlines, labelled "both ways" (not "return", which reads like the flight back only), from the fares that Aviasales users found in the last few days for upcoming dates (free through Travelpayouts). It is an estimate to plan with, not a price to book, and the same for any dates. An airline shows only with at least two fares. A route with too few fares for that (mostly from outside Europe) shows live Google Flights prices through SerpApi for the client's dates instead: up to three airlines, cheapest first, with stops and journey time. When live prices are not available either, it shows the average of all airlines together, if there is one. A button below opens Google Flights with the client's dates, or with an example trip four weeks ahead.
@@ -115,6 +115,15 @@ Closing: "Thank you for contacting me :)"
 
 City and country (page 2) are also the starting point for the travel estimator, so an enquiry can carry the client's trip estimate.
 
+## Privacy
+
+The privacy notice (`/privacy`, English and Portuguese; the other languages show the English notice) is a draft written for the site on 2026-11-13. The studio reviews it before launch, in particular:
+
+- The legal name of whoever is responsible for the data (the notice says "Daniel Castro Tattoo Studio").
+- The hosting company, once chosen; the notice names Resend and Google (Gmail) and describes the host without a name.
+- Retention: enquiries that lead to no booking are deleted within 12 months of the last contact. Deletion is by hand: the admin list flags enquiries older than 12 months.
+- Google Fonts: the site loads its fonts from Google, which the notice states. Hosting the fonts on the site would remove this.
+
 ## Policies
 
 The studio answered the question list on 2026-11-12 (`support_documents/Respostas.docx`, private). The How to book FAQ and "Before your session" list, the Aftercare page, and the Travel page's "In Braga" tips use these answers.
@@ -164,4 +173,4 @@ None on the About page since November 2026: the biography is the studio's own (a
 
 - Previous website: https://daniel-castro-tattoo.joanapimentel97.chatgpt.site/
 - Google Maps: https://www.google.com/maps/place/Daniel+Castro+Tattoo+Studio/@41.5704216,-8.4521988,17z
-- Enquiry form: https://docs.google.com/forms/d/e/1FAIpQLScIKMz-n1q6GchMpAc_Kb5gCie4_CfcEPv4tdrCgdhVPE_YmQ/viewform
+- Former enquiry form (Google Form): https://docs.google.com/forms/d/e/1FAIpQLScIKMz-n1q6GchMpAc_Kb5gCie4_CfcEPv4tdrCgdhVPE_YmQ/viewform

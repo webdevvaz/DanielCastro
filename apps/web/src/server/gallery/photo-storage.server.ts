@@ -59,7 +59,7 @@ const makeFileSystemStorage = Effect.gen(function* () {
   });
 });
 
-/** Stores gallery photo files. */
+/** Stores photo files: the gallery's, and the photos clients send with enquiries. */
 export class PhotoStorage extends Context.Service<PhotoStorage, PhotoStorageService>()(
   "web/PhotoStorage",
 ) {}

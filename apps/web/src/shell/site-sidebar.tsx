@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouteContext } from "@tanstack/react-router";
 
-import { appConfig } from "@/app-config";
 import { formatDateRange } from "@/components/format-date-range";
 import { localeParam } from "@/i18n/locales";
 import { useSiteMessages } from "@/i18n/site-messages";
@@ -59,9 +58,13 @@ export function SiteSidebar() {
       </p>
       <SiteNav className="site-nav" label={t.nav.mainLabel} />
       <NextGuestSpot />
-      <a className="btn btn-red" href={appConfig.links.enquiry} target="_blank" rel="noreferrer">
+      <Link
+        className="btn btn-red"
+        to="/{-$locale}/enquiry"
+        params={{ locale: localeParam(locale) }}
+      >
         {t.bookSession}
-      </a>
+      </Link>
       <SiteContact />
       <LanguageSwitcher className="language-switcher" />
     </aside>

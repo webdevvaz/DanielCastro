@@ -13,6 +13,7 @@ export function AdminOverview() {
   const { data: photos } = useSuspenseQuery(context.adminGalleryQueryOptions);
   const { data: spots } = useSuspenseQuery(context.adminGuestSpotsQueryOptions);
   const { data: travelSettings } = useSuspenseQuery(context.adminTravelSettingsQueryOptions);
+  const { data: newEnquiries } = useSuspenseQuery(context.newEnquiryCountQueryOptions);
 
   const today = studioToday();
   const work = photos.filter((photo) => photo.section === "work");
@@ -28,6 +29,12 @@ export function AdminOverview() {
       </p>
       <h1>{t.overview.welcome}</h1>
       <div className="stats">
+        <div className="panel stat">
+          <strong>{newEnquiries}</strong>
+          <span>{t.overview.newEnquiries}</span>
+          <br />
+          <Link to="/admin/enquiries">{t.overview.manageEnquiries}</Link>
+        </div>
         <div className="panel stat">
           <strong>{work.length}</strong>
           <span>{t.overview.galleryStat(featured, hidden, studio.length)}</span>

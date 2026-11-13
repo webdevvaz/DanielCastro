@@ -5,13 +5,18 @@ import { useId } from "react";
 import { isFieldIssue } from "./field-issues";
 import { useFieldContext } from "./form-context";
 
-/** The messages of the field's current errors. */
-function useFieldErrors() {
+/**
+ * The messages of the field's current errors. `errorText` replaces them when the field has an
+ * error, for forms that show their errors in the page's language.
+ */
+function useFieldErrors(errorText: string | undefined) {
   const field = useFieldContext<unknown>();
 
   const errors: ReadonlyArray<unknown> = field.state.meta.errors;
 
-  return errors.filter(isFieldIssue).map((issue) => issue.message);
+  const messages = errors.filter(isFieldIssue).map((issue) => issue.message);
+
+  return errorText !== undefined && messages.length > 0 ? [errorText] : messages;
 }
 
 /** The ID of the text that describes a control: its error when it has one, else its hint. */
@@ -46,9 +51,8 @@ function FieldFrame({ id, label, hint, errors, children }: FieldFrameProps) {
 }
 
 /**
- * A one-line text input: text, email, password, or date. `suggestions` are offered while the
- * user types; any other text stays allowed. `errorText` replaces the schema's messages when the
- * field has an error, for forms that show their errors in the page's language.
+ * A one-line text input: text, email, phone, password, or date. `suggestions` are offered while
+ * the user types; any other text stays allowed.
  */
 export function TextField({
   label,
@@ -62,9 +66,7 @@ export function TextField({
   const field = useFieldContext<string>();
   const id = useId();
 
-  const fieldErrors = useFieldErrors();
-
-  const errors = errorText !== undefined && fieldErrors.length > 0 ? [errorText] : fieldErrors;
+  const errors = useFieldErrors(errorText);
 
   const suggestionsId = suggestions === undefined ? undefined : `${id}-suggestions`;
 
@@ -98,11 +100,11 @@ export function TextField({
 }
 
 /** A whole number. An empty input holds `NaN`, which the form's schema reports as an error. */
-export function NumberField({ label, hint, min, max }: NumberFieldProps) {
+export function NumberField({ label, hint, min, max, errorText }: NumberFieldProps) {
   const field = useFieldContext<number>();
   const id = useId();
 
-  const errors = useFieldErrors();
+  const errors = useFieldErrors(errorText);
 
   return (
     <FieldFrame id={id} label={label} hint={hint} errors={errors}>
@@ -126,11 +128,11 @@ export function NumberField({ label, hint, min, max }: NumberFieldProps) {
 }
 
 /** A multi-line text input. */
-export function TextareaField({ label, hint, rows = 3 }: TextareaFieldProps) {
+export function TextareaField({ label, hint, rows = 3, errorText }: TextareaFieldProps) {
   const field = useFieldContext<string>();
   const id = useId();
 
-  const errors = useFieldErrors();
+  const errors = useFieldErrors(errorText);
 
   return (
     <FieldFrame id={id} label={label} hint={hint} errors={errors}>
@@ -150,11 +152,11 @@ export function TextareaField({ label, hint, rows = 3 }: TextareaFieldProps) {
 }
 
 /** A choice from a short list of options. */
-export function SelectField({ label, hint, options }: SelectFieldProps) {
+export function SelectField({ label, hint, options, errorText }: SelectFieldProps) {
   const field = useFieldContext<string>();
   const id = useId();
 
-  const errors = useFieldErrors();
+  const errors = useFieldErrors(errorText);
 
   return (
     <FieldFrame id={id} label={label} hint={hint} errors={errors}>
@@ -178,6 +180,40 @@ export function SelectField({ label, hint, options }: SelectFieldProps) {
   );
 }
 
+/**
+ * A checkbox with its label beside it, such as "I accept the privacy notice". `children` is the
+ * label, so it can hold a link.
+ */
+export function CheckboxField({ children, errorText }: CheckboxFieldProps) {
+  const field = useFieldContext<boolean>();
+  const id = useId();
+
+  const errors = useFieldErrors(errorText);
+
+  return (
+    <div className="field">
+      <label className="field-check" htmlFor={id}>
+        <input
+          id={id}
+          name={field.name}
+          type="checkbox"
+          checked={field.state.value}
+          aria-invalid={errors.length > 0}
+          aria-describedby={errors.length > 0 ? `${id}-error` : undefined}
+          onBlur={field.handleBlur}
+          onChange={(event) => field.handleChange(event.target.checked)}
+        />
+        <span>{children}</span>
+      </label>
+      {errors.map((message) => (
+        <p className="field-error" id={`${id}-error`} key={message} role="alert">
+          {message}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 type FieldFrameProps = {
   readonly id: string;
   readonly label: string;
@@ -189,7 +225,7 @@ type FieldFrameProps = {
 type TextFieldProps = {
   readonly label: string;
   readonly hint?: string;
-  readonly type?: "text" | "email" | "password" | "date";
+  readonly type?: "text" | "email" | "tel" | "password" | "date";
   readonly autoComplete?: string;
   readonly placeholder?: string;
   readonly suggestions?: ReadonlyArray<string>;
@@ -202,16 +238,24 @@ type NumberFieldProps = {
   readonly hint?: string;
   readonly min?: number;
   readonly max?: number;
+  readonly errorText?: string;
 };
 
 type TextareaFieldProps = {
   readonly label: string;
   readonly hint?: string;
   readonly rows?: number;
+  readonly errorText?: string;
 };
 
 type SelectFieldProps = {
   readonly label: string;
   readonly hint?: string;
   readonly options: ReadonlyArray<{ readonly value: string; readonly label: string }>;
+  readonly errorText?: string;
+};
+
+type CheckboxFieldProps = {
+  readonly children: ReactNode;
+  readonly errorText?: string;
 };

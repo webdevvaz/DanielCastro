@@ -8,6 +8,7 @@ Server routes. Typical entries:
 | `health.ts`             | Liveness probe: the process answers             |
 | `ready.ts`              | Readiness probe: the database answers           |
 | `photos/$.ts`           | Serves stored gallery photos                    |
+| `enquiry-photos/$.ts`   | Serves clients' enquiry photos to admins only   |
 | `instagram/connect.ts`  | Sends an admin to Instagram Login               |
 | `instagram/callback.ts` | Connects the account Instagram Login sends back |
 

@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 
-import { appConfig } from "@/app-config";
 import { localeParam } from "@/i18n/locales";
 import { useSiteMessages } from "@/i18n/site-messages";
 import { useLocale } from "@/i18n/use-locale";
@@ -27,14 +26,9 @@ export function HowToBookPage() {
               {t.headingFirst} <em>{t.headingSecond}</em>
             </h1>
           </div>
-          <a
-            className="btn btn-red"
-            href={appConfig.links.enquiry}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <Link className="btn btn-red" to="/{-$locale}/enquiry" params={params}>
             {t.start}
-          </a>
+          </Link>
         </div>
 
         <ol className="book-steps">

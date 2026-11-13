@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 
-import { appConfig } from "@/app-config";
 import { localeParam } from "@/i18n/locales";
 import { useSiteMessages } from "@/i18n/site-messages";
 import { useLocale } from "@/i18n/use-locale";
@@ -23,14 +22,13 @@ export function SiteMobileNav() {
           <img src="/assets/brand/wordmark-white.webp" alt="" width={600} height={226} />
         </Link>
         <LanguageSwitcher className="language-switcher language-switcher-compact" />
-        <a
+        <Link
           className="btn btn-red btn-small"
-          href={appConfig.links.enquiry}
-          target="_blank"
-          rel="noreferrer"
+          to="/{-$locale}/enquiry"
+          params={{ locale: localeParam(locale) }}
         >
           {t.bookShort}
-        </a>
+        </Link>
       </div>
       <SiteNav className="site-tabs" label={t.nav.tabsLabel} />
     </div>

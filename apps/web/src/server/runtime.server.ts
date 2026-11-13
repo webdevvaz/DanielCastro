@@ -4,6 +4,8 @@ import { layerFromConfig as DatabaseLive } from "@daniel/db";
 import { Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/unstable/http";
 
+import { ResendLive } from "./email/resend.server";
+import { SecretBoxLive } from "./email/secret-box.server";
 import { PhotoStorageLive } from "./gallery/photo-storage.server";
 import { InstagramApiLive } from "./instagram/instagram-api.server";
 import { ObservabilityLive } from "./observability/observability.server";
@@ -19,7 +21,8 @@ import { TravelDataLive } from "./travel/travel-data.server";
 const AppLive = Layer.mergeAll(
   AuthLive,
   PhotoStorageLive,
-  Layer.mergeAll(TravelDataLive, InstagramApiLive, ShopifyLive).pipe(
+  SecretBoxLive,
+  Layer.mergeAll(TravelDataLive, InstagramApiLive, ShopifyLive, ResendLive).pipe(
     Layer.provide(FetchHttpClient.layer),
   ),
 ).pipe(Layer.provideMerge(DatabaseLive), Layer.provideMerge(ObservabilityLive));

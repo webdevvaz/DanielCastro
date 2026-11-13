@@ -1,12 +1,11 @@
 import { Schema } from "effect";
 
 import { ReturnPathSearchValue } from "./return-path";
+import { EmailAddress } from "./schema-fields";
 
 /** Email and password submitted by the sign-in form. */
 export const SignInInput = Schema.Struct({
-  email: Schema.Trim.check(
-    Schema.isPattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: "Enter a valid email address" }),
-  ),
+  email: EmailAddress,
   password: Schema.String.check(Schema.isMinLength(1, { message: "Password is required" })),
 });
 

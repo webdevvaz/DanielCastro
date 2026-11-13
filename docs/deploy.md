@@ -1,6 +1,6 @@
 # Deploying
 
-The site runs as one container image (`Containerfile`) with three things around it: a PostgreSQL database, a disk folder for the gallery photos, and an `https://` address. The test site for Daniel runs on [Railway](https://railway.com), which builds the image from the GitHub repository on every push to `main`.
+The site runs as one container image (`Containerfile`) with three things around it: a PostgreSQL database, a disk folder for the gallery photos and the photos clients send with enquiries, and an `https://` address. The test site for Daniel runs on [Railway](https://railway.com), which builds the image from the GitHub repository on every push to `main`.
 
 ## What a new version does
 
@@ -38,6 +38,7 @@ Railway changes the names in its dashboard from time to time, so a label may dif
    - `BETTER_AUTH_SECRET` must be new: never reuse the one in your `.env.local`.
    - `HIDE_FROM_SEARCH_ENGINES=true` keeps the test site out of Google. Leave it out on the real site.
    - Add `INSTAGRAM_APP_ID` and `INSTAGRAM_APP_SECRET` when the Meta app exists (`docs/instagram.md`).
+   - Enquiry emails need no variable: an admin saves the Resend API key, the sender, and the recipients on the admin **Email** page, once the site's domain is verified in Resend. Until then, enquiries are saved and listed in the admin area only.
 
 6. **Deploy steps.** In the web service, open **Settings → Deploy**:
    - **Pre-deploy command:** `node /app/release/migrate.mjs`
@@ -75,4 +76,4 @@ Run it again to add an admin later; existing accounts are skipped.
 
 - **Travelpayouts:** free, with no monthly limit. The site reads each city's fares once a day.
 - **SerpApi:** hotels use it for every trip estimate with new dates (one search; the same dates again within 6 hours use none, and so does the example trip for every visitor on the same day). Flights use it only for routes with too few Travelpayouts fares, mostly from outside Europe: one search per city and dates, reused for a day. The free plan has 250 searches a month, shared by your computer and every site that uses the key. When they are used up, the hotel card shows the typical hotel prices, and rare routes show an average of all airlines or only the Google Flights button, until the next month.
-- **Backups:** Railway can back up the database and the volume. Turn on automatic backups for both before Daniel starts adding real photos.
+- **Backups:** Railway can back up the database and the volume. Turn on automatic backups for both before Daniel starts adding real photos. The volume also holds clients' enquiry photos.

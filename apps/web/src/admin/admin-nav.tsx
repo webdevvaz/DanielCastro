@@ -25,10 +25,12 @@ export function AdminNav() {
       <Link to="/admin" activeOptions={{ exact: true }}>
         {t.nav.overview}
       </Link>
+      <Link to="/admin/enquiries">{t.nav.enquiries}</Link>
       <Link to="/admin/gallery">{t.nav.gallery}</Link>
       <Link to="/admin/guest-spots">{t.nav.guestSpots}</Link>
       <Link to="/admin/travel">{t.nav.travel}</Link>
       <Link to="/admin/instagram">{t.nav.instagram}</Link>
+      <Link to="/admin/email">{t.nav.email}</Link>
       <div className="admin-nav-end">
         <p className="admin-nav-user">{context.user.email}</p>
         <AdminLanguageSwitch />

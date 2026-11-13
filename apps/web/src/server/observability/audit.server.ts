@@ -13,6 +13,13 @@ const AUDIT_ACTIONS = [
   "travel.settings_updated",
   "instagram.connected",
   "instagram.disconnected",
+  "enquiry.status_changed",
+  "enquiry.email_sent_again",
+  "enquiry.deleted",
+  "email.addresses_updated",
+  "email.key_saved",
+  "email.key_removed",
+  "email.test_sent",
 ] as const;
 
 /** The `_tag` of the typed failure, or "defect" when the effect died. */
@@ -79,6 +86,8 @@ export type AuditEvent = {
     | "guest_spot"
     | "travel_settings"
     | "instagram_connection"
-    | "instagram_post";
+    | "instagram_post"
+    | "enquiry"
+    | "email_settings";
   readonly targetId?: string | undefined;
 };

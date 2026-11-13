@@ -4,6 +4,10 @@ export { DatabaseError, mapDatabaseError } from "./errors";
 
 export type { DatabaseExecutor, DatabaseTransaction } from "./transaction";
 
+export * from "./queries/email-settings";
+
+export * from "./queries/enquiries";
+
 export * from "./queries/gallery";
 
 export * from "./queries/guest-spots";

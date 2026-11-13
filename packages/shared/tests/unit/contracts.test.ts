@@ -1,6 +1,8 @@
 import { Predicate, Schema } from "effect";
 import { describe, expect, it } from "vite-plus/test";
 
+import { SaveEmailSettingsInput } from "../../src/email-settings";
+import { EnquiryDetails, EnquiryFormData } from "../../src/enquiry";
 import { GalleryUploadFormData, ReorderGalleryInput } from "../../src/gallery";
 import { CreateGuestSpotInput } from "../../src/guest-spots";
 import { ImportInstagramPostInput } from "../../src/instagram";
@@ -270,5 +272,186 @@ describe("ShopProductInput", () => {
     { name: "an empty handle", input: { locale: "en", handle: "" }, paths: ["handle"] },
   ])("$name: problems at $paths", async ({ input, paths }) => {
     expect(await issuePaths(ShopProductInput)(input)).toEqual(paths);
+  });
+});
+
+// The enquiry form's answers come from the browser; the server must refuse what the studio cannot
+// accept, and put each problem on its field so the form shows it there.
+describe("EnquiryDetails", () => {
+  const answers = {
+    locale: "de",
+    name: "Lena Vogel",
+    age: 24,
+    instagram: "@lena.vogel",
+    email: "lena@example.test",
+    phone: "",
+    city: "Köln",
+    country: "Germany",
+    location: "braga",
+    locationOther: "",
+    theme: "Bloodborne",
+    description: "The Hunter on the upper arm",
+    questions: "",
+    consent: true,
+    website: "",
+  };
+
+  it.each([
+    { name: "complete answers", input: answers, paths: [] },
+    {
+      name: "a guest spot",
+      input: { ...answers, location: "3f2a1c9e-8b4d-4e6f-9a0b-1c2d3e4f5a6b" },
+      paths: [],
+    },
+    {
+      name: "another place, named",
+      input: { ...answers, location: "other", locationOther: "Lisbon" },
+      paths: [],
+    },
+    {
+      name: "another place, unnamed",
+      input: { ...answers, location: "other" },
+      paths: ["locationOther"],
+    },
+    { name: "a made-up place", input: { ...answers, location: "paris" }, paths: ["location"] },
+    { name: "a client under 18", input: { ...answers, age: 17 }, paths: ["age"] },
+    { name: "an empty age", input: { ...answers, age: Number.NaN }, paths: ["age"] },
+    { name: "no consent", input: { ...answers, consent: false }, paths: ["consent"] },
+    {
+      name: "a filled-in bot field",
+      input: { ...answers, website: "spam.example" },
+      paths: ["website"],
+    },
+    {
+      name: "an Instagram link",
+      input: { ...answers, instagram: "instagram.com/lena" },
+      paths: ["instagram"],
+    },
+    { name: "an unknown language", input: { ...answers, locale: "it" }, paths: ["locale"] },
+    { name: "a blank theme", input: { ...answers, theme: "   " }, paths: ["theme"] },
+  ])("$name: problems at $paths", async ({ input, paths }) => {
+    // A field can report more than one problem; the form shows one message per field.
+    expect([...new Set(await issuePaths(EnquiryDetails)(input))]).toEqual(paths);
+  });
+});
+
+// The photos arrive as files beside the JSON answers. Counts follow the studio's Google Form, and
+// anything but a JPG, PNG, or WebP image is refused before the server reads it.
+/** A small JPEG file; each photo of a form needs its own. */
+const jpegFile = () =>
+  new File([new Uint8Array([0xff, 0xd8, 0xff])], "photo.jpg", { type: "image/jpeg" });
+
+describe("EnquiryFormData", () => {
+  const text = new File(["hello"], "notes.txt", { type: "text/plain" });
+
+  const answers = JSON.stringify({
+    locale: "en",
+    name: "Sam Lee",
+    age: 30,
+    instagram: "sam",
+    email: "sam@example.test",
+    phone: "",
+    city: "Leeds",
+    country: "United Kingdom",
+    location: "braga",
+    locationOther: "",
+    theme: "Evangelion",
+    description: "Unit-01 on the back",
+    questions: "",
+    consent: true,
+    website: "",
+  });
+
+  const formWith = (
+    counts: Record<"reference" | "favourite" | "placement", number>,
+    extra?: File,
+  ) => {
+    const formData = new FormData();
+
+    formData.append("details", answers);
+
+    for (const [kind, count] of Object.entries(counts)) {
+      for (let index = 0; index < count; index += 1) formData.append(kind, jpegFile());
+    }
+
+    if (extra !== undefined) formData.append("placement", extra);
+
+    return formData;
+  };
+
+  it.each([
+    {
+      name: "one photo of each kind",
+      form: formWith({ reference: 1, favourite: 1, placement: 1 }),
+      ok: true,
+    },
+    {
+      name: "the most photos",
+      form: formWith({ reference: 10, favourite: 10, placement: 5 }),
+      ok: true,
+    },
+    {
+      name: "no placement photo",
+      form: formWith({ reference: 1, favourite: 1, placement: 0 }),
+      ok: false,
+    },
+    {
+      name: "11 references",
+      form: formWith({ reference: 11, favourite: 1, placement: 1 }),
+      ok: false,
+    },
+    {
+      name: "6 placement photos",
+      form: formWith({ reference: 1, favourite: 1, placement: 6 }),
+      ok: false,
+    },
+    {
+      name: "a text file among the photos",
+      form: formWith({ reference: 1, favourite: 1, placement: 1 }, text),
+      ok: false,
+    },
+  ])("$name: valid $ok", ({ form, ok }) => {
+    expect(Schema.is(EnquiryFormData)(form)).toBe(ok);
+  });
+});
+
+// The admin sets who sends and receives enquiry emails; a malformed address would make every
+// email fail.
+describe("SaveEmailSettingsInput", () => {
+  const settings = {
+    sender: "Daniel Castro <enquiries@studio.test>",
+    recipients: "joana@studio.test, daniel@studio.test",
+  };
+
+  it.each([
+    { name: "a named sender and two recipients", input: settings, paths: [] },
+    {
+      name: "a bare sender address",
+      input: { ...settings, sender: "enquiries@studio.test" },
+      paths: [],
+    },
+    {
+      name: "a sender without an address",
+      input: { ...settings, sender: "Daniel Castro" },
+      paths: ["sender"],
+    },
+    { name: "no recipients", input: { ...settings, recipients: " , " }, paths: ["recipients"] },
+    {
+      name: "one malformed recipient",
+      input: { ...settings, recipients: "joana@studio.test, daniel" },
+      paths: ["recipients"],
+    },
+    {
+      name: "six recipients",
+      input: {
+        ...settings,
+        recipients: Array.from({ length: 6 }, (_, index) => `r${String(index)}@studio.test`).join(
+          ",",
+        ),
+      },
+      paths: ["recipients"],
+    },
+  ])("$name: problems at $paths", async ({ input, paths }) => {
+    expect(await issuePaths(SaveEmailSettingsInput)(input)).toEqual(paths);
   });
 });

@@ -1,7 +1,7 @@
 import { createFormHook } from "@tanstack/react-form";
 
 import { fieldContext, formContext } from "./form-context";
-import { NumberField, SelectField, TextField, TextareaField } from "./form-fields";
+import { CheckboxField, NumberField, SelectField, TextField, TextareaField } from "./form-fields";
 
 /**
  * The app's TanStack Form hook. Fields rendered through `form.AppField` get the shared field
@@ -10,6 +10,6 @@ import { NumberField, SelectField, TextField, TextareaField } from "./form-field
 export const { useAppForm } = createFormHook({
   fieldContext,
   formContext,
-  fieldComponents: { NumberField, SelectField, TextField, TextareaField },
+  fieldComponents: { CheckboxField, NumberField, SelectField, TextField, TextareaField },
   formComponents: {},
 });

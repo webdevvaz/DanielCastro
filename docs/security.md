@@ -32,7 +32,7 @@ Return paths after sign-in come from the URL: accept only a path inside this app
 - **CSRF:** server-function calls must come from the app's own origin (request middleware in `start.ts`). Better Auth checks the origin of its own endpoints against `BETTER_AUTH_URL` and `trustedOrigins`.
 - **Headers:** set `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy: strict-origin-when-cross-origin` on every response, plus `Strict-Transport-Security` in production.
 - **Rate limits:** Better Auth limits auth requests per client IP. Behind a proxy, set `AUTH_IP_ADDRESS_HEADER`, or all users share one limit.
-- **Server routes** (`apps/web/src/routes/api/`) are outside the server-function middleware and its CSRF check. Each one checks the session and role itself. An OAuth callback, such as `/api/instagram/callback`, also requires the `state` value from an HTTP-only cookie that its start route set (see `docs/instagram.md`).
+- **Server routes** (`apps/web/src/routes/api/`) are outside the server-function middleware and its CSRF check. Each one checks the session and role itself. `/api/enquiry-photos` answers 404 to anyone who is not a signed-in admin, the same answer as for a missing photo. An OAuth callback, such as `/api/instagram/callback`, also requires the `state` value from an HTTP-only cookie that its start route set (see `docs/instagram.md`).
 - **Outgoing requests:** when a service takes a key or token in the address (SerpApi, Instagram) or in a header (Travelpayouts), turn tracing off for its requests (`HttpClient.TracerDisabledWhen`) and keep only `describeHttpFailure(error)` in errors, because traces and error messages can record addresses and headers. Prefer a header when the service accepts one. Fetch user-influenced addresses only from an allowed list of hosts over HTTPS.
 
 ## Input and output
@@ -40,6 +40,8 @@ Return paths after sign-in come from the URL: accept only a path inside this app
 - **Validation:** every server function decodes its input with an Effect schema through `validateInput`. Schemas bound lengths and formats (IDs, slugs, text sizes).
 - **Errors:** only `AppError` classes reach the browser, with a status and a safe message. Anything else becomes a generic 500; the details go to the server log.
 - **Uploads:** check size and the file's magic bytes, not the name. Derive storage keys from the owner, so a path cannot reach another user's files.
+- **Public forms:** the enquiry form needs no sign-in. Its schema bounds every answer and the photo counts and types; a hidden field that people never see must stay empty (bots fill it in); the server checks each photo's magic bytes and re-encodes it, which drops camera metadata such as the location. Clients' photos are personal data: they are stored under random names outside the gallery's served names and only admins can open them.
+- **Secrets that admins enter:** the Resend API key is encrypted before it is stored (AES-256-GCM, with a key derived from `BETTER_AUTH_SECRET` through HKDF) and never sent back to a browser; the admin page shows its last four characters. Changing `BETTER_AUTH_SECRET` makes the stored key unreadable: the admin page says so, and the admin enters it again.
 
 ## Audit
 
@@ -59,4 +61,4 @@ Wrap administrative changes with `withAuditEvent` to emit an audit log record an
 - A Content-Security-Policy.
 - Rate-limit storage shared between replicas.
 - Multi-factor authentication (Better Auth `twoFactor` plugin).
-- Rate limits for your own server functions.
+- Rate limits for your own server functions. The public enquiry form has none yet: add one, or a check such as Cloudflare Turnstile, if spam arrives.
