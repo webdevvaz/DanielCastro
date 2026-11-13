@@ -295,6 +295,32 @@ h2 em {
   color: var(--bone);
 }
 
+.contact-link {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.contact-link svg {
+  margin-top: 3px;
+}
+
+.contact-link > span {
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.contact-link:hover > span {
+  text-decoration-color: currentColor;
+}
+
+.contact-note {
+  padding-left: 24px;
+}
+
 .site-social {
   display: flex;
   gap: 6px;

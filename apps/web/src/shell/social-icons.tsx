@@ -47,3 +47,38 @@ export function YouTubeIcon() {
     </svg>
   );
 }
+
+/** A map pin, for the studio address. */
+export function MapPinIcon() {
+  return (
+    <svg {...iconProps} width={16} height={16}>
+      <path
+        d="M12 21.5s-7-6.2-7-11.5a7 7 0 0 1 14 0c0 5.3-7 11.5-7 11.5Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+/** An envelope, for the studio email. */
+export function MailIcon() {
+  return (
+    <svg {...iconProps} width={16} height={16}>
+      <rect
+        x="3"
+        y="5"
+        width="18"
+        height="14"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <path d="m3.5 6.5 8.5 6.5 8.5-6.5" fill="none" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
