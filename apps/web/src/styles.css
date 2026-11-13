@@ -295,6 +295,19 @@ h2 em {
   color: var(--bone);
 }
 
+.site-social {
+  display: flex;
+  gap: 6px;
+  margin-left: -8px;
+}
+
+.site-social a {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+}
+
 .language-switcher {
   display: flex;
   flex-wrap: wrap;
