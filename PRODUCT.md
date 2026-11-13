@@ -31,7 +31,7 @@ The website of Daniel Castro, Tattoo Artist®: show the portfolio, turn visitors
 - Career (from Daniel's CV, November 2026; the About page uses it): tattooing since 2015 after a course at EvaBelle, Guimarães; own studio since 2018 (Vila de Prado), the current Braga studio since June 2023; resident artist with Squid Ink aboard Virgin Voyages ships since April 2022; Pepax Pro Team member since October 2023.
 - Awards: Lisbon Tattoo Rock Fest 2023 (First place, Best Anime/Manga Tattoo; Best of Day), Lisbon Tattoo Rock Fest 2024 (Second place, Anime/Manga/Kawaii Tattoo), Urban Land Tattoo Expo Roma 2024 (Third place, Anime Cartoon).
 - Conventions: Oporto Tattoo (2017, 2019, 2022, 2023, 2025), Lisbon Tattoo Rock Fest (2023, 2024), Urban Land Tattoo Expo Roma (2024), The Tattooed Planet, Manchester (2024), Pyromaniacs, Luxembourg (2019).
-- Not on the site: Daniel's personal phone and email, his full legal name, his engineering degree, follower counts, and the studio's other artists.
+- Not on the site: Daniel's personal phone and email, his full legal name, follower counts, and the studio's other artists. The engineering degree is part of the studio's own biography, which the About page uses.
 
 ## Main user journeys
 
@@ -45,7 +45,7 @@ The website of Daniel Castro, Tattoo Artist®: show the portfolio, turn visitors
    - **Stay in Braga:** live Google Hotels prices (through SerpApi) for the 3 cheapest hotels with 3 stars or more and a review score of 3.5 or more, for the trip dates, each with a Booking.com link, and their average per night and for the whole stay. The total uses the average. Without live prices, the typical prices that the admin sets. A button opens Booking.com with Braga and the dates filled in (an affiliate link once Daniel joins the programme).
    - **By car** (Spain and Portugal): a button that opens Google Maps directions to the studio.
    - A rough total range. When no fare data exists for a route, show only the links. Always label the values as estimates, and remind clients to confirm dates and deposit before they book travel.
-6. **Buy merchandise.** Products come from the Shopify store Necrotic Wear (`necrotic-wear.myshopify.com`, https://necroticwear.com, EUR): prints and t-shirts in collections such as 4 Yonkos, Prints, and Zodiac. Checkout happens on Shopify.
+6. **Buy merchandise.** Products come from the Shopify store Necrotic Wear (`necrotic-wear.myshopify.com`, https://necroticwear.com, EUR): prints and t-shirts in collections such as 4 Yonkos, Prints, and Zodiac. Checkout happens on Shopify. The studio sent the public Storefront API token of the headless channel on 2026-11-12 (`SHOPIFY_STOREFRONT_TOKEN` in `.env.local`); on 2026-11-13 it read 28 products (26 for sale) in 5 collections.
 7. **Manage the gallery** (admin). Adding photos must be quick:
    - Upload several photos at once by drag and drop, from a phone or a computer. The site resizes them for the web.
    - Add an Instagram post from Daniel News to the gallery with one click. The site copies the image, because Instagram image links expire.
@@ -115,13 +115,27 @@ Closing: "Thank you for contacting me :)"
 
 City and country (page 2) are also the starting point for the travel estimator, so an enquiry can carry the client's trip estimate.
 
-## Policies still to confirm
+## Policies
 
-The deposit amount varies per project. Never publish an amount; say that the deposit is set with the quote.
+The studio answered the question list on 2026-11-12 (`support_documents/Respostas.docx`, private). The How to book FAQ and "Before your session" list, the Aftercare page, and the Travel page's "In Braga" tips use these answers.
 
-The FAQ needs answers from Daniel on: the deadline to pay the deposit, payment methods, rescheduling and cancellation, minimum age and health limits, pricing approach, session length, preparation before a session, touch-ups, and design changes.
-
-Aftercare is answered: the Aftercare page translates the studio's care sheet ("Informações e cuidados a ter com a tatuagem"). BALM TATTOO cream 2–3 times a day for 7 days (the sheet's chart says 3 times; the owner chose 2–3). The Portuguese sheet is the source for the Portuguese version.
+- **Deposit:** non-refundable; confirms the date and is deducted on the day. Never publish an amount. There is no fixed deadline to pay it: the date stays pencilled in, and the studio contacts the client when someone else asks for the date, the week fills up, or the date is less than a month away.
+- **Payment:** deposit by MB WAY, PayPal, Revolut, or bank transfer. On the day: cash, MB WAY, or Revolut (no card terminal).
+- **Rescheduling:** once, with 2 weeks' notice; the deposit moves to the new date. A second change needs a new deposit. The studio makes exceptions for illness, a death in the family, or an accident, but does not publish them.
+- **Late, no-show, last-minute cancellation:** 15 minutes' tolerance without notice; case by case with notice. A no-show or late cancellation loses the deposit, and a new date needs 50% of the price paid in advance (confirmed 2026-11-13).
+- **Studio cancellations:** the studio reschedules and moves the deposit. When Daniel declines a project because the ideas do not match, the deposit is refunded (not on the site). When a session is refused because the client ignored the rules they were given, the deposit is kept.
+- **Age and health:** 18 or over, no minors. No tattoos during pregnancy or breastfeeding, on antibiotics or anticoagulants, during chemotherapy or similar, or under alcohol or drugs. Not on skin with sunburn, wounds, cuts, burns, or conditions such as psoriasis; with a general skin condition, medical approval before the deposit.
+- **Pricing:** large projects (full sleeves, full backs, more than 3 sessions) have a fixed price per session; single pieces are priced by complexity, size, and placement. No hourly rates; the quote changes only when the idea or size changes, and the client hears the new price before tattooing. The studio minimum is €60; it stays off the site (confirmed 2026-11-13), because prices are not published.
+- **Sessions:** 95% are full days for one client, from 11:00 until done. About 4–5 hours for ~20 cm (one side of a forearm), 7–8 hours or more for ~30 cm (outer upper arm); about 6 hours on average.
+- **Several sessions:** "printer mode": each area is finished in one session, so sessions do not wait for healing. Recommended: no more than 2 days in a row, with 1–2 rest days. For travelling clients, up to 4 sessions a week (every other day); a full arm sleeve usually takes 4 sessions, about a week.
+- **Before the session** (the email sent after the deposit): no alcohol or excess coffee the day before and on the day; sleep well; eat in the hour before and bring a snack; comfortable clothes; no sun or tanning on the area for 2 weeks; moisturise and drink water; Daniel shaves on the day (wax at least 5 days before); the design arrives the night before, around 23:00; one companion aged 16 or over.
+- **Design changes:** details can change after the night-before design, or on the day before the stencil. Changing the whole design or its structure means a new date and the loss of the deposit (a design takes 3–4 hours).
+- **Aftercare** (replaces the care sheet's cream routine; the sheet still needs updating for the studio): film off after 2 hours; wash gently with water and neutral soap; pat dry with kitchen paper; dry for the first 24 hours; then Hustle Butter twice a day (BALM TATTOO is no longer used; the studio may sell Hustle Butter); after 10–12 days, when the skin has closed, an unscented lotion such as NIVEA Repair & Care or CeraVe Moisturising Lotion. The other rules and the timings follow the sheet's chart (shower water 4 days, scabs and sun 2 weeks, pools, hair removal and sauna 1 month).
+- **Touch-ups:** free for small gaps in lines or shading within 6 months, after Daniel has looked at the healed tattoo (healing depends on aftercare); not free after poor aftercare (beach, sea, pools, sunburn). The site says this kindly: the tattoo is art the client carries and must look after.
+- **Photos online:** the consent form asks whether the client's face may be shown; if not, only content without the face is used.
+- **Guest spots:** the same process, adapted to the host studio's rules (companions, payment); the client gets guidelines for that studio.
+- **Gift vouchers:** printed only, collected at the studio or sent by post. The studio would like to sell them online through the site; the voucher terms (such as validity) must be set first.
+- **Languages:** Portuguese and English.
 
 ## Accounts and hosting
 
@@ -132,12 +146,13 @@ Aftercare is answered: the Aftercare page translates the studio's care sheet ("I
 ## Travel facts
 
 - Nearest airport: Porto (OPO). Direct coach connections from the airport to Braga (getbus.eu).
-- Suggested base: central Braga. Local sights: Bom Jesus do Monte, the old streets and gardens.
+- Suggested base: central Braga (the historic centre). There is no accommodation near the studio. Local sights: Bom Jesus do Monte, the old streets and gardens.
+- To the studio: buses 2 and 9 stop in front of it (stop "Ramoa"); an Uber from the centre takes about 10 minutes and costs about €5. Free parking on Rua da Ramoa and behind the studio, from Av. Doutor António da Rocha.
 - Flights, accommodation, local transport, and meals are booked and paid by the client. The studio does not arrange travel.
 
 ## Placeholder content
 
-None on the About page since November 2026: the biography, awards, conventions, and past guest spots come from Daniel's CV, and the portrait and studio photos from the photos he sent.
+None on the About page since November 2026: the biography is the studio's own (also on the Necrotic Wear site), the awards, conventions, and past guest spots come from Daniel's CV, and the portrait and studio photos from the photos he sent. The studio will send newer studio photos; the admin's Studio section replaces them.
 
 ## Out of scope
 

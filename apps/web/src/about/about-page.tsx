@@ -86,21 +86,36 @@ export function AboutPage() {
             height={1067}
           />
           <div className="about-text">
-            <p className="lead">
-              Daniel Castro has been tattooing since 2015. He works from his own studio in Braga,
-              Portugal, and at guest spots across Europe.
+            <blockquote className="about-quote">
+              <p>
+                “When I was 6 years old, I was drawing on paper and someone told me: ‘Did you know
+                it’s possible to make drawings on the skin that never wash off?’ That was the first
+                time I heard about tattoos, and I have been fascinated ever since.”
+              </p>
+            </blockquote>
+            <p>
+              Daniel grew up always enjoying drawing, but life took him to another field. He
+              graduated in electrotechnical engineering, and right after his graduation he got an
+              internship with promises of a career. Fortunately for him, those promises were not
+              kept, and he took that as the chance to follow his dream of becoming a tattoo artist.
             </p>
             <p>
-              Every design is his own, drawn from scratch for the person who wears it: original
-              blackwork inspired by anime, manga, and dark fantasy, and by films, comic books, video
-              games, and mythologies. He works in black and white, with intricate linework, strong
-              contrast, and small red accents when they suit the design. Most of his pieces are
-              large and take several sessions.
+              He enrolled in a tattoo course, to get the best guidance for his new adventure, and
+              started what is now his career, in 2015. The road was not always smooth, but hard work
+              pays off: he started on his own, and built his way to his own studio in Portugal and
+              to travelling around the world with his art.
             </p>
             <p>
-              He opened his first studio in 2018 and his current studio in Braga in June 2023. Since
-              2022 he has also been a resident artist with Squid Ink aboard Virgin Voyages ships,
-              and since 2023 he has been a member of the Pepax Pro Team.
+              Over the years he developed a very unique style, with linework as its foundation and
+              inspiration from the artists who fascinated him as a kid: comic book artists, manga
+              artists, and even Renaissance artists. Today he focuses mainly on anime themes in
+              manga style, because he will always be a geek at heart, looking for the next challenge
+              to improve his skills.
+            </p>
+            <p>
+              His studio in Braga opened in June 2023. Since 2022 he has also been a resident artist
+              with Squid Ink aboard Virgin Voyages ships, and since 2023 he has been a member of the
+              Pepax Pro Team.
             </p>
 
             <h2 className="page-subtitle">Awards</h2>

@@ -497,6 +497,21 @@ h2 em {
   color: var(--bone);
 }
 
+.about-quote {
+  max-width: 640px;
+  margin: 0 0 28px;
+  padding-left: 20px;
+  border-left: 2px solid var(--red);
+}
+
+.about-quote p {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--bone);
+}
+
 .about-text a,
 .book-details p a,
 .book-details .muted a {

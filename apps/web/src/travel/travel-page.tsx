@@ -1,9 +1,10 @@
 import { useSearch } from "@tanstack/react-router";
 
+import { BragaTips } from "./braga-tips";
 import { TripEstimate } from "./trip-estimate";
 import { TripSearchForm } from "./trip-search-form";
 
-/** The travel estimator: the search form, and the estimate once the visitor has searched. */
+/** The travel estimator: the search form, the estimate once the visitor has searched, and tips for Braga. */
 export function TravelPage() {
   const search = useSearch({ from: "/_site/travel" });
 
@@ -28,6 +29,7 @@ export function TravelPage() {
         {search.from === undefined ? null : (
           <TripEstimate input={{ from: search.from, arrive: search.arrive, leave: search.leave }} />
         )}
+        <BragaTips />
       </div>
     </main>
   );

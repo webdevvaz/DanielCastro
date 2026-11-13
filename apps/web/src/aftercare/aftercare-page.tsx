@@ -1,44 +1,48 @@
 /**
- * Daniel's aftercare instructions, from the sheet the studio gives each client ("Informações e
- * cuidados a ter com a tatuagem"). The Portuguese original is the source; keep both in step.
+ * Daniel's aftercare instructions: the studio's care sheet ("Informações e cuidados a ter com a
+ * tatuagem") with the routine that replaced it in November 2026 (PRODUCT.md, "Policies"): the
+ * first 24 hours dry, then Hustle Butter twice a day, then an unscented lotion. The timings come
+ * from the sheet's chart.
  */
 const FIRST_DAY = [
   "Take the film off after 2 hours, or after the time your artist tells you.",
-  "Rinse with water and rub very gently with two fingers to clean off dried blood.",
-  "Pat dry with paper towel, without dragging it over the skin.",
-  "Apply BALM TATTOO healing cream after cleaning and before you go to sleep.",
+  "Wash the tattoo very gently with water and a neutral soap, or with water only.",
+  "Pat it dry with kitchen paper, without dragging it over the skin.",
+  "Leave it dry for the first 24 hours: no cream yet.",
 ] as const;
 
 const FOLLOWING_DAYS = [
-  "Apply a very thin layer of BALM TATTOO healing cream 2–3 times a day for 7 days.",
-  "In the shower, do not scrub the tattoo with shower gel, and keep the water from running straight onto it for at least a week.",
+  "After the first 24 hours, apply a thin layer of Hustle Butter twice a day.",
+  "After 10 to 12 days, when the skin has fully closed, change to an unscented moisturising lotion, such as NIVEA Repair & Care or CeraVe Moisturising Lotion, and keep the tattoo moisturised from then on.",
+  "In the shower, do not scrub the tattoo with shower gel, and keep the water from running straight onto it for the first 4 days.",
   "Do not soak the tattoo for at least 2 weeks. For swimming pools, wait a month because of the chlorine.",
   "Rest for at least 4 days: avoid exercise and effort that works the muscles under the tattoo, so the lines do not open.",
   "Keep the tattoo out of the sun, dust, and similar for at least 2 weeks.",
-  "Use SPF 50+ sunscreen whenever the tattoo is in the sun, so it does not fade or turn greenish. In the first 7 days, you can alternate the sunscreen with the BALM TATTOO cream if you need to.",
+  "Use SPF 50+ sunscreen whenever the tattoo is in the sun, so it does not fade or turn greenish.",
   "Do not scratch the tattoo or pick off the scabs while it heals.",
   "Avoid tight clothes over the tattoo for 2 weeks, so they do not pull off the scabs.",
   "Never cover the tattoo with film again, not even to shower or to sleep.",
   "Do not remove hair on the tattoo by any method (wax, razor, trimmer, cream) for at least 1 month.",
   "Never use laser hair removal over the tattoo.",
-  "After it heals, keep the skin moisturised to slow down the ageing of the tattoo.",
-  "No sauna, Turkish bath, sunbed, or similar until it has fully healed. Avoid sunbeds to protect the tattoo.",
+  "No sauna, Turkish bath, sunbed, or similar for the first month. Avoid sunbeds to protect the tattoo.",
 ] as const;
 
-/** How long each rule lasts, from the timeline on the sheet. */
+/** How long each rule lasts, from the chart on the care sheet. */
 const AT_A_GLANCE = [
-  { rule: "Film", time: "First 2 hours only" },
-  { rule: "BALM TATTOO cream, 2–3 times a day", time: "7 days" },
+  { rule: "Film", time: "First 2 hours" },
+  { rule: "No cream, keep it dry", time: "First 24 hours" },
+  { rule: "Hustle Butter, twice a day", time: "Day 2 to day 10–12" },
+  { rule: "Unscented moisturising lotion", time: "From day 10–12, always" },
   { rule: "No exercise or effort", time: "4 days" },
-  { rule: "No direct water in the shower", time: "1 week" },
+  { rule: "No direct water in the shower", time: "4 days" },
   { rule: "No sun, no dust", time: "2 weeks" },
   { rule: "No soaking in the sea or a river", time: "2 weeks" },
+  { rule: "No scratching, no picking scabs", time: "2 weeks" },
+  { rule: "No tight clothes", time: "2 weeks" },
   { rule: "No swimming pools", time: "1 month" },
   { rule: "No hair removal", time: "1 month" },
-  { rule: "No scratching, no picking scabs", time: "Until healed" },
-  { rule: "No sauna, Turkish bath, or sunbed", time: "Until healed" },
+  { rule: "No sauna, Turkish bath, or sunbed", time: "1 month" },
   { rule: "SPF 50+ sunscreen in the sun", time: "Always" },
-  { rule: "Moisturise the skin", time: "Always, after healing" },
   { rule: "No laser hair removal", time: "Always" },
 ] as const;
 
