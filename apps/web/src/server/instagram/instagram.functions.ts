@@ -1,10 +1,16 @@
-import { ImportInstagramPostInput } from "@daniel/shared/instagram";
+import {
+  CreateInstagramConnectLinkInput,
+  ImportInstagramPostInput,
+  InstagramConnectLinkInput,
+} from "@daniel/shared/instagram";
 import { createServerFn } from "@tanstack/react-start";
 
 import { adminMiddleware } from "../auth/auth.middleware";
 import { runServerEffect } from "../run.server";
 import { validateInput } from "../validate-input";
 import {
+  checkInstagramConnectLink,
+  createInstagramConnectLink as createInstagramConnectLinkEffect,
   disconnectInstagram as disconnectInstagramEffect,
   getInstagramAdminView,
   getNewsFeed as getNewsFeedEffect,
@@ -39,3 +45,16 @@ export const importInstagramPost = createServerFn({ method: "POST" })
 export const disconnectInstagram = createServerFn({ method: "POST" })
   .middleware([adminMiddleware])
   .handler(({ context }) => runServerEffect(disconnectInstagramEffect(context.user.id)));
+
+/** Makes a link that connects one Instagram account without an admin sign-in. */
+export const createInstagramConnectLink = createServerFn({ method: "POST" })
+  .middleware([adminMiddleware])
+  .validator(validateInput(CreateInstagramConnectLinkInput))
+  .handler(({ context, data }) =>
+    runServerEffect(createInstagramConnectLinkEffect(context.user.id, data.username)),
+  );
+
+/** Whether a connect link still works, and the account it connects. Public. */
+export const getInstagramConnectLink = createServerFn({ method: "GET" })
+  .validator(validateInput(InstagramConnectLinkInput))
+  .handler(({ data }) => runServerEffect(checkInstagramConnectLink(data.token)));

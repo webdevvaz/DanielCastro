@@ -42,20 +42,29 @@ Do these steps once, logged in with the Meta account that owns the site's accoun
 
 If the connection fails, the admin page says so. The usual causes: the redirect address in the Meta app is not exactly the one above, the account has no role in the app, or the app ID and secret are the Facebook ones.
 
+### From a link, without an admin account
+
+Daniel does not need an admin account. On the admin **Instagram** page, under **Link for Daniel**, an admin creates a link for `@danielcastro_tattooartist` (the field is filled in) and sends it to him, for example on WhatsApp. On his phone he opens it, accepts the tester invitation once if Instagram asks (the page links to it), presses **Connect Instagram**, and allows access. The page then says whether it worked.
+
+- The link is `/admin/connect-instagram/<token>`. The token names the account and the admin who made it, expires after 7 days, and is signed with a key derived from `BETTER_AUTH_SECRET`; nothing is stored, and changing the secret makes every link invalid.
+- It connects **only the account it names**. If someone logs in with another account, nothing changes and the page says so. A leaked or edited link therefore cannot put another account's posts on the News page.
+- The connection is recorded as made by the admin who created the link.
+
 To connect a different account, use **Connect another account**. **Disconnect** forgets the account and its token; photos already in the gallery stay.
 
 ## How it works
 
-| File                                                      | Holds                                                                     |
-| --------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `apps/web/src/server/instagram/instagram-api.server.ts`   | The `InstagramApi` service: login, tokens, posts, and image downloads     |
-| `apps/web/src/server/instagram/instagram.server.ts`       | Token renewal, the News feed, the admin view, connect, disconnect, import |
-| `apps/web/src/server/instagram/instagram-route.server.ts` | The connect and callback routes, with the state cookie                    |
-| `packages/db/src/schema/instagram.ts`                     | `instagram_connection`: one row with the account and its token            |
+| File                                                             | Holds                                                                     |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `apps/web/src/server/instagram/instagram-api.server.ts`          | The `InstagramApi` service: login, tokens, posts, and image downloads     |
+| `apps/web/src/server/instagram/instagram.server.ts`              | Token renewal, the News feed, the admin view, connect, disconnect, import |
+| `apps/web/src/server/instagram/instagram-route.server.ts`        | The connect and callback routes, with the state cookie                    |
+| `apps/web/src/server/instagram/instagram-connect-link.server.ts` | Signing and checking connect links                                        |
+| `packages/db/src/schema/instagram.ts`                            | `instagram_connection`: one row with the account and its token            |
 
 Security:
 
-- **Login CSRF:** "Connect Instagram" sets a random `state` in an HTTP-only cookie limited to `/api/instagram`, for 10 minutes. The callback connects an account only for a signed-in admin, and only when Instagram returns the same `state`. Without this check, another site could make an admin's browser connect the wrong account.
+- **Login CSRF:** "Connect Instagram" sets a random `state` in an HTTP-only cookie limited to `/api/instagram`, for 10 minutes. The callback connects an account only when Instagram returns the same `state`, and then only for a signed-in admin or a valid connect link (whose token rides in the same cookie, after the state). Without this check, another site could make an admin's browser connect the wrong account.
 - **Secrets in addresses:** Instagram takes the access token, and for one request the app secret, as address parameters. Effect's HTTP client records addresses in traces, so tracing is off for every Instagram request, and errors keep only the error type and status.
 - **The token** stays on the server. No server function returns it.
 - **Downloads** go only to Instagram's image servers (`*.cdninstagram.com`, `*.fbcdn.net`) over HTTPS, are limited to 25 MB, and must be JPG, PNG, or WebP images.

@@ -8,12 +8,17 @@ import {
 } from "@daniel/db";
 import { ConflictError, InvalidInputError, ServiceUnavailableError } from "@daniel/shared/errors";
 import { addDays, differenceInHours, isAfter } from "date-fns";
-import { Effect } from "effect";
+import { Config, Effect, Option } from "effect";
 
 import { addPhotoToGallery } from "../gallery/gallery.server";
 import { checkPhotoBytes } from "../gallery/photo-image.server";
 import { withAuditEvent } from "../observability/audit.server";
 import { InstagramApi, type InstagramError, type InstagramPost } from "./instagram-api.server";
+import {
+  createConnectLinkToken,
+  normalizeInstagramUsername,
+  readConnectLinkToken,
+} from "./instagram-connect-link.server";
 
 /** A token lasts about 60 days; it is renewed once fewer than this many remain. */
 const RENEW_WITHIN_DAYS = 30;
@@ -158,14 +163,25 @@ export const getInstagramAdminView = Effect.gen(function* () {
 }).pipe(Effect.withSpan("getInstagramAdminView"));
 
 /**
- * Connects the Instagram account an admin logged in with, from the code Instagram Login sent
- * back. Replaces any account connected before.
+ * Connects the Instagram account someone logged in with, from the code Instagram Login sent
+ * back. Replaces any account connected before. With `expectedUsername` (a connect link), it fails
+ * with `ConflictError`, and keeps the current connection, for any other account.
  */
 export const connectInstagram = Effect.fn("connectInstagram")(
-  function* (userId: string, code: string) {
+  function* (userId: string, code: string, expectedUsername: string | null) {
     const api = yield* InstagramApi;
 
     const account = yield* api.connect(code);
+
+    const wrongAccount =
+      expectedUsername !== null &&
+      normalizeInstagramUsername(account.username) !== expectedUsername;
+
+    if (wrongAccount) {
+      yield* Effect.logWarning("A connect link was used with another Instagram account");
+
+      return yield* new ConflictError({ reason: "This link connects another Instagram account" });
+    }
 
     yield* saveInstagramConnection({
       instagramUserId: account.instagramUserId,
@@ -186,6 +202,60 @@ export const connectInstagram = Effect.fn("connectInstagram")(
       }),
     ),
 );
+
+/**
+ * Makes a link that connects one Instagram account without an admin sign-in, for Daniel to open
+ * on his phone. It works for 7 days and only for `username`.
+ */
+export const createInstagramConnectLink = Effect.fn("createInstagramConnectLink")(
+  function* (userId: string, username: string) {
+    const api = yield* InstagramApi;
+
+    if (!api.configured) {
+      return yield* new ConflictError({ reason: "Instagram is not set up for this site yet" });
+    }
+
+    const siteUrl = yield* Config.String("BETTER_AUTH_URL");
+    const link = yield* createConnectLinkToken(userId, username);
+
+    return {
+      url: `${siteUrl}/admin/connect-instagram/${link.token}`,
+      username: normalizeInstagramUsername(username),
+      expiresAt: link.expiresAt,
+    };
+  },
+  (effect, userId) =>
+    effect.pipe(
+      withAuditEvent({
+        action: "instagram.link_created",
+        actorUserId: userId,
+        targetType: "instagram_connection",
+      }),
+    ),
+);
+
+/**
+ * What the connect link page shows: the account the link connects and its expiry, or `invalid`
+ * for a forged or expired link, or `not_configured` before the Meta app is set up. Public: the
+ * link itself is the permission.
+ */
+export const checkInstagramConnectLink = Effect.fn("checkInstagramConnectLink")(function* (
+  token: string,
+) {
+  const api = yield* InstagramApi;
+
+  const link = yield* readConnectLinkToken(token);
+
+  if (Option.isNone(link)) return { status: "invalid" } as const;
+
+  if (!api.configured) return { status: "not_configured" } as const;
+
+  return {
+    status: "ready",
+    username: link.value.username,
+    expiresAt: link.value.expiresAt,
+  } as const;
+});
 
 /** Forgets the connected account and its token. Photos already added to the gallery stay. */
 export const disconnectInstagram = Effect.fn("disconnectInstagram")(

@@ -20,6 +20,7 @@ import { afterAll, expect } from "vite-plus/test";
 
 import { PhotoStorageLive } from "../../src/server/gallery/photo-storage.server";
 import { InstagramApiLive } from "../../src/server/instagram/instagram-api.server";
+import { createConnectLinkToken } from "../../src/server/instagram/instagram-connect-link.server";
 import {
   finishInstagramConnection,
   startInstagramConnection,
@@ -196,6 +197,18 @@ const signedInAs = Effect.fn("test.signedInAs")(function* (role: "user" | "admin
 const routeRequest = (path: string, cookies: ReadonlyArray<string>) =>
   new Request(new URL(path, BASE_URL), { headers: { cookie: cookies.join("; ") } });
 
+/** The site's secret, which signs connect links, as the server reads it. */
+const SecretConfigLive = ConfigProvider.layer(
+  ConfigProvider.fromUnknown({ BETTER_AUTH_SECRET: "integration-test-secret-with-32-characters" }),
+);
+
+/** A connect link's token for `username`, made by `adminId`. */
+const linkTokenFor = (adminId: string, username: string) =>
+  createConnectLinkToken(adminId, username).pipe(
+    Effect.map(({ token }) => token),
+    Effect.provide(SecretConfigLive),
+  );
+
 /** Runs a route program for `request`, as `runServerRoute` does. */
 const runRoute = <E, R>(request: Request, program: Effect.Effect<Response, E, R>) =>
   program.pipe(Effect.provideService(RequestHeaders, request.headers));
@@ -231,10 +244,11 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
       const admin = yield* signedInAs("admin");
       const instagram = instagramWith(workingInstagram());
 
-      const start = yield* runRoute(
-        routeRequest("/api/instagram/connect", [admin.cookie]),
-        startInstagramConnection,
-      ).pipe(Effect.provide(instagram.live));
+      const startRequest = routeRequest("/api/instagram/connect", [admin.cookie]);
+
+      const start = yield* runRoute(startRequest, startInstagramConnection(startRequest)).pipe(
+        Effect.provide(instagram.live),
+      );
 
       const authorizeUrl = new URL(start.headers.get("location") ?? "");
       const stateCookie = start.headers.get("set-cookie") ?? "";
@@ -293,6 +307,95 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
     }),
   );
 
+  // The link lets Daniel connect without an admin account. It must connect only his account, so a
+  // leaked or altered link cannot put someone else's posts on the News page.
+  it.effect(
+    "connects through a connect link without a sign-in, but only the account it names",
+    () =>
+      Effect.gen(function* () {
+        yield* deleteInstagramConnection();
+
+        const admin = yield* signedInAs("admin");
+
+        /** Starts and finishes Instagram Login from a browser with no session, as Daniel's phone. */
+        const loginWithLink = (token: string) =>
+          Effect.gen(function* () {
+            const instagram = instagramWith(workingInstagram());
+            const startRequest = routeRequest(`/api/instagram/connect?link=${token}`, []);
+
+            const start = yield* runRoute(
+              startRequest,
+              startInstagramConnection(startRequest),
+            ).pipe(Effect.provide(instagram.live));
+
+            const state = new URL(start.headers.get("location") ?? "").searchParams.get("state");
+            const cookie = (start.headers.get("set-cookie") ?? "").split(";")[0] ?? "";
+            const callback = routeRequest(
+              `/api/instagram/callback?code=one-time-code&state=${state ?? ""}`,
+              [cookie],
+            );
+
+            const finish = yield* runRoute(callback, finishInstagramConnection(callback)).pipe(
+              Effect.provide(instagram.live),
+            );
+
+            return { start, finish, requests: instagram.requests };
+          }).pipe(Effect.provide(SecretConfigLive));
+
+        // A link for another account: Instagram answers with Daniel's, so nothing is saved.
+        const otherToken = yield* linkTokenFor(admin.userId, "@Someone.Else");
+        const other = yield* loginWithLink(otherToken);
+
+        expect(other.finish.headers.get("location")).toBe(
+          `/admin/connect-instagram/${otherToken}?result=wrong_account`,
+        );
+        expect(yield* getInstagramConnection()).toBeNull();
+
+        // A link whose account was edited: the signature no longer matches, so Instagram is never asked.
+        const danielToken = yield* linkTokenFor(admin.userId, USERNAME);
+        const [, signature] = danielToken.split(".");
+        const editedBody = Buffer.from(
+          JSON.stringify({
+            by: admin.userId,
+            username: "someone.else",
+            expiresAt: "2099-01-01T00:00:00.000Z",
+          }),
+        ).toString("base64url");
+        const edited = yield* Effect.gen(function* () {
+          const instagram = instagramWith(workingInstagram());
+          const request = routeRequest(
+            `/api/instagram/connect?link=${editedBody}.${signature ?? ""}`,
+            [],
+          );
+
+          const response = yield* runRoute(request, startInstagramConnection(request)).pipe(
+            Effect.provide(instagram.live),
+          );
+
+          return { response, requests: instagram.requests };
+        }).pipe(Effect.provide(SecretConfigLive));
+
+        expect(edited.response.headers.get("location")).toContain("result=failed");
+        expect(edited.requests).toEqual([]);
+
+        // Daniel's own link connects his account, recorded as connected by the admin who made it.
+        const daniel = yield* loginWithLink(danielToken);
+
+        expect(daniel.finish.headers.get("location")).toBe(
+          `/admin/connect-instagram/${danielToken}?result=connected`,
+        );
+        const db = yield* Database;
+        const saved = yield* db
+          .select({
+            username: instagramConnection.username,
+            connectedBy: instagramConnection.connectedBy,
+          })
+          .from(instagramConnection);
+
+        expect(saved).toEqual([{ username: USERNAME, connectedBy: admin.userId }]);
+      }),
+  );
+
   // Without the state check, another site could make an admin's browser connect its account.
   it.effect.each([
     { name: "a different state", cookieState: "expected-state", queryState: "forged-state" },
@@ -335,7 +438,7 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
         return runRoute(
           request,
           path.startsWith("/api/instagram/connect")
-            ? startInstagramConnection
+            ? startInstagramConnection(request)
             : finishInstagramConnection(request),
         ).pipe(Effect.provide(instagram.live));
       };

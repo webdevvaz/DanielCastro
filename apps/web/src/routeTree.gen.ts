@@ -23,6 +23,7 @@ import { Route as AdminDashboardGalleryRouteImport } from './routes/admin/_dashb
 import { Route as AdminDashboardGuestSpotsRouteImport } from './routes/admin/_dashboard/guest-spots'
 import { Route as AdminDashboardInstagramRouteImport } from './routes/admin/_dashboard/instagram'
 import { Route as AdminDashboardTravelRouteImport } from './routes/admin/_dashboard/travel'
+import { Route as AdminConnectInstagramTokenRouteImport } from './routes/admin/connect-instagram.$token'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiEnquiryPhotosSplatRouteImport } from './routes/api/enquiry-photos/$'
 import { Route as ApiInstagramCallbackRouteImport } from './routes/api/instagram/callback'
@@ -114,6 +115,12 @@ const AdminDashboardTravelRoute = AdminDashboardTravelRouteImport.update({
   path: '/travel',
   getParentRoute: () => AdminDashboardRoute,
 } as any)
+const AdminConnectInstagramTokenRoute =
+  AdminConnectInstagramTokenRouteImport.update({
+    id: '/connect-instagram/$token',
+    path: '/connect-instagram/$token',
+    getParentRoute: () => AdminRouteRoute,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -236,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/admin/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/instagram': typeof AdminDashboardInstagramRoute
   '/admin/travel': typeof AdminDashboardTravelRoute
+  '/admin/connect-instagram/$token': typeof AdminConnectInstagramTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/enquiry-photos/$': typeof ApiEnquiryPhotosSplatRoute
   '/api/instagram/callback': typeof ApiInstagramCallbackRoute
@@ -269,6 +277,7 @@ export interface FileRoutesByTo {
   '/admin/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/instagram': typeof AdminDashboardInstagramRoute
   '/admin/travel': typeof AdminDashboardTravelRoute
+  '/admin/connect-instagram/$token': typeof AdminConnectInstagramTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/enquiry-photos/$': typeof ApiEnquiryPhotosSplatRoute
   '/api/instagram/callback': typeof ApiInstagramCallbackRoute
@@ -303,6 +312,7 @@ export interface FileRoutesById {
   '/admin/_dashboard/guest-spots': typeof AdminDashboardGuestSpotsRoute
   '/admin/_dashboard/instagram': typeof AdminDashboardInstagramRoute
   '/admin/_dashboard/travel': typeof AdminDashboardTravelRoute
+  '/admin/connect-instagram/$token': typeof AdminConnectInstagramTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/enquiry-photos/$': typeof ApiEnquiryPhotosSplatRoute
   '/api/instagram/callback': typeof ApiInstagramCallbackRoute
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/admin/guest-spots'
     | '/admin/instagram'
     | '/admin/travel'
+    | '/admin/connect-instagram/$token'
     | '/api/auth/$'
     | '/api/enquiry-photos/$'
     | '/api/instagram/callback'
@@ -371,6 +382,7 @@ export interface FileRouteTypes {
     | '/admin/guest-spots'
     | '/admin/instagram'
     | '/admin/travel'
+    | '/admin/connect-instagram/$token'
     | '/api/auth/$'
     | '/api/enquiry-photos/$'
     | '/api/instagram/callback'
@@ -404,6 +416,7 @@ export interface FileRouteTypes {
     | '/admin/_dashboard/guest-spots'
     | '/admin/_dashboard/instagram'
     | '/admin/_dashboard/travel'
+    | '/admin/connect-instagram/$token'
     | '/api/auth/$'
     | '/api/enquiry-photos/$'
     | '/api/instagram/callback'
@@ -537,6 +550,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/travel'
       preLoaderRoute: typeof AdminDashboardTravelRouteImport
       parentRoute: typeof AdminDashboardRoute
+    }
+    '/admin/connect-instagram/$token': {
+      id: '/admin/connect-instagram/$token'
+      path: '/connect-instagram/$token'
+      fullPath: '/admin/connect-instagram/$token'
+      preLoaderRoute: typeof AdminConnectInstagramTokenRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -705,11 +725,13 @@ const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(
 interface AdminRouteRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRouteWithChildren
   AdminSignInRoute: typeof AdminSignInRoute
+  AdminConnectInstagramTokenRoute: typeof AdminConnectInstagramTokenRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminDashboardRoute: AdminDashboardRouteWithChildren,
   AdminSignInRoute: AdminSignInRoute,
+  AdminConnectInstagramTokenRoute: AdminConnectInstagramTokenRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(

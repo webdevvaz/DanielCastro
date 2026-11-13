@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 
 import {
   getAdminInstagram,
+  getInstagramConnectLink,
   getNewsFeed,
   getNewsStatus,
 } from "@/server/instagram/instagram.functions";
@@ -15,6 +16,7 @@ export const instagramQueryKeys = {
   newsStatus: ["instagram", "news-status"] as const,
   news: ["instagram", "news"] as const,
   admin: ["instagram", "admin"] as const,
+  link: (token: string) => ["instagram", "link", token] as const,
 };
 
 /** Whether the News page is live: the menu shows News only then. */
@@ -36,3 +38,10 @@ export const adminInstagramQueryOptions = queryOptions({
   queryKey: instagramQueryKeys.admin,
   queryFn: () => getAdminInstagram(),
 });
+
+/** Whether a connect link still works, and the account it connects. */
+export const instagramConnectLinkQueryOptions = (token: string) =>
+  queryOptions({
+    queryKey: instagramQueryKeys.link(token),
+    queryFn: () => getInstagramConnectLink({ data: { token } }),
+  });

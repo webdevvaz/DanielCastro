@@ -250,6 +250,42 @@ const en = {
     noImage: "No image",
     noCaption: "No caption",
     photosOnly: "You can add only photos to the gallery.",
+    linkTitle: "Link for Daniel",
+    linkText:
+      "Send Daniel a link, for example on WhatsApp. He opens it on his phone, logs in to Instagram, and allows access: no admin account needed. The link connects only the account below and works for 7 days.",
+    linkUsername: "Instagram account",
+    linkCreate: "Create link",
+    linkCreating: "Creating…",
+    linkCopy: "Copy",
+    linkCopied: "Copied",
+    linkValidUntil: (date: string) => `Works until ${date}.`,
+    linkFailed: "The link could not be created",
+  },
+  connectLink: {
+    pageTitle: "Connect Instagram — Daniel Castro",
+    eyebrow: "Instagram",
+    title: "Connect Instagram to the site",
+    intro:
+      "The site's News page then shows your latest posts. You only do this once. The site can only read your profile and posts: it cannot post, comment, or read messages.",
+    stepInvite:
+      "If Instagram asks, first accept the site's invitation: on instagram.com, open Settings → Website permissions → Apps and websites → Tester invites, and accept it.",
+    openInvites: "Open the invitations on Instagram",
+    stepConnect: (username: string) =>
+      `Then press the button and log in to Instagram with @${username}, and allow access.`,
+    connect: "Connect Instagram",
+    validUntil: (date: string) => `This link works until ${date}.`,
+    results: {
+      connected: "Done! Instagram is connected. The News page now shows your posts.",
+      cancelled: "The connection was cancelled. You can try again.",
+      wrong_account: (username: string) =>
+        `You logged in with another Instagram account. This link only connects @${username}. Log out of that account on Instagram and try again.`,
+      failed:
+        "Instagram did not connect. Try again; if it keeps failing, tell whoever sent you the link.",
+    },
+    viewNews: "See the News page",
+    invalid: "This link no longer works. Ask whoever sent it for a new one.",
+    notConfigured:
+      "Instagram is not switched on for this site yet. Tell whoever sent you the link.",
   },
   booking: {
     title: "Bookings",
@@ -590,6 +626,41 @@ const pt: AdminText = {
     noImage: "Sem imagem",
     noCaption: "Sem legenda",
     photosOnly: "Só é possível adicionar fotos à galeria.",
+    linkTitle: "Link para o Daniel",
+    linkText:
+      "Envie um link ao Daniel, por exemplo por WhatsApp. Ele abre-o no telemóvel, entra no Instagram e permite o acesso, sem precisar de conta no admin. O link só liga a conta abaixo e funciona durante 7 dias.",
+    linkUsername: "Conta do Instagram",
+    linkCreate: "Criar link",
+    linkCreating: "A criar…",
+    linkCopy: "Copiar",
+    linkCopied: "Copiado",
+    linkValidUntil: (date: string) => `Funciona até ${date}.`,
+    linkFailed: "Não foi possível criar o link",
+  },
+  connectLink: {
+    pageTitle: "Ligar o Instagram — Daniel Castro",
+    eyebrow: "Instagram",
+    title: "Ligar o Instagram ao site",
+    intro:
+      "Assim, a página Notícias do site mostra os seus posts mais recentes. Só tem de fazer isto uma vez. O site só pode ler o perfil e os posts: não publica, não comenta e não lê mensagens.",
+    stepInvite:
+      "Se o Instagram pedir, aceite primeiro o convite do site: em instagram.com, abra Definições → Permissões de sites → Apps e sites → Convites de tester e aceite-o.",
+    openInvites: "Abrir os convites no Instagram",
+    stepConnect: (username: string) =>
+      `Depois carregue no botão, entre no Instagram com @${username} e permita o acesso.`,
+    connect: "Ligar Instagram",
+    validUntil: (date: string) => `Este link funciona até ${date}.`,
+    results: {
+      connected: "Pronto! O Instagram está ligado. A página Notícias já mostra os seus posts.",
+      cancelled: "A ligação foi cancelada. Pode tentar de novo.",
+      wrong_account: (username: string) =>
+        `Entrou com outra conta do Instagram. Este link só liga @${username}. Saia dessa conta no Instagram e tente de novo.`,
+      failed:
+        "Não foi possível ligar o Instagram. Tente de novo; se continuar, avise quem lhe enviou o link.",
+    },
+    viewNews: "Ver a página Notícias",
+    invalid: "Este link já não funciona. Peça um novo a quem lho enviou.",
+    notConfigured: "O Instagram ainda não está ativo neste site. Avise quem lhe enviou o link.",
   },
   booking: {
     title: "Agenda",

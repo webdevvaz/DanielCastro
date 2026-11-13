@@ -5,6 +5,7 @@ import { localeParam } from "@/i18n/locales";
 import { RichText } from "@/i18n/rich-text";
 
 import { useAdminText } from "../use-admin-text";
+import { ConnectLinkPanel } from "./connect-link-panel";
 import { InstagramAccount } from "./instagram-account";
 import { InstagramPostGrid } from "./instagram-post-grid";
 
@@ -52,6 +53,13 @@ export function AdminInstagramPage() {
         <h2>{t.instagram.account}</h2>
         <InstagramAccount view={view} />
       </section>
+
+      {view.configured ? (
+        <section className="admin-section">
+          <h2>{t.instagram.linkTitle}</h2>
+          <ConnectLinkPanel />
+        </section>
+      ) : null}
 
       <section className="admin-section">
         <h2>{t.instagram.posts}</h2>

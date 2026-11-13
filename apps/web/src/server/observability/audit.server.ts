@@ -18,6 +18,7 @@ const AUDIT_ACTIONS = [
   "travel.settings_updated",
   "instagram.connected",
   "instagram.disconnected",
+  "instagram.link_created",
   "enquiry.status_changed",
   "enquiry.email_sent_again",
   "enquiry.deleted",

@@ -2695,3 +2695,60 @@ html:has(.photo-viewer[open]) {
 .booking-state[data-open="false"] b {
   color: var(--red);
 }
+
+/* Instagram connect link: the admin panel and the page Daniel opens. */
+
+.connect-link-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.connect-link-form .field {
+  flex: 1 1 240px;
+  margin: 0;
+}
+
+.connect-link-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 16px;
+}
+
+.connect-link-result .input {
+  flex: 1 1 320px;
+}
+
+.connect-link-result .field-hint {
+  flex-basis: 100%;
+}
+
+.connect-link .lead {
+  margin-bottom: 24px;
+}
+
+.connect-link-steps {
+  display: grid;
+  gap: 24px;
+  margin: 0 0 24px;
+  padding-left: 20px;
+}
+
+.connect-link-steps li {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.connect-link-done {
+  margin-bottom: 24px;
+  color: var(--bone);
+}
+
+.connect-link .form-error {
+  margin-bottom: 20px;
+}

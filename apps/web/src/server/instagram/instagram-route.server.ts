@@ -1,10 +1,11 @@
 import "@tanstack/react-start/server-only";
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 
 import { getRequestSession } from "../auth/session.server";
 import { plainTextResponse } from "../plain-text-response";
 import { InstagramApi } from "./instagram-api.server";
+import { readConnectLinkToken } from "./instagram-connect-link.server";
 import { connectInstagram } from "./instagram.server";
 
 /**
@@ -85,14 +86,32 @@ const failedConnection = <E, R>(effect: Effect.Effect<Response, E, R>) =>
     ),
   );
 
-/**
- * `GET /api/instagram/connect`: starts Instagram Login for a signed-in admin. Sets the state
- * cookie and sends the admin to Instagram.
- */
-export const startInstagramConnection = Effect.gen(function* () {
-  const admin = yield* requireAdminUser;
+/** Separates the state from a connect link's token in the state cookie. */
+const LINK_SEPARATOR = "~";
 
-  if (admin instanceof Response) return admin;
+/** The page a connect link opens, with the outcome of the login. */
+const linkPage = (token: string, result: ConnectLinkResult) =>
+  `/admin/connect-instagram/${encodeURIComponent(token)}?result=${result}`;
+
+/**
+ * `GET /api/instagram/connect`: starts Instagram Login. A signed-in admin starts it from the admin
+ * page. With `?link=<token>`, anyone holding a valid connect link starts it without signing in;
+ * the token then rides in the state cookie, so the callback knows which account it may connect.
+ */
+export const startInstagramConnection = Effect.fn("instagram.startConnection")(function* (
+  request: Request,
+) {
+  const linkToken = new URL(request.url).searchParams.get("link");
+
+  if (linkToken !== null) {
+    const link = yield* readConnectLinkToken(linkToken);
+
+    if (Option.isNone(link)) return redirectTo(linkPage(linkToken, "failed"), clearedStateCookie);
+  } else {
+    const admin = yield* requireAdminUser;
+
+    if (admin instanceof Response) return admin;
+  }
 
   const api = yield* InstagramApi;
   const state = randomBytes(32).toString("base64url");
@@ -100,30 +119,73 @@ export const startInstagramConnection = Effect.gen(function* () {
 
   if (authorizeUrl === null) return redirectTo(FAILED_PAGE, clearedStateCookie);
 
-  return redirectTo(authorizeUrl, stateCookie(state, STATE_MAX_AGE_SECONDS));
-}).pipe(failedConnection, Effect.withSpan("instagram.startConnection"));
+  const cookieValue = linkToken === null ? state : `${state}${LINK_SEPARATOR}${linkToken}`;
+
+  return redirectTo(authorizeUrl, stateCookie(cookieValue, STATE_MAX_AGE_SECONDS));
+}, failedConnection);
+
+/**
+ * Finishes a login that a connect link started: connects the account only when the link is still
+ * valid and the account is the one the link names. Sends Daniel back to the link page with the
+ * outcome.
+ */
+const finishLinkConnection = Effect.fn("instagram.finishLinkConnection")(function* (
+  linkToken: string,
+  params: URLSearchParams,
+) {
+  const link = yield* readConnectLinkToken(linkToken);
+
+  if (Option.isNone(link)) return redirectTo(linkPage(linkToken, "failed"), clearedStateCookie);
+
+  if (params.has("error")) return redirectTo(linkPage(linkToken, "cancelled"), clearedStateCookie);
+
+  const code = params.get("code");
+
+  if (code === null) return redirectTo(linkPage(linkToken, "failed"), clearedStateCookie);
+
+  // Instagram adds `#_` to the code; it is not part of it.
+  return yield* connectInstagram(link.value.by, code.replace(/#_$/, ""), link.value.username).pipe(
+    Effect.as(redirectTo(linkPage(linkToken, "connected"), clearedStateCookie)),
+    Effect.catchTag("ConflictError", () =>
+      Effect.succeed(redirectTo(linkPage(linkToken, "wrong_account"), clearedStateCookie)),
+    ),
+    Effect.catchCause((cause) =>
+      Effect.logError("Could not connect Instagram from a connect link", cause).pipe(
+        Effect.as(redirectTo(linkPage(linkToken, "failed"), clearedStateCookie)),
+      ),
+    ),
+  );
+});
 
 /**
  * `GET /api/instagram/callback`: finishes Instagram Login. Connects the account only when the
- * answer carries the state this browser was given, and only for a signed-in admin. A cancelled
- * login changes nothing.
+ * answer carries the state this browser was given, and then only for a signed-in admin or a
+ * valid connect link. A cancelled login changes nothing.
  */
 export const finishInstagramConnection = Effect.fn("instagram.finishConnection")(function* (
   request: Request,
 ) {
-  const admin = yield* requireAdminUser;
-
-  if (admin instanceof Response) return admin;
-
   const params = new URL(request.url).searchParams;
-  const expected = readCookie(request.headers, STATE_COOKIE);
+  const cookie = readCookie(request.headers, STATE_COOKIE);
+  const [expected, linkToken] = (cookie ?? "").split(LINK_SEPARATOR);
   const received = params.get("state");
 
-  if (expected === null || received === null || !sameState(expected, received)) {
+  if (
+    expected === undefined ||
+    expected === "" ||
+    received === null ||
+    !sameState(expected, received)
+  ) {
     yield* Effect.logWarning("Instagram Login returned without the expected state");
 
     return redirectTo(FAILED_PAGE, clearedStateCookie);
   }
+
+  if (linkToken !== undefined) return yield* finishLinkConnection(linkToken, params);
+
+  const admin = yield* requireAdminUser;
+
+  if (admin instanceof Response) return admin;
 
   if (params.has("error")) return redirectTo(ADMIN_PAGE, clearedStateCookie);
 
@@ -132,7 +194,10 @@ export const finishInstagramConnection = Effect.fn("instagram.finishConnection")
   if (code === null) return redirectTo(FAILED_PAGE, clearedStateCookie);
 
   // Instagram adds `#_` to the code; it is not part of it.
-  yield* connectInstagram(admin.id, code.replace(/#_$/, ""));
+  yield* connectInstagram(admin.id, code.replace(/#_$/, ""), null);
 
   return redirectTo(ADMIN_PAGE, clearedStateCookie);
 }, failedConnection);
+
+/** How a login from a connect link ended, as the link page shows it. */
+export type ConnectLinkResult = "connected" | "cancelled" | "wrong_account" | "failed";
