@@ -95,15 +95,16 @@ const media = (id: string, mediaType: string, extra: Record<string, unknown> = {
 const json = (body: unknown, status = 200): Answer => ({ status, body: JSON.stringify(body) });
 
 /**
- * Meta as it answers when everything works, for the posts in `posts`. `assigned` is what the
- * login gave access to; it is empty when the configuration lacks `business_management`.
+ * Meta as it answers when everything works, for the posts in `posts`. `assigned` is the account
+ * list, which needs `business_management`; `granted` are the accounts the token's details name.
  */
 const workingInstagram =
   (
     posts: ReadonlyArray<ReturnType<typeof media>> = [],
-    assigned: ReadonlyArray<{ readonly id: string; readonly username: string }> = [
-      { id: ACCOUNT_ID, username: USERNAME },
-    ],
+    access: {
+      readonly assigned: ReadonlyArray<{ readonly id: string; readonly username: string }>;
+      readonly granted: ReadonlyArray<string>;
+    } = { assigned: [{ id: ACCOUNT_ID, username: USERNAME }], granted: [ACCOUNT_ID] },
   ) =>
   (request: SeenRequest): Answer | Effect.Effect<Answer> => {
     const { url } = request;
@@ -114,10 +115,26 @@ const workingInstagram =
 
     // A system-user token from a configuration with "Never" has no expiry.
     if (url.pathname === "/v26.0/debug_token") {
-      return json({ data: { is_valid: true, expires_at: 0, type: "SYSTEM_USER" } });
+      return json({
+        data: {
+          is_valid: true,
+          expires_at: 0,
+          type: "SYSTEM_USER",
+          granular_scopes: [{ scope: "instagram_basic", target_ids: access.granted }],
+        },
+      });
     }
 
-    if (url.pathname === "/v26.0/me/assigned_instagram_accounts") return json({ data: assigned });
+    if (url.pathname === "/v26.0/me/assigned_instagram_accounts") {
+      return json({ data: access.assigned });
+    }
+
+    if (
+      url.pathname === `/v26.0/${ACCOUNT_ID}` &&
+      url.searchParams.get("fields") === "id,username"
+    ) {
+      return json({ id: ACCOUNT_ID, username: USERNAME });
+    }
 
     if (url.pathname === `/v26.0/${ACCOUNT_ID}/media`) return json({ data: posts });
 
@@ -469,14 +486,27 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
     }),
   );
 
-  // Without business_management in the configuration, Meta's answer lists no account. The site
-  // must say the connection failed and keep the account it had, not save a token with no account.
-  it.effect("connects nothing when the login gives access to no Instagram account", () =>
+  // Meta's dashboard may not offer business_management, so the account list comes back empty;
+  // the token's details still name the account, and the site must connect it from those.
+  it.effect.each([
+    {
+      name: "connects the account the token's details name when the account list is empty",
+      access: { assigned: [], granted: [ACCOUNT_ID] },
+      location: "/admin/instagram",
+      connected: true,
+    },
+    {
+      name: "connects nothing when the login gives access to no Instagram account",
+      access: { assigned: [], granted: [] },
+      location: "/admin/instagram?connect=failed",
+      connected: false,
+    },
+  ])("$name", ({ access, location, connected }) =>
     Effect.gen(function* () {
       yield* deleteInstagramConnection();
 
       const admin = yield* signedInAs("admin");
-      const instagram = instagramWith(workingInstagram([], []));
+      const instagram = instagramWith(workingInstagram([], access));
 
       const startRequest = routeRequest("/api/instagram/connect", [admin.cookie]);
       const start = yield* runRoute(startRequest, startInstagramConnection(startRequest)).pipe(
@@ -494,8 +524,8 @@ layer(TestAppLive, { excludeTestServices: true, timeout: "120 seconds" })("insta
         Effect.provide(instagram.live),
       );
 
-      expect(finish.headers.get("location")).toBe("/admin/instagram?connect=failed");
-      expect(yield* getInstagramConnection()).toBeNull();
+      expect(finish.headers.get("location")).toBe(location);
+      expect((yield* getInstagramConnection())?.username ?? null).toBe(connected ? USERNAME : null);
     }),
   );
 

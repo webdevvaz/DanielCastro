@@ -75,21 +75,34 @@ const TokenResponse = Schema.Struct({
   access_token: Schema.String,
 });
 
-/** The token's details; `expires_at` is seconds since 1970, or 0 when it never expires. */
+/**
+ * The token's details. `expires_at` is seconds since 1970, or 0 when it never expires.
+ * `granular_scopes` names the assets each permission covers: for `instagram_basic`, the
+ * Instagram account the login gave access to.
+ */
 const DebugTokenResponse = Schema.Struct({
   data: Schema.Struct({
     expires_at: Schema.optional(Schema.Finite),
+    granular_scopes: Schema.optional(
+      Schema.Array(
+        Schema.Struct({
+          scope: Schema.String,
+          target_ids: Schema.optional(Schema.Array(NumericId)),
+        }),
+      ),
+    ),
   }),
 });
 
-/** The Instagram accounts the login gave this app access to. */
+/** One Instagram account's ID and username. */
+const AccountFields = Schema.Struct({
+  id: NumericId,
+  username: Schema.String,
+});
+
+/** The Instagram accounts the login gave this app access to; needs `business_management`. */
 const AssignedAccountsResponse = Schema.Struct({
-  data: Schema.Array(
-    Schema.Struct({
-      id: NumericId,
-      username: Schema.String,
-    }),
-  ),
+  data: Schema.Array(AccountFields),
 });
 
 const Media = Schema.Struct({
@@ -227,6 +240,8 @@ const makeInstagramApi = Effect.gen(function* () {
       DebugTokenResponse,
     );
 
+    // Meta's dashboard does not always offer `business_management`, which this list needs. Without
+    // it the list is empty or refused; the token's details then name the account instead.
     const assigned = yield* send(
       "assignedAccounts",
       graph("me/assigned_instagram_accounts", {
@@ -234,18 +249,40 @@ const makeInstagramApi = Effect.gen(function* () {
         access_token: token.access_token,
       }),
       AssignedAccountsResponse,
+    ).pipe(
+      Effect.map((list) => list.data),
+      Effect.catchTag("InstagramError", (error) =>
+        Effect.logInfo(
+          "Listing assigned Instagram accounts failed; using the token's details",
+          error,
+        ).pipe(Effect.as([])),
+      ),
     );
+
+    const grantedIds = (details.data.granular_scopes ?? [])
+      .filter((grant) => grant.scope === "instagram_basic")
+      .flatMap((grant) => grant.target_ids ?? []);
+
+    const accounts =
+      assigned.length > 0
+        ? assigned
+        : yield* Effect.forEach(grantedIds, (id) =>
+            send(
+              "account",
+              graph(String(id), { fields: "id,username", access_token: token.access_token }),
+              AccountFields,
+            ),
+          );
 
     // A login may give access to several accounts; a connect link names the one it wants.
     const chosen =
-      assigned.data.find((account) => account.username.toLowerCase() === preferredUsername) ??
-      assigned.data.at(0);
+      accounts.find((account) => account.username.toLowerCase() === preferredUsername) ??
+      accounts.at(0);
 
     if (chosen === undefined) {
       return yield* new InstagramError({
-        operation: "assignedAccounts",
-        cause:
-          "The login gave access to no Instagram account. Add business_management to the configuration in Facebook Login for Business.",
+        operation: "account",
+        cause: "The login gave access to no Instagram account",
       });
     }
 

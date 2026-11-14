@@ -11,13 +11,13 @@ The News page (`/news`) shows Daniel's latest Instagram posts. Daniel connects h
 
 Since October 2026, new Meta apps cannot use "API setup with Instagram login" (`instagram.com/oauth/authorize`, which answers "Invalid platform app"). They must use **"Instagram API with Unified login"**: Facebook Login for Business with a **configuration** that gives a system-user access token. The site uses that:
 
-| Step    | Request                                                                                                                                                                                                                |
-| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Login   | `https://www.facebook.com/v26.0/dialog/oauth` with `client_id`, `config_id`, `redirect_uri`, `response_type=code`, `override_default_response_type=true`, `state`. No `scope`: the configuration sets the permissions. |
-| Token   | `GET https://graph.facebook.com/v26.0/oauth/access_token` with `client_id`, `client_secret`, `redirect_uri`, `code`.                                                                                                   |
-| Expiry  | `GET /v26.0/debug_token`; `expires_at` 0 means the token never expires.                                                                                                                                                |
-| Account | `GET /v26.0/me/assigned_instagram_accounts?fields=id,username`.                                                                                                                                                        |
-| Posts   | `GET /v26.0/{instagram-account-id}/media` on `graph.facebook.com`.                                                                                                                                                     |
+| Step    | Request                                                                                                                                                                                                                                                                        |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Login   | `https://www.facebook.com/v26.0/dialog/oauth` with `client_id`, `config_id`, `redirect_uri`, `response_type=code`, `override_default_response_type=true`, `state`. No `scope`: the configuration sets the permissions.                                                         |
+| Token   | `GET https://graph.facebook.com/v26.0/oauth/access_token` with `client_id`, `client_secret`, `redirect_uri`, `code`.                                                                                                                                                           |
+| Expiry  | `GET /v26.0/debug_token`; `expires_at` 0 means the token never expires.                                                                                                                                                                                                        |
+| Account | `GET /v26.0/me/assigned_instagram_accounts?fields=id,username` (needs `business_management`). When it is empty or refused: the `instagram_basic` entry of `debug_token`'s `granular_scopes` names the account ID, and `GET /v26.0/{id}?fields=id,username` gives its username. |
+| Posts   | `GET /v26.0/{instagram-account-id}/media` on `graph.facebook.com`.                                                                                                                                                                                                             |
 
 Meta's documentation for Unified login is thin. These steps follow what other developers reported working in November 2026 (for example [OpenReply #104](https://github.com/diwenne/openreply/issues/104) and [Postiz #2404](https://github.com/gitroomhq/postiz-app/pull/2404)); check them against the first real connection.
 
@@ -36,7 +36,7 @@ Do these steps once, logged in to developers.facebook.com with your own account.
    It must be exactly `BETTER_AUTH_URL` followed by `/api/instagram/callback`.
 
 4. **Configuration.** Click **Create new configuration**: system-user access token, expiration **Never**, asset **Instagram account**. The site needs only `instagram_basic`; untick the other permissions if Meta allows it. Copy the **configuration ID**.
-5. **Facebook Login for Business.** Add this product. In its **Settings → Valid OAuth Redirect URIs**, add the same redirect URL. In its **Configurations**, edit the configuration and add `business_management`: without it, Meta lists no Instagram account after the login (the admin page then says the connection failed).
+5. **Facebook Login for Business.** Add this product. In its **Settings → Valid OAuth Redirect URIs**, add the same redirect URL. `business_management` is optional: Meta's configuration editors often do not offer it, and the site then finds the account from the token's details.
 6. **Tester.** In **App roles → Roles**, add `danielcastro_tattooartist` as an **Instagram Tester**. Daniel accepts the invitation once (instagram.com → Settings → Website permissions → Apps and websites → Tester invites). With a role in the app, the app needs no App Review.
 7. **Keys.** From **App settings → Basic**, copy the **App ID** and **App secret**. Put them and the configuration ID in the server settings (`.env.local` on a computer, the host's variables in production), then restart the site:
 
@@ -54,7 +54,7 @@ Do these steps once, logged in to developers.facebook.com with your own account.
 2. Select **Connect Instagram**. Meta's login opens: choose to continue with Instagram, log in with Daniel's account (`@danielcastro_tattooartist`), and allow access.
 3. Meta sends you back to the admin page, which shows the account and its recent posts.
 
-If the connection fails, the admin page says so. The usual causes: the redirect address is missing from the configuration or from Facebook Login for Business, the configuration lacks `business_management`, or the account has no role in the app. The server log names the failed step (`exchangeCode`, `debugToken`, `assignedAccounts`).
+If the connection fails, the admin page says so. The usual causes: the redirect address is missing from the configuration or from Facebook Login for Business, the account has no role in the app, or the login gave access to no Instagram account. The server log names the failed step (`exchangeCode`, `debugToken`, `account`).
 
 ### From a link, without an admin account
 
